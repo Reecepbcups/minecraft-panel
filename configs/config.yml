@@ -1,0 +1,11 @@
+downloadloc: /root/panel-test-code/downloads
+serverloc: /root/panel-test-code/servers
+# Provide a path to the plugin e/g
+# if your plugin has a subfolder called sub and the main file was called runner
+# sub.runner
+# follow this by a dash and the plugins name so your final format is
+# sub.runner-Runner
+plugins:
+ - example-Example
+# Don't add all your servers here just change serverloc
+external_servers:

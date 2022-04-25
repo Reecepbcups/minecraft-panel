@@ -1,13 +1,7 @@
 # Default imports every python3 isntall has
-import subprocess, platform, os, time
 
 
-# from importlib.util import find_spec
-# from utils.package_utils import installPackage
-# for package_name in ['pyfiglet', 'pyufw', 'PyYAML', 'requests']:
-#     if find_spec(package_name) is None:
-#         print(package_name +" is not installed. Ensure you install pip & the requirements.txt")
-#         installPackage(package_name)
+# https://stackoverflow.com/questions/9002275/how-to-build-a-single-python-file-from-multiple-scripts
 
 from importlib import import_module
 from utils.file_utils import gather_plugins
@@ -16,7 +10,7 @@ from utils.panel_utils import Panel_Interface
 import native_components.server_creator as screator
 import native_components.server_manager as smanager
 import native_components.firewall as firewall
-
+import time
 
 choices = {
     '1': ["Server Creator", screator.on_call],
@@ -40,7 +34,4 @@ def main():
     panel.launch()
 
 if __name__ == "__main__":
-
-    # exit(0)
-
     main()

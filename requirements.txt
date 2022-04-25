@@ -1,2 +1,9 @@
+## INSTALL
+# pip install -r requirements.txt
+
+## UPDATE DEENDS
+# python -m pip install pipreqs && pipreqs .
+
 pyfiglet
 pyyaml
+pyufw # sudo apt-get install ufw

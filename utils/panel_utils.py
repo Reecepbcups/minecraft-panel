@@ -66,6 +66,8 @@ class Panel_Interface():
 
             if self.footnote is not None:
                 cprint(self.footnote)
+
+            # TODO: print out configs locations here
                 
             self.print_arguments(self.choices)
 

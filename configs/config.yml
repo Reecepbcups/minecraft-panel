@@ -1,5 +1,5 @@
-downloadloc: /root/panel-test-code/downloads
-serverloc: /root/panel-test-code/servers
+downloadloc: /root/minecraft-panel/downloads
+serverloc: /root/minecraft-panel/servers
 # Provide a path to the plugin e/g
 # if your plugin has a subfolder called sub and the main file was called runner
 # sub.runner
@@ -8,4 +8,5 @@ serverloc: /root/panel-test-code/servers
 plugins:
  - example-Example
 # Don't add all your servers here just change serverloc
+# TODO: just show all files in the server dir?
 external_servers:

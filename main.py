@@ -12,9 +12,13 @@ import native_components.server_manager as smanager
 import native_components.firewall as firewall
 import time
 
-choices = {
-    '1': ["Server Creator", screator.on_call],
-    '2': ["Server Manager", smanager.on_call],
+controlPanel = {
+    '1': ["Console", smanager.on_call],
+    'admin': ["Admin Panel", smanager.on_call],
+}
+
+adminPanel = {
+    '2': ["Server Creator", screator.on_call],
     '3': ["Firewall", firewall.on_call],
 }
 
@@ -22,15 +26,15 @@ def main():
     plugins = gather_plugins()
     start = time.time()*1000
 
-    curdex = len(choices.keys())+1
+    curdex = len(controlPanel.keys())+1
     for key in plugins:
         temp_import = import_module("plugins."+plugins[key])
-        choices[str(curdex)] = [key, temp_import.on_call]
+        controlPanel[str(curdex)] = [key, temp_import.on_call]
         curdex+=1
     end = time.time()*1000
     cprint(f'&aLoaded all plugins in {end-start} miliseconds')
 
-    panel = Panel_Interface(choices, "MCAdminPanel", "&4", "A Minecraft Python Administrator panel", "self")
+    panel = Panel_Interface(controlPanel, "Control Panel", "&3", None, "self")
     panel.launch()
 
 if __name__ == "__main__":

@@ -51,6 +51,7 @@ def on_call(headPanel: Panel_Interface):
     shutil.move(file_path, server_path)
 
     # Auto EULA Yes
+    # TODO: Do this in start script
     with open(server_path+"/eula.txt", 'w') as file:
         file.write("eula=true")
     
@@ -75,9 +76,12 @@ def on_call(headPanel: Panel_Interface):
         else:
             startup_arguments = cinput("Start Args >> ")
             file.write(startup_arguments)
-    os.system("chmod +x start.sh")
+    os.system(f"chmod +x {server_path}/start.sh")
     
     # spigot.yml
     with open(server_path+"/spigot.yml", "a") as file:
         bungeecord = cinput("&3Bungee [true/false] >> ")
         file.write("bungeecord: "+bungeecord+"\n")
+
+    # ensure there is a logs folder
+    os.mkdir("logs")

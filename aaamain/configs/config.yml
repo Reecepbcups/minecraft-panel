@@ -1,0 +1,3 @@
+# just put downloads in /tmp?
+downloadloc: /root/minecraft-panel/aaamain/downloads/
+serverloc: /root/minecraft-panel/aaamain/servers/

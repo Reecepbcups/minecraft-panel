@@ -9,12 +9,12 @@ Continued production for CraftEconomy's needs - here
 # Setup
 ### Arch
 ```
-pacman -S ufw python-pip sudo screen
+pacman -S ufw python-pip sudo screen jre-openjdk
 python -m pip install -r requirements.txt
 ```
 
 ### Ubuntu / Debian
 ```
-sudo apt install ufw python3-pip sudo screen
+sudo apt install ufw python3-pip sudo screen <someJREHere>
 python3 -m pip install -r requirements.txt
 ```

@@ -75,11 +75,12 @@ def dummyConsole():
 
     choices = getServers(print_output=True)
 
-    server = input("Server Selector:")
+    server = cinput("Server Selector:")
     if server not in choices:
-        cprint("&c", "Invalid Selection")
+        cprint("&cInvalid Selection")
 
-    ServerPanel(choices[server]).enter_console()
+    panel = ServerPanel(choices[server])
+    panel.enter_console()
     
 
 from utils.file_utils import chdir
@@ -88,14 +89,19 @@ import subprocess
 from utils.killable_thread import thread_with_trace
 
 class ServerPanel:
+
     def __init__(self, server_name):
         self.server_name = server_name
         self.path = f'/root/minecraft-panel/aaamain/servers/{server_name}'
+        self.values = {} # from properties & spigot.yml
+        self.getInformation() # populates values in a dict
 
     def start_server(self):
         if is_screen_running(self.server_name):
             cprint("&cYou can't start a server that is already running")
             return
+
+        # if on bungeecord, ensure that its firewalled
 
         os.chdir(self.path) #; print(os.getcwd())
         v = os.system(f'screen -dmS {self.server_name} ./start.sh')
@@ -131,7 +137,10 @@ class ServerPanel:
         cprint("&6 -> 'stop-server'")
         cprint("&6 -> 'exit' &f(ctrl + x + enter)")
 
-        cprint("\n&bserver-port=")
+        cprint(f"\n&bserver-port={self.values['server-port']}")
+        cprint(f"&bview-distance={self.values['view-distance']}")
+        cprint(f"&bon-bungeecord={self.values['bungeecord']}")
+        cprint(f"&bmax-players={self.values['max-players']}")
         cprint("&bMEMORY=")
         cprint("&bPID=")
         print()
@@ -194,6 +203,28 @@ class ServerPanel:
                     continue
                 
                 cprint(line.replace("\n", ""))
+
+    def getInformation(self):
+        spigotYML = self.path + "/spigot.yml"
+        properties = self.path + "/server.properties"
+
+        # open properties, get all keys & add to values dict
+        with open(properties, 'r') as f:
+            for line in f:
+                pair = line.split("=")
+                if len(pair) > 1:
+                    self.values[pair[0]] = pair[1].strip()
+
+        # open spigotYML & check if the bungeecord key is set
+        with open(spigotYML, 'r') as f:
+            for line in f:
+                if line.startswith("bungeecord:"):
+                    self.values["bungeecord"] = line.split(":")[1].strip()
+                    break
+
+def getValueFromFile(path, key):
+
+    pass
 
 def getServerPort(server_name): # could make this get any server variable from start.sh or spigot.yml w/ enums
     pass

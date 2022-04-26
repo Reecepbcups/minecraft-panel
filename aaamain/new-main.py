@@ -222,8 +222,10 @@ class ServerPanel:
                     self.values["bungeecord"] = line.split(":")[1].strip()
                     break
 
-def getValueFromFile(path, key):
-
+def changeJavaVersion():
+    # sudo archlinux-java
+    # sudo update-alternatives --config java
+    # sudo update-java-alternatives -s $(sudo update-java-alternatives -l | grep 8 | cut -d " " -f1) || echo '.'
     pass
 
 def getServerPort(server_name): # could make this get any server variable from start.sh or spigot.yml w/ enums

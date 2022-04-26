@@ -105,9 +105,9 @@ class ServerPanel:
         cprint("&6 Console:")
         cprint("&6 -> 'start-server' &f(only if offline)")
         cprint("&6 -> 'stop-server'")
-        cprint("&6 -> 'exit'")
+        cprint("&6 -> 'exit' &f(ctrl + x + enter)")
 
-        cprint("&bserver-port=")
+        cprint("\n&bserver-port=")
         cprint("&bMEMORY=")
         cprint("&bPID=")
         print()

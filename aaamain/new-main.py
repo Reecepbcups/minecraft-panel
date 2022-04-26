@@ -139,25 +139,29 @@ class ServerPanel:
         console = thread_with_trace(target=self.follow)
         console.start()
 
+        options = {
+            "start-server": [self.start_server, "continue"],
+            "stop-server": [self.stop_server, "break"],
+            # "restart": self.re, # start.sh will auto do this
+            "stop": [self.stop_server, "break"],
+        }
+
         try:
             while True:
                 user_input = input()
-                if user_input == "\x18":
-                    break
-                elif user_input == "exit":
-                    break
-                elif user_input == "start-server":
-                    self.start_server()
+
+                if user_input in options:
+                    options[user_input][0]()
+                    if options[user_input][1] == "break":
+                        break
                     continue
-                elif user_input == "stop-server":
-                    self.stop_server()
-                    continue
-                elif user_input == "restart":
-                    self.restart_server()
+                
+                elif user_input == "\x18":
                     break
-                elif user_input == "stop":
-                    self.stop_server()
+
+                elif user_input == "exit": # brings you to main() after console killed
                     break
+
                 else:
                     self.send_console_command(user_input)
         except KeyboardInterrupt:
@@ -166,8 +170,8 @@ class ServerPanel:
         console.kill()
         console.join(timeout=0.05)
 
-        # if user_input == "exit":
-        #     main()
+        if user_input == "exit":
+            main()
 
     def send_console_command(self, user_input):
         subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015'])
@@ -203,6 +207,9 @@ def stopAllServers():
 def listRunningServers():
     pass
 
+def clear_all_logs():
+    # loop through all dirs/logs, and clear *.log.gz
+    pass
 
 
 # == MongoDB ==

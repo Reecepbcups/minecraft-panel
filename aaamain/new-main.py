@@ -70,18 +70,25 @@ def tail_file(file_path):
             
             cprint(line.replace("\n", ""))
 
-def dummyConsole():
-    cfiglet("&a", "Console")
-    # show all servers in list
+def getServers(print_output=False) -> dict:
     choices = {}
     for idx, server in enumerate(fetch_servers()):
         choices[str(idx)] = server
-        print(f"[{idx}] {server}")
+        if print_output:
+            print(f"[{idx}] {server}")
+    return choices
 
-    panel = ServerPanel("economy")
-    panel.enter_console()
+def dummyConsole():
+    cfiglet("&a", "Console")
+    # show all servers in list
 
-    tail_file("/root/minecraft-panel/aaamain/test.log")
+    choices = getServers(print_output=True)
+
+    server = input("Server Selector:")
+    if server not in choices:
+        cprint("&c", "Invalid Selection")
+
+    ServerPanel(choices[server]).enter_console()
     
 
 import subprocess
@@ -93,6 +100,18 @@ class ServerPanel:
         self.path = f'/root/minecraft-panel/aaamain/servers/{server_name}'
 
     def enter_console(self):
+
+        cfiglet("&a", self.server_name)
+        cprint("&6 Console:")
+        cprint("&6 -> 'start-server' &f(only if offline)")
+        cprint("&6 -> 'stop-server'")
+        cprint("&6 -> 'exit'")
+
+        cprint("&bserver-port=")
+        cprint("&bMEMORY=")
+        cprint("&bPID=")
+        print()
+
         console = thread_with_trace(target=self.follow)
         console.start()
 

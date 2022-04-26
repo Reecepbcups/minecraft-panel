@@ -97,12 +97,10 @@ class ServerPanel():
     def server_input(self, user_input):
         subprocess.call(['screen', '-S', f'{self.name}', '-X', 'stuff', f'{user_input}\015'])
 
-
     def follow(self):
         relative_log_location = "logs/latest.log" 
         with open(f'{self.path}/{relative_log_location}') as log:
             log.seek(0, os.SEEK_END)
-
             while True:
                 line = log.readline()
                 if not line:

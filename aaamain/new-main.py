@@ -57,6 +57,19 @@ def main():
     # controlPanel[request][1]()
     pass
 
+import time, os
+def tail_file(file_path):
+    with open(f'{file_path}') as log:
+        log.seek(0, os.SEEK_END)
+
+        while True:
+            line = log.readline()
+            if not line:
+                time.sleep(0.1)
+                continue
+            
+            cprint(line.replace("\n", ""))
+
 def dummyConsole():
     cfiglet("&a", "Console")
     # show all servers in list
@@ -65,15 +78,54 @@ def dummyConsole():
         choices[str(idx)] = server
         print(f"[{idx}] {server}")
 
-    # get input
-    choice = cinput("Select Server: ")
-    # open console view for them here
+    panel = ServerPanel("economy")
+    panel.enter_console()
+
+    tail_file("/root/minecraft-panel/aaamain/test.log")
     
-    pass
 
+import subprocess
+from utils.killable_thread import thread_with_trace
 
+class ServerPanel:
+    def __init__(self, server_name):
+        self.server_name = server_name
+        self.path = f'/root/minecraft-panel/aaamain/servers/{server_name}'
 
-    # 
+    def enter_console(self):
+        console = thread_with_trace(target=self.follow)
+        console.start()
+
+        running = True
+        while running:
+            user_input = input()
+            if user_input == "\x18":
+                running = False
+            elif user_input == "restart":
+                running = False
+                self.restart_server()
+            elif user_input == "stop":
+                running = False
+                self.stop_server()
+            else:
+                self.server_input(user_input)
+        
+        console.kill()
+        console.join(timeout=0.05)
+
+    def server_input(self, user_input):
+        subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015'])
+
+    def follow(self):
+        with open(f'{self.path}/logs/latest.log') as log:
+            log.seek(0, os.SEEK_END)
+            while True:
+                line = log.readline()
+                if not line:
+                    time.sleep(0.1)
+                    continue
+                
+                cprint(line.replace("\n", ""))
 
 
 def sendServerCommand(server_name):

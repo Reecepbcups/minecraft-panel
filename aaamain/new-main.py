@@ -20,6 +20,16 @@ def splitColors(myStr) -> list:
     # _str = "&at&bt&ct"; splitColors(_str)
     return re.split("(&[a-zA-Z0-9])", myStr)
 
+# Load this before anything else
+from utils.yaml_utils import Yaml
+v = Yaml(f'/root/minecraft-panel/aaamain/configs/config.yml')
+config = v.loadConfig()
+
+PROXIES = config['servers']['proxy']
+SERVERS = config['servers']['spigot']       
+ALL = list(PROXIES) + list(SERVERS)
+# /////
+
 '''
 adminPanel = {
         "1": newServerInstance,
@@ -47,7 +57,8 @@ def main():
     print(is_screen_running("test"))
     # get_all_active_screens()
 
-    dummyConsole()
+    # dummyConsole()
+    startAllServers()
 
     # controlPanel = {        
     #     "1": ["Console", dummyConsole],
@@ -92,7 +103,7 @@ class ServerPanel:
 
     def __init__(self, server_name):
         self.server_name = server_name
-        self.path = f'/root/minecraft-panel/aaamain/servers/{server_name}'
+        self.path = f"{config['serverloc']}/{server_name}"
         self.values = {} # from properties & spigot.yml
         self.getInformation() # populates values in a dict
 
@@ -204,9 +215,10 @@ class ServerPanel:
                 
                 cprint(line.replace("\n", ""))
 
-    def getInformation(self):
+    def getInformation(self): # TODO: add proxy support here
         spigotYML = self.path + "/spigot.yml"
         properties = self.path + "/server.properties"
+        startFile = self.path + "/start.sh"
 
         # open properties, get all keys & add to values dict
         with open(properties, 'r') as f:
@@ -222,22 +234,42 @@ class ServerPanel:
                     self.values["bungeecord"] = line.split(":")[1].strip()
                     break
 
+        # open start.sh
+        with open(startFile, 'r') as f:
+            # for line in f:
+            #     if '=' not in line:
+            #         continue
+            #     pair = line.split("=")
+            #     if len(pair) > 1:
+            #         self.values[pair[0]] = pair[1].strip()
+            pass
+
 def changeJavaVersion():
     # sudo archlinux-java
     # sudo update-alternatives --config java
     # sudo update-java-alternatives -s $(sudo update-java-alternatives -l | grep 8 | cut -d " " -f1) || echo '.'
     pass
 
-def getServerPort(server_name): # could make this get any server variable from start.sh or spigot.yml w/ enums
-    pass
+def _startServer(name):
+    # TODO: Actually start
+    print("Starting server:", name)
 
-def startAllServers():
-    pass
+def startAllServers(): 
+    for server in ALL:
+        _startServer(server)
+    
+    serversOnMachine = os.listdir(config['serverloc'])
+    print(serversOnMachine)
+
+def _stopServer(name):
+    if not is_screen_running(name):
+        cprint(f"&cServer {name} is not running")
+        return
+    
 
 def stopAllServers():
-    pass
-
-def listRunningServers():
+    # for server in all:
+    #     stopServer(server)    
     pass
 
 def clear_all_logs():

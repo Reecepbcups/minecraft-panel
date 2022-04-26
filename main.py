@@ -15,6 +15,7 @@ import time
 controlPanel = {
     '1': ["Console", smanager.on_call],
     'admin': ["Admin Panel", smanager.on_call],
+    'new': ["Creator", screator.on_call],
 }
 
 adminPanel = {

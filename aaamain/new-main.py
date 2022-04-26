@@ -1,6 +1,8 @@
 '''
 Rewrite of features in 1 file for now based on past BASH script?
 https://github.com/Reecepbcups/bash-minecraft-panel
+
+sudo pacman -S jre-openjdk
 '''
 
 SERVER_INFO_LOCATION = '/root/minecraft-panel/server_info.yml'
@@ -15,9 +17,30 @@ from utils.file_utils import fetch_servers
 import re
 def splitColors(myStr) -> list:
     # "&at&bt&ct" -> ['', '&a', 't', '&b', 't', '&c', 't']
-    # _str = "&at&bt&ct"
-    # splitColors(_str)
+    # _str = "&at&bt&ct"; splitColors(_str)
     return re.split("(&[a-zA-Z0-9])", myStr)
+
+'''
+adminPanel = {
+        "1": newServerInstance,
+        "2": stopAllServers,
+        # "3": "dailyRebootSetup",
+        # "WEB": "webLinkShortener",
+        "RESET-FIREWALL": firewallReset,
+        "CHANGE-JAVA-VERSION": changeJavaVersion,
+        # "KILL-ALL-JAVA": ,
+        "APPLY-FIREWALL": firewallApplyRules,
+    }
+    databasePanel = {
+        "1": createDatabase,
+        "2": deleteDatabase,
+        "3": showDatabases,
+        "4": createNewUser,
+        "5": deleteUser,
+        "6": showUser,
+        "exit": exit,
+    }
+'''
 
 def main():
 
@@ -25,26 +48,6 @@ def main():
     # get_all_active_screens()
 
     dummyConsole()
-
-    # adminPanel = {
-    #     "1": newServerInstance,
-    #     "2": stopAllServers,
-    #     # "3": "dailyRebootSetup",
-    #     # "WEB": "webLinkShortener",
-    #     "RESET-FIREWALL": firewallReset,
-    #     "CHANGE-JAVA-VERSION": changeJavaVersion,
-    #     # "KILL-ALL-JAVA": ,
-    #     "APPLY-FIREWALL": firewallApplyRules,
-    # }
-    # databasePanel = {
-    #     "1": createDatabase,
-    #     "2": deleteDatabase,
-    #     "3": showDatabases,
-    #     "4": createNewUser,
-    #     "5": deleteUser,
-    #     "6": showUser,
-    #     "exit": exit,
-    # }
 
     # controlPanel = {        
     #     "1": ["Console", dummyConsole],
@@ -58,17 +61,6 @@ def main():
     pass
 
 import time, os
-def tail_file(file_path):
-    with open(f'{file_path}') as log:
-        log.seek(0, os.SEEK_END)
-
-        while True:
-            line = log.readline()
-            if not line:
-                time.sleep(0.1)
-                continue
-            
-            cprint(line.replace("\n", ""))
 
 def getServers(print_output=False) -> dict:
     choices = {}
@@ -80,7 +72,6 @@ def getServers(print_output=False) -> dict:
 
 def dummyConsole():
     cfiglet("&a", "Console")
-    # show all servers in list
 
     choices = getServers(print_output=True)
 
@@ -91,6 +82,8 @@ def dummyConsole():
     ServerPanel(choices[server]).enter_console()
     
 
+from utils.file_utils import chdir
+
 import subprocess
 from utils.killable_thread import thread_with_trace
 
@@ -99,9 +92,40 @@ class ServerPanel:
         self.server_name = server_name
         self.path = f'/root/minecraft-panel/aaamain/servers/{server_name}'
 
-    def enter_console(self):
+    def start_server(self):
+        if is_screen_running(self.server_name):
+            cprint("&cYou can't start a server that is already running")
+            return
 
+        os.chdir(self.path) #; print(os.getcwd())
+        v = os.system(f'screen -dmS {self.server_name} ./start.sh')
+        if v != 0:
+            cprint(f"&cSome error when starting server")
+            return
+        cprint(f"&aServer '{self.server_name}' Started")
+
+    def stop_server(self):
+        if not is_screen_running(self.server_name):
+            cprint(f"&cServer {self.server_name} is not running")
+            return
+        
+        # sigterm minecraft
+        # kill $(ps h --ppid $(screen -ls | grep session_name | cut -d. -f1) -o pid)
+        self.send_console_command("stop")
+        cprint(f"&eServer '{self.server_name}' stopping...")
+        time.sleep(5)
+
+        # stop the screen using os.system
+        v = os.system(f'screen -S {self.server_name} -X quit')
+        if v != 0:
+            cprint(f"&cSome error when stopping server")
+            return
+        cprint(f"&aServer '{self.server_name}' Stopped")
+
+    def enter_console(self):
         cfiglet("&a", self.server_name)
+
+        cprint(f"&f - {self.path}\n")
         cprint("&6 Console:")
         cprint("&6 -> 'start-server' &f(only if offline)")
         cprint("&6 -> 'stop-server'")
@@ -115,28 +139,49 @@ class ServerPanel:
         console = thread_with_trace(target=self.follow)
         console.start()
 
-        running = True
-        while running:
-            user_input = input()
-            if user_input == "\x18":
-                running = False
-            elif user_input == "restart":
-                running = False
-                self.restart_server()
-            elif user_input == "stop":
-                running = False
-                self.stop_server()
-            else:
-                self.server_input(user_input)
+        try:
+            while True:
+                user_input = input()
+                if user_input == "\x18":
+                    break
+                elif user_input == "exit":
+                    break
+                elif user_input == "start-server":
+                    self.start_server()
+                    continue
+                elif user_input == "stop-server":
+                    self.stop_server()
+                    continue
+                elif user_input == "restart":
+                    self.restart_server()
+                    break
+                elif user_input == "stop":
+                    self.stop_server()
+                    break
+                else:
+                    self.send_console_command(user_input)
+        except KeyboardInterrupt:
+            pass
         
         console.kill()
         console.join(timeout=0.05)
 
-    def server_input(self, user_input):
+        # if user_input == "exit":
+        #     main()
+
+    def send_console_command(self, user_input):
         subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015'])
 
     def follow(self):
-        with open(f'{self.path}/logs/latest.log') as log:
+        path = f'{self.path}/logs/latest.log'
+        # check if exist
+        if not os.path.exists(path):
+            cprint("&cLog file not found. Creating...")
+            # write to path, including any nested folders
+            with open(path, 'w') as f:
+                f.write("")
+            
+        with open(path, 'r') as log:
             log.seek(0, os.SEEK_END)
             while True:
                 line = log.readline()
@@ -145,10 +190,6 @@ class ServerPanel:
                     continue
                 
                 cprint(line.replace("\n", ""))
-
-
-def sendServerCommand(server_name):
-    pass
 
 def getServerPort(server_name): # could make this get any server variable from start.sh or spigot.yml w/ enums
     pass

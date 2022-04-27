@@ -301,6 +301,34 @@ def clear_all_logs():
 
 
 # == MongoDB ==
+# python -m pip install pymongo dnspython (so we can use srv URI)
+# sudo pacman -S --needed base-devel git nano vi
+
+# https://www.maketecheasier.com/use-aur-in-arch-linux/
+# useradd -m software -p myPassword19191 --shell /bin/false
+# usermod -aG wheel software # this is adding sudo to user
+# nano /etc/sudoers # (really you should use visudo, but you'll be okay)
+# uncomment the following lines: 
+# # %wheel ALL=(ALL:ALL) ALL
+# # %wheel ALL=(ALL:ALL) NOPASSWD: ALL
+# ctrl+x, y, enter
+
+# su software -s /bin/bash
+# cd ~
+# git clone https://aur.archlinux.org/mongodb-bin.git
+# cd mongodb-bin
+# makepkg -si
+
+# exit # gets you back to root user
+# cd /home/software/mongodb-bin/ && sudo pacman -U --noconfirm mongodb-bin-*.tar.zst
+# systemctl start mongodb.service
+# systemctl status mongodb # should return active
+# if so:
+# systemctl enable mongodb.service
+# mongo
+
+from pymongo import MongoClient
+import pymongo
 def createDatabase():
     pass
 def deleteDatabase():

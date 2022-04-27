@@ -44,7 +44,4 @@ def cprint(text):
     print(color(text))  
 
 def cinput(text):
-    try:
-        return input(color(str(text)))
-    except KeyboardInterrupt:
-        return str("None")
+    return input(color(str(text)))

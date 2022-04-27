@@ -54,35 +54,29 @@ adminPanel = {
 
 def main():
 
+    isSpigotServerOnBungee("test")
     
-    
-    # 'Enable Access Control' `mongodb://myDBReader:password@127.0.0.1:27017/?authSource=admin`.
-    # mongo -u myUserAdmin -p OR mongo, then 'use admin; db.auth("myUserAdmin", "password123");'
-    database = Database("mongodb://myUserAdmin:password123@127.0.0.1:27017/?authSource=admin") 
-    # database = Database("mongodb://127.0.0.1:27017/")
-
-    dbs = database.listDatabases()
-    print(dbs)
-    database.dropDatabase("test_db", debug=True)
-
-    # print(database.listDatabaseRoles("admin"))
-    print("admin db users:", database.listUsers(database_name="admin"))
-    database.enableMongoDBAuthentication()
-
-    # creates user on the test database, with roles to access other databases as well. This means the myTester user MUST auth with the test database in the uri
-    # mongo -u myTester -p --authenticationDatabase test OR mongo, then 'use test; db.auth("myTester", "myPassXYZ");'
-    database.createNewUser("test", "myTester", "myPassXYZ", [{'role': 'readWrite', 'db': 'test'}, {'role': 'read', 'db': 'test_db'}])
-    print("test db users:", database.listUsers(database_name="test"))
-
+    # # 'Enable Access Control' `mongodb://myDBReader:password@127.0.0.1:27017/?authSource=admin`.
+    # # mongo -u myUserAdmin -p OR mongo, then 'use admin; db.auth("myUserAdmin", "password123");'
+    # database = Database("mongodb://myUserAdmin:password123@127.0.0.1:27017/?authSource=admin") 
+    # # database = Database("mongodb://127.0.0.1:27017/")
+    # dbs = database.listDatabases()
+    # print(dbs)
+    # database.dropDatabase("test_db", debug=True)
+    # # print(database.listDatabaseRoles("admin"))
+    # print("admin db users:", database.listUsers(database_name="admin"))
+    # database.enableMongoDBAuthentication()
+    # # creates user on the test database, with roles to access other databases as well. This means the myTester user MUST auth with the test database in the uri
+    # # mongo -u myTester -p --authenticationDatabase test OR mongo, then 'use test; db.auth("myTester", "myPassXYZ");'
+    # database.createNewUser("test", "myTester", "myPassXYZ", [{'role': 'readWrite', 'db': 'test'}, {'role': 'read', 'db': 'test_db'}])
+    # print("test db users:", database.listUsers(database_name="test"))
     # database.changeUsersPassword("test", "myTester")
-
     # database.createTestCollection(collection_name="test-s", database_name="test")
-
-    print("="*20)
-    # database.createNewUser("test", "testingacc", "myPassXYZ", [{'role': 'readWrite', 'db': 'test'}])
-    print("test db users:", database.listUsers(database_name="test"))
-    database.deleteUser("test", "testingacc")
-    print("test db users:", database.listUsers(database_name="test"))
+    # print("="*20)
+    # # database.createNewUser("test", "testingacc", "myPassXYZ", [{'role': 'readWrite', 'db': 'test'}])
+    # print("test db users:", database.listUsers(database_name="test"))
+    # database.deleteUser("test", "testingacc")
+    # print("test db users:", database.listUsers(database_name="test"))
 
 
     # collections = database.listCollections("admin")
@@ -141,7 +135,7 @@ class Server:
         self.server_name = server_name
         self.path = f"{config['serverloc']}/{server_name}"
         self.values = {} # from properties & spigot.yml
-        # self.getInformation() # populates values in a dict
+        self.getInformation() # populates values in a dict
 
     def start_server(self):
         if is_screen_running(self.server_name):
@@ -501,29 +495,26 @@ class Database:
                 return True
         return False
         
-
-
-# import pymongo
-# https://www.mongodb.com/languages/python
-def createDatabase():
-    client = MongoClient("")
-
-
-    # mongo
-    # show dbs; #< will now show
-
-
-
 def console(server_name):
     if server_name in ALL:
         Server(server_name).enter_console()
     else:
         cprint("&cServer not found")
 
-def isSpigotServerOnBungee(): # do in server object
-    # Checks if server is on bungee with spigot bungee=true.
+def isSpigotServerOnBungee(server_name): # do in server object
+    check = Server(server_name).values['bungeecord']
+
 	# if so, return 1 - will ufw block it on startup for security
-    pass
+    return check
+def firewallBungeeServer(server_name):
+    port = Server(server_name).values['server-port']
+    if port == "25565":
+        v = cinput("&e[!] Caution, are you sure you want to close port 25565 from connections? This is usually the proxy (y/n)")
+        if v.lower() not in ['y', 'yes']:
+            return False
+    # ufw enable firewall for port here
+    return True
+
 
 def fixPort():
     # could do this when server is started / first input? check if log contains the PORT issue

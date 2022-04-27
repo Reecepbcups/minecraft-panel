@@ -53,10 +53,11 @@ adminPanel = {
 '''
 
 def main():
+
+    createDatabase()
+
     # clear_all_logs()
-
-    print(Server('proxy').getInformation())
-
+    # print(Server('proxy').getInformation())
     # print(is_screen_running("test"))
     # get_all_active_screens()
 
@@ -218,7 +219,7 @@ class Server:
                 
                 cprint(line.replace("\n", ""))
 
-    def getInformation(self): # TODO: add proxy support here
+    def getInformation(self):
         startFile = self.path + "/start.sh"
         with open(startFile, 'r') as f:
             for line in f:
@@ -245,7 +246,7 @@ class Server:
 
         spigotYML = self.path + "/spigot.yml"        
         properties = self.path + "/server.properties"
-        # TODO: paperYML = self.path + "/paper.yml"
+        # paperYML = self.path + "/paper.yml"
         # open properties, get all keys & add to values dict
         with open(properties, 'r') as f:
             for line in f:
@@ -328,11 +329,29 @@ def clear_all_logs():
 # mongo
 
 from pymongo import MongoClient
-import pymongo
+# import pymongo
+CONNECTION_URI = "mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb"
+# https://www.mongodb.com/languages/python
 def createDatabase():
-    pass
+    client = MongoClient(CONNECTION_URI)
+    print(client)
+
+    db = client['test_db']
+    print(db)
+    # add a collectionq
+    collection = db['test_collection']
+    print(collection)
+
+    # add a document
+    collection.insert_one({'name': 'test'})
+    print(collection.find_one())
+
+    # mongo
+    # show dbs; #< will now show
+
 def deleteDatabase():
     pass
+
 def showDatabases():
     pass
 

@@ -53,12 +53,15 @@ adminPanel = {
 '''
 
 def main():
+    # clear_all_logs()
 
-    print(is_screen_running("test"))
+    print(Server('proxy').getInformation())
+
+    # print(is_screen_running("test"))
     # get_all_active_screens()
 
     # dummyConsole()
-    startAllServers()
+    # startAllServers()
 
     # controlPanel = {        
     #     "1": ["Console", dummyConsole],
@@ -90,7 +93,7 @@ def dummyConsole():
     if server not in choices:
         cprint("&cInvalid Selection")
 
-    panel = ServerPanel(choices[server])
+    panel = Server(choices[server])
     panel.enter_console()
     
 
@@ -99,13 +102,13 @@ from utils.file_utils import chdir
 import subprocess
 from utils.killable_thread import thread_with_trace
 
-class ServerPanel:
+class Server:
 
     def __init__(self, server_name):
         self.server_name = server_name
         self.path = f"{config['serverloc']}/{server_name}"
         self.values = {} # from properties & spigot.yml
-        self.getInformation() # populates values in a dict
+        # self.getInformation() # populates values in a dict
 
     def start_server(self):
         if is_screen_running(self.server_name):
@@ -152,8 +155,8 @@ class ServerPanel:
         cprint(f"&bview-distance={self.values['view-distance']}")
         cprint(f"&bon-bungeecord={self.values['bungeecord']}")
         cprint(f"&bmax-players={self.values['max-players']}")
-        cprint("&bMEMORY=")
-        cprint("&bPID=")
+        cprint(f"&bMEMORY={self.values['MEM_HEAP']}")
+        cprint(f"&bPID=")
         print()
 
         console = thread_with_trace(target=self.follow)
@@ -216,10 +219,33 @@ class ServerPanel:
                 cprint(line.replace("\n", ""))
 
     def getInformation(self): # TODO: add proxy support here
-        spigotYML = self.path + "/spigot.yml"
-        properties = self.path + "/server.properties"
         startFile = self.path + "/start.sh"
+        with open(startFile, 'r') as f:
+            for line in f:
+                if '=' not in line:
+                    continue
+                elif line.strip().startswith('#'):
+                    continue # ignore commented lines
+                pair = line.split("=", 1)
+                if len(pair) > 1:
+                    self.values[pair[0]] = pair[1].strip()            
 
+        # This is a proxy, do this then return
+        proxyYML = self.path + "/waterfall.yml"        
+        if os.path.exists(proxyYML):
+            proxyConfig = self.path + "/config.yml"
+
+            config = Yaml(proxyConfig).loadConfig(); #print(config)
+            for key in config.keys():
+                self.values[key] = config[key]
+
+            # Retrurn early since its not a spigot server
+            return self.values
+
+
+        spigotYML = self.path + "/spigot.yml"        
+        properties = self.path + "/server.properties"
+        # TODO: paperYML = self.path + "/paper.yml"
         # open properties, get all keys & add to values dict
         with open(properties, 'r') as f:
             for line in f:
@@ -234,15 +260,25 @@ class ServerPanel:
                     self.values["bungeecord"] = line.split(":")[1].strip()
                     break
 
-        # open start.sh
-        with open(startFile, 'r') as f:
-            # for line in f:
-            #     if '=' not in line:
-            #         continue
-            #     pair = line.split("=")
-            #     if len(pair) > 1:
-            #         self.values[pair[0]] = pair[1].strip()
-            pass
+        return self.values
+
+
+
+    def clear_logs(self, debug=False):
+        location = self.path + "/logs"
+
+        if os.path.exists(location):
+            # loop through files in location
+            for file in os.listdir(location):
+                # delete file if it is a *.log.gz file
+                if file.endswith(".log.gz"):
+                    f = location + "/" + file
+                    if debug: 
+                        print("-", f)
+                    os.remove(f)
+
+
+
 
 def changeJavaVersion():
     # sudo archlinux-java
@@ -250,31 +286,18 @@ def changeJavaVersion():
     # sudo update-java-alternatives -s $(sudo update-java-alternatives -l | grep 8 | cut -d " " -f1) || echo '.'
     pass
 
-def _startServer(name):
-    # TODO: Actually start
-    print("Starting server:", name)
 
 def startAllServers(): 
     for server in ALL:
-        _startServer(server)
-    
-    serversOnMachine = os.listdir(config['serverloc'])
-    print(serversOnMachine)
-
-def _stopServer(name):
-    if not is_screen_running(name):
-        cprint(f"&cServer {name} is not running")
-        return
-    
+        Server(server).start_server()         
 
 def stopAllServers():
-    # for server in all:
-    #     stopServer(server)    
-    pass
+    for server in ALL:
+        Server(server).stop_server() 
 
 def clear_all_logs():
-    # loop through all dirs/logs, and clear *.log.gz
-    pass
+    for server in ALL:
+        Server(server).clear_logs()
 
 
 # == MongoDB ==
@@ -292,14 +315,14 @@ def deleteUser():
 def showUser():
     pass
 
-def printTitle():
-    # figlet
-    pass
 
 def console(server_name):
-    pass
+    if server_name in ALL:
+        Server(server_name).enter_console()
+    else:
+        cprint("&cServer not found")
 
-def isServerOnBungee():
+def isSpigotServerOnBungee(): # do in server object
     # Checks if server is on bungee with spigot bungee=true.
 	# if so, return 1 - will ufw block it on startup for security
     pass
@@ -353,10 +376,6 @@ done"'''
     pass
 
 # == Debug ==
-def changeJavaVersion():
-    #   sudo update-alternatives --config java
-    pass
- 
 def otherStuff():
     # kilall -9 java;
     # speedometer -l -r eth0 -t eth0 -m $(( 1024 * 1024 * 3 / 2 )) # network stats

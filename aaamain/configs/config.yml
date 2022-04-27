@@ -1,5 +1,6 @@
-downloadloc: /root/minecraft-panel/aaamain/downloads/ # just put downloads in /tmp?
-serverloc: /root/minecraft-panel/aaamain/servers/
+# Do not end locations with a /
+downloadloc: /root/minecraft-panel/aaamain/downloads # just put downloads in /tmp?
+serverloc: /root/minecraft-panel/aaamain/servers
 
 backup_dir: /root/minecraft-panel/backups
 

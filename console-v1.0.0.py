@@ -607,39 +607,6 @@ def addConsoleAliasToBashProfileIfNotThereAlready():
     
     cprint(f"&c{'='*20}\nRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
 
-
-addConsoleAliasToBashProfileIfNotThereAlready()
-
-exit()
-
 if __name__ == "__main__":
-    # new machine setup, ensure to create server_info.sh here too + backup script
-    """
-    apt-get --yes --force-yes install curl software-properties-common
-		curl -sL https://deb.nodesource.com/setup_12.x | bash -
-		
-    # Install other programs
-    apt-get --yes --force-yes install build-essential sudo zip unzip lsof dos2unix nginx screen htop glances 
-    apt-get --yes --force-yes install nodejs cpufrequtils figlet redis default-jre sysstat slurm speedometer
-    cpufreq-set -r -g performance	
-    timedatectl set-timezone America/Chicago
-    
-    # Java 11 - doesnt work for my 1.8 MC
-    echo 'deb http://ftp.debian.org/debian stretch-backports main' | sudo tee /etc/apt/sources.list.d/stretch-backports.list
-    sudo apt update && apt-get upgrade
-    sudo apt install openjdk-11-jdk
-    sudo apt-get install openjdk-11-jre
-    
-    # Java 8 / Java8
-    wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-    sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
-    sudo apt-get update && sudo apt-get install adoptopenjdk-8-hotspot
-    
-    # https://stackoverflow.com/questions/57031649/how-to-install-openjdk-8-jdk-on-debian-10-buster
-    sudo apt-add-repository 'deb http://security.debian.org/debian-security stretch/updates main'
-    sudo apt-get update
-    sudo apt-get install openjdk-8-jdk
-    
-    sudo update-alternatives --config java
-    """
+    addConsoleAliasToBashProfileIfNotThereAlready()
     main()

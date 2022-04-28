@@ -7,11 +7,9 @@ from utils.yaml_utils import Yaml
 from utils.cosmetics import cprint
 from utils.panel_utils import FileInstallException
 
-CONFIG = Yaml(os.getcwd() + "/configs/config.yml")
+# Move this to main console.py prob
+CONFIG = Yaml(os.getcwd() + "/config.yml")
 CONFIG.loadConfig()
-
-RUNNING = Yaml(os.getcwd() + "/configs/running.yml")
-RUNNING.loadConfig()
 
 def download(link, name=None, return_json=False, no_download=False):
     '''

@@ -63,17 +63,17 @@ def get_time() -> str:
 SERVER_NAME = cinput("&bServer Name: ") or ("myServer-" + get_time())
 
 # Add config check where if serverloc is not found, it will ask the user for the location of servers & make config
-server_loc = CONFIG.get("serverloc")
+server_loc = CONFIG.get("SERVER_DIRECTORY")
 if not os.path.exists(server_loc):
     os.mkdir(server_loc)
 
-server_path = f'{CONFIG.get("serverloc")}/{SERVER_NAME}'
+server_path = f'{server_loc}/{SERVER_NAME}'
 if os.path.exists(server_path):
     cprint(f"&cThis is already a server {server_path=}")
     exit()    
 
 jarName = paper_install()
-file_path = f'{CONFIG.get("downloadloc")}/{jarName}'
+file_path = f'{CONFIG.get("DOWNLOAD_CACHE")}/{jarName}'
 
 # print(f"{file_path=} {server_path=}")
 
@@ -122,19 +122,31 @@ os.system(f"chmod +x {server_path}/start.sh")
 
 # spigot.yml
 with open(server_path+"/spigot.yml", "a") as file:
-    bungeecord = cinput("&3Behind Bungee? [true/(false)] >> ") or "false"
-    file.write("settings:\n  bungeecord: "+bungeecord+"\n")
+    isBehindBungee = cinput("&3Behind Bungee? [true/(false)] >> ") or "false"
+    file.write(f"""settings:
+      bungeecord: {isBehindBungee}
+      restart-on-crash: false"""
+    )
 
+# server.properties
 with open(server_path+"/server.properties", "a") as file:
     # Add check to ensure port can not be set if another one uses it
     port = int(cinput("&3Port: [(25565)] >> ") or 25565)
     allow_nether = cinput("&3Allow Nether [(true)/false]>> ") or "true"
     max_players = cinput("&3Max Players (200) >> ") or "200"
     view_distance = cinput("&3View Distance (8)>> ") or "8"
-    file.write("server-port="+str(port)+"\n")
-    file.write("allow-nether="+allow_nether+"\n")
-    file.write("max-players="+max_players+"\n")
-    file.write("view-distance="+view_distance+"\n")
+    file.write(f"server-port={str(port)}\n")
+    file.write(f"allow-nether={allow_nether}\n")
+    file.write(f"max-players={max_players}\n")
+    file.write(f"view-distance={view_distance}\n")
+
+    if isBehindBungee == "true":
+        file.write("network-compression-threshold=-1")
+        file.write("online-mode=false")
+    else:
+        file.write("online-mode=true")
+        file.write("network-compression-threshold=256")
+
     # use-native-transport=false if you get spam for unable to access address of buffer
 
 # cprint(f"&aServer created at {server_path=}")

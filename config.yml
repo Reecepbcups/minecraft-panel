@@ -1,12 +1,12 @@
 # Do not end locations with a /
 
-PANEL_DIRECTORY: /root/minecraft-panel/aaamain
+PANEL_DIRECTORY: /root/minecraft-panel
 
-SERVER_DIRECTORY: /root/minecraft-panel/aaamain/servers
+SERVER_DIRECTORY: /root/minecraft-panel/servers
 
-BACKUP_DIRECTORY: /root/minecraft-panel/aaamain/backups
+BACKUP_DIRECTORY: /root/minecraft-panel/backups
 
-DOWNLOAD_CACHE: /root/minecraft-panel/aaamain/downloads
+DOWNLOAD_CACHE: /root/minecraft-panel/downloads
 
 servers:
   proxy:
@@ -14,15 +14,15 @@ servers:
   spigot:
   - "testing"
   - "economy-1"
-  standalone: # servers which are not started with start-all command
+  standalone: # servers which are not started with start-all command. Not done yet
   - ""
 
 
-firewall:
+firewall: # not done
   allow-ports: "21 22 80 443 25565"
   whitelisted-server-ips: "127.0.0.1"
   bungee-backend-ports: "25570 30000" # This should be auto done when starting / creating a server which is bungee compatible.
 
-web-shortner:
+web-shortner: # not done
   location: /var/www/html/l
   domain: "reece.sh/l"

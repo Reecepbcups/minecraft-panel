@@ -591,24 +591,21 @@ def addConsoleAliasToBashProfileIfNotThereAlready():
         with open(profile, 'w') as f:
             f.write(" ")
 
-    cprint(f"&eSourcing: source {profile};")
-    v = os.popen(f"source {profile}").read()
-    print(v)
+    # way to source from here? source {profile}
+
+    panelDir = CONFIG.get("PANEL_DIRECTORY"); # print(f"{thisDirectory=}")
+    alias = f"alias console='python {panelDir}/console-*.py'\n"
 
     lines = open(profile, 'r').read()
-    if 'alias console' in lines:        
-        print("Console already added")
+    if alias in lines:        
+        print(f"Console already added. If you need to source: source {profile}")
         return
 
-    thisDirectory = CONFIG.get("PANEL_DIRECTORY"); # print(f"{thisDirectory=}")
-
-   
-
     with open(profile, 'a') as bashprofile:
-        bashprofile.write(f"alias console='python {thisDirectory}/console-*.py'\n")
+        bashprofile.write(alias)
         print(f"Added alias 'console' to {profile}.")
     
-    cprint(f"&aYou can now use 'console' to enter the console.")
+    cprint(f"&c{'='*20}\nRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
 
 
 addConsoleAliasToBashProfileIfNotThereAlready()

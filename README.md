@@ -15,8 +15,6 @@ cpufreq-set -r -g performance
 timedatectl set-timezone America/Chicago
 ```
 
-
-
 # Setup
 ### Arch
 ```
@@ -25,7 +23,7 @@ pacman -S ufw python-pip sudo curl screen zip unzip lsof dos2unix jre-openjdk
 python -m pip install -r requirements.txt
 
 Optional:
-pacman -S redis
+pacman -S redis iotop
 ```
 
 ### Ubuntu / Debian

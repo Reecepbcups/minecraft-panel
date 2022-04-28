@@ -581,32 +581,36 @@ def killAll():
 # get the users linux home directory
 homeDir = os.path.expanduser('~')
 profile = os.path.join(homeDir, '.bashrc')
+screenfile = os.path.join(homeDir, '.screenrc')
 
 from utils.file_utils import CONFIG
 
 def addConsoleAliasToBashProfileIfNotThereAlready():
     # ensure profile file is there
     if not os.path.exists(profile):
-        cprint(f"&c[!] File {profile} not found")
-        with open(profile, 'w') as f:
-            f.write(" ")
+        cprint(f"&c[!] File {profile} not found.. creating")
+        open(profile, 'x') # creates file
 
-    # way to source from here? source {profile}
+    # allows scrolling in screen
+    if not os.path.exists(screenfile):
+        open(screenfile, 'x')
+    if "termcapinfo xterm* ti@:te@" not in open(screenfile, 'r').read():
+        with open(screenfile, 'a') as sf:
+            sf.write("termcapinfo xterm* ti@:te@")
 
     panelDir = CONFIG.get("PANEL_DIRECTORY"); # print(f"{thisDirectory=}")
     alias = f"alias console='python {panelDir}/console-*.py'\n"
 
-    lines = open(profile, 'r').read()
-    if alias in lines:        
-        print(f"Console already added. If you need to source: source {profile}")
+    if alias in open(profile, 'r').read():        
+        cprint(f"&cConsole already added. If you need to source: &e`source {profile}`")
         return
 
     with open(profile, 'a') as bashprofile:
         bashprofile.write(alias)
         print(f"Added alias 'console' to {profile}.")
     
-    cprint(f"&c{'='*20}\nRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
+    cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
 
 if __name__ == "__main__":
     addConsoleAliasToBashProfileIfNotThereAlready()
-    main()
+    # main()

@@ -18,22 +18,34 @@ timedatectl set-timezone America/Chicago
 # Setup
 ### Arch
 ```
-pacman -S ufw python-pip sudo curl screen zip unzip lsof dos2unix jre-openjdk
+pacman -S ufw python-pip sudo curl screen zip unzip lsof jq dos2unix jre-openjdk
 
 python -m pip install -r requirements.txt
 
 Optional:
-pacman -S redis iotop
+pacman -S redis iotop atop docker dstat glances
 ```
 
 ### Ubuntu / Debian
 ```
-sudo apt install ufw python3-pip sudo curl screen zip unzip lsof dos2unix <someJREHere>
+sudo apt install ufw python3-pip sudo curl screen zip unzip lsof jq dos2unix <someJREHere>
 
 python3 -m pip install -r requirements.txt
 
 # Optional:
 curl -sL https://deb.nodesource.com/setup_12.x | bash -
+```
+
+
+### Tuning the Machine
+```
+# You can view all params to change with `sysctl -a`
+echo "65535" > /proc/sys/fs/file-max
+echo "fs.file-max = 65535" >> /etc/sysctl.conf
+echo "root hard nofile 150000" >> /etc/security/limits.conf
+echo "root soft nofile 150000" >> /etc/security/limits.conf
+echo "* hard nofile  150000" >> /etc/security/limits.conf
+echo "* soft nofile 150000" >> /etc/security/limits.conf
 ```
 
 ### Debian Things

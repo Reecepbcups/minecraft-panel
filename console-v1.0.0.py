@@ -233,8 +233,7 @@ class Server:
         if not os.path.exists(path):
             cprint("&cLog file not found. Creating...")
             # write to path, including any nested folders
-            with open(path, 'w') as f:
-                f.write("")
+            open(path, 'w')
             
         with open(path, 'r') as log:
             log.seek(0, os.SEEK_END)

@@ -7,11 +7,9 @@ from utils.yaml_utils import Yaml
 from utils.cosmetics import cprint
 from utils.panel_utils import FileInstallException
 
-CONFIG = Yaml(os.getcwd() + "/configs/config.yml")
+# Move this to main console.py prob
+CONFIG = Yaml(os.getcwd() + "/config.yml")
 CONFIG.loadConfig()
-
-RUNNING = Yaml(os.getcwd() + "/configs/running.yml")
-RUNNING.loadConfig()
 
 def download(link, name=None, return_json=False, no_download=False):
     '''
@@ -53,29 +51,17 @@ def chdir(dir):
     return wd
 
 
-def gather_plugins() -> list:
-    '''
-    Gets all plugins from the plugins folder given
-    they are properly registerd in the config.yml
-    '''
-    start = time.time()*1000
-    plugins = {}
-    if CONFIG.get("plugins") != None:
-        for plugin in CONFIG.get("plugins"):
-            name = plugin.split("-")
-            plugins[name[1]] = name[0] 
-    
-    end = time.time()*1000
-    cprint(f'&aFetched all plugins in {end-start} miliseconds')
-    return plugins
+def fetch_servers() -> list:
+    serverloc = CONFIG.get("serverloc")
 
+    servers = []
 
-def get_screen_pid(name: str):
-    server = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE)
-    stdout, _ = server.communicate()
-    matches = re.search(r'(\d+).%s' % name, stdout.decode("utf-8"), re.MULTILINE)
-    if matches:
-        pids = matches.group()
-        pid = pids.split(".")[0]
-        os.kill(int(pid), 9)
-        subprocess.Popen(['screen', '-wipe'])
+    if not os.path.exists(serverloc):
+        cprint(
+            f'''
+            &cYou don't have any servers yet create servers using 
+            the server creator or change the paths in the config.yml
+            your config location is: {os.getcwd() + "/configs/config.yml"}
+            ''')
+
+    return os.listdir(serverloc)

@@ -40,11 +40,8 @@ def cfiglet(clr, figlet):
     print(color(clr+pyfiglet.figlet_format(figlet)))
 
 
-def cprint(text):
-    print(color(text))
+def cprint(text):  
+    print(color(text))  
 
 def cinput(text):
-    try:
-        return input(color(str(text)))
-    except KeyboardInterrupt:
-        return str("None")
+    return input(color(str(text)))

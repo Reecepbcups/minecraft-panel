@@ -618,13 +618,6 @@ exit()
 if __name__ == "__main__":
     # new machine setup, ensure to create server_info.sh here too + backup script
     """
-    apt-get update --allow-releaseinfo-change
-    echo "root ALL=(ALL) ALL" >> /etc/sudoers
-	echo "sudo ALL=(ALL) ALL" >> /etc/sudoers
-
-    echo "alias console='/root/server/Console-v*.sh'" >> /root/.bashrc
-	source /root/.bashrc
-
     apt-get --yes --force-yes install curl software-properties-common
 		curl -sL https://deb.nodesource.com/setup_12.x | bash -
 		

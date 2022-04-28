@@ -16,6 +16,7 @@ class Yaml():
             self.config = yaml.safe_load(file)
             if self.config == None:
                 self.config = {}
+            return self.config
     
     def set(self, key, value):
         self.config[key] = value

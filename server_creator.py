@@ -66,7 +66,6 @@ SERVER_NAME = cinput("&bServer Name: ") or ("myServer-" + get_time())
 server_loc = CONFIG.get("SERVER_DIRECTORY")
 if not os.path.exists(server_loc):
     os.mkdir(server_loc)
-
 server_path = f'{server_loc}/{SERVER_NAME}'
 if os.path.exists(server_path):
     cprint(f"&cThis is already a server {server_path=}")
@@ -154,7 +153,8 @@ with open(server_path+"/server.properties", "a") as file:
 # ask if we should add to config? default yes
 # change terminal to server_path and exit
 os.chdir(server_path)
+os.mkdir("logs")
+
 # os.system(f"{server_path}/start.sh")
-exit(0)
 
 # ask to if we should change dir to it

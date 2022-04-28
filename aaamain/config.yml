@@ -1,8 +1,12 @@
 # Do not end locations with a /
-downloadloc: /root/minecraft-panel/aaamain/downloads # just put downloads in /tmp?
-serverloc: /root/minecraft-panel/aaamain/servers
 
-backup_dir: /root/minecraft-panel/backups
+PANEL_DIRECTORY: /root/minecraft-panel/aaamain
+
+SERVER_DIRECTORY: /root/minecraft-panel/aaamain/servers
+
+BACKUP_DIRECTORY: /root/minecraft-panel/aaamain/backups
+
+DOWNLOAD_CACHE: /root/minecraft-panel/aaamain/downloads
 
 servers:
   proxy:

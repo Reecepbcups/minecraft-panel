@@ -5,8 +5,6 @@ https://github.com/Reecepbcups/bash-minecraft-panel
 sudo pacman -S jre-openjdk
 '''
 
-SERVER_INFO_LOCATION = '/root/minecraft-panel/server_info.yml'
-
 from utils.cosmetics import color, cfiglet, cprint, color_dict, cinput
 
 import pyfiglet
@@ -22,11 +20,14 @@ def splitColors(myStr) -> list:
 
 # Load this before anything else
 from utils.yaml_utils import Yaml
-v = Yaml(f'/root/minecraft-panel/aaamain/configs/config.yml')
-config = v.loadConfig()
 
-PROXIES = config['servers']['proxy']
-SERVERS = config['servers']['spigot']       
+
+from utils.file_utils import CONFIG
+
+serverGroups = CONFIG.get('servers') # 'proxy' & 'spigot'
+PROXIES = serverGroups['proxy']
+SERVERS = serverGroups['spigot']       
+
 ALL = list(PROXIES) + list(SERVERS)
 # /////
 
@@ -133,7 +134,7 @@ class Server:
 
     def __init__(self, server_name):
         self.server_name = server_name
-        self.path = f"{config['serverloc']}/{server_name}"
+        self.path = f"""{CONFIG.get("SERVER_DIRECTORY")}/{server_name}"""
         self.values = {} # from properties & spigot.yml
         self.getInformation() # populates values in a dict
 
@@ -533,45 +534,86 @@ def firewallApplyRules():
 def serverReboot(server_name):
     pass
 
-def newServerInstance():
-    # eula true in start.sh script
-    '''"#!/bin/sh
-# Reecepbcups - start.sh script for servers. 
-# Use the 1st JAVA_ARGS option (long) if you use more than 12GB of ram on the server instance
-            
-MEM_HEAP=\"${RAM}\"
-JAR_FILE=\"Paper-${VERSION}.jar\"
-#JAVA_ARGS=\"-Dfile.encoding=utf-8 -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=40 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch  -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=50 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=15 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=8 -XX:InitiatingHeapOccupancyPercent=20 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=true -Daikars.new.flags=true -jar\"
-JAVA_ARGS=\"-Dfile.encoding=utf-8 -jar\"
-while true; do
-	java -Xms\$MEM_HEAP -Xmx\$MEM_HEAP \$JAVA_ARGS \$JAR_FILE nogui
-	echo \"Restarting server in 5 seconds\"
-	sleep 4
-	echo \"Restarting...\"
-	sleep 1
-done"'''
-
-    '''
-    if [ "$BUNGEE" == "y" ]; then 
-            ONLINEMODE=false && NETWORKCOMPRESSION=-1
-            echo "settings:
-    bungeecord: true
-    restart-on-crash: false
-    restart-script: ./DoneByStartScript.sh" >> spigot.yml
-        else
-            ONLINEMODE=true && NETWORKCOMPRESSION=256
-        fi
-    '''
-    pass
-
 # == Debug ==
 def otherStuff():
-    # kilall -9 java;
-    # speedometer -l -r eth0 -t eth0 -m $(( 1024 * 1024 * 3 / 2 )) # network stats
-    # free -g -l && free -t | awk 'NR == 2 {printf("\n\nCurrent Memory Utilization is : %.2f%\n\n"), $3/$2*100}' # RAM
-    # iostat && df -h # storage
+    # kilall -9 java;  
     pass
 
+
+def getStorageAmount():
+    storage = os.popen("""df -h / | grep /""").read().strip().split()
+    size = storage[1]
+    used = storage[2]
+    free = storage[3]
+    percentUsed = storage[4]
+    print(f"{size=} {used=} {free=} {percentUsed=}")
+    return size, used, free
+
+def getRamUsage():
+    totalRam = os.popen("""free -h | grep Mem | awk '{print $2}'""").read().strip()
+    usedRam = os.popen("""free -h | grep Mem | awk '{print $3}'""").read().strip()
+
+    ramUsed = os.popen("""free -m | grep Mem | awk '{print (($3/$2)*100)}'""").read().strip()
+    print(f"System is using {ramUsed}% of TOTAL RAM ({usedRam}/{totalRam})")
+    pass
+
+def getNetworkUsage():
+    usage = os.popen("""ip -h -s link""").read()
+    print(usage)
+
+def getAllJavaPIDs():
+    v = os.popen("ps aux | grep java").read()
+    print(v)
+    pass
+
+def killAll():
+    v = os.popen("killall -9 java").read()
+    print(v)
+    pass
+
+# getRamUsage()
+# getStorageAmount()
+# getNetworkUsage()
+# killAll()
+
+
+
+# get the users linux home directory
+homeDir = os.path.expanduser('~')
+profile = os.path.join(homeDir, '.bashrc')
+
+from utils.file_utils import CONFIG
+
+def addConsoleAliasToBashProfileIfNotThereAlready():
+    # ensure profile file is there
+    if not os.path.exists(profile):
+        cprint(f"&c[!] File {profile} not found")
+        with open(profile, 'w') as f:
+            f.write(" ")
+
+    cprint(f"&eSourcing: source {profile};")
+    v = os.popen(f"source {profile}").read()
+    print(v)
+
+    lines = open(profile, 'r').read()
+    if 'alias console' in lines:        
+        print("Console already added")
+        return
+
+    thisDirectory = CONFIG.get("PANEL_DIRECTORY"); # print(f"{thisDirectory=}")
+
+   
+
+    with open(profile, 'a') as bashprofile:
+        bashprofile.write(f"alias console='python {thisDirectory}/console-*.py'\n")
+        print(f"Added alias 'console' to {profile}.")
+    
+    cprint(f"&aYou can now use 'console' to enter the console.")
+
+
+addConsoleAliasToBashProfileIfNotThereAlready()
+
+exit()
 
 if __name__ == "__main__":
     # new machine setup, ensure to create server_info.sh here too + backup script

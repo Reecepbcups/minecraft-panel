@@ -290,6 +290,10 @@ def addConsoleAliasToBashProfileIfNotThereAlready():
     panelDir = CONFIG.get("PANEL_DIRECTORY"); # print(f"{thisDirectory=}")
     alias = f"alias console='python {panelDir}/console-*.py'\n"
 
+    # .bashrc | checks if you have an alias for a given command and runs the aliased command instead of the literal one with sudo in that case
+    # sudo() { if alias "$1" &> /dev/null ; then $(type "$1" | sed -E 's/^.*`(.*).$/\1/') "${@:2}" ; else command sudo $@ ; fi }
+    # then source
+
     if alias in open(profile, 'r').read():        
         cprint(f"&cConsole already added. If you need to source: &e`source {profile}`")
         return

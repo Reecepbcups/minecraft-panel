@@ -1,9 +1,8 @@
 # use UFW, root required? can we chekif root in python, if not prompt for root when trying to use UFW module 
 
+
+
 # confirm firewall with telnet hostname port
-
-
-
 import socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 result = sock.connect_ex(('127.0.0.1', 80))
@@ -13,37 +12,4 @@ else:
    print("Port is not open")
 sock.close()
 
-# check if script is run as root hen using UFW
-# import os, sys
-# if os.geteuid() != 0:
-#     print("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
-#     sys.exit()
 
-
-# https://github.com/5tingray/pyufw
-# check if ufw is installed on the system
-# import subprocess, sys
-# try:
-#     subprocess.check_call(['ufw', 'status'])
-# except:
-#     print("UFW is not installed on this system. Exiting.")
-#     # sys.exit()
-
-
-import platform
-def checkIfSystemIsUbuntuOrArch() -> str:
-    distr = platform.dist()[0]
-    if distr in ['Ubuntu', "Debian"]:
-        return "apt-get install"
-    elif distr in ['Arch']:
-        return "pacman -S"
-    else:
-        return 'N/A'
-
-distr = checkIfSystemIsUbuntuOrArch()
-print(distr)
-
-
-# .bashrc | checks if you have an alias for a given command and runs the aliased command instead of the literal one with sudo in that case
-# sudo() { if alias "$1" &> /dev/null ; then $(type "$1" | sed -E 's/^.*`(.*).$/\1/') "${@:2}" ; else command sudo $@ ; fi }
-# then source

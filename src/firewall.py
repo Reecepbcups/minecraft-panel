@@ -1,5 +1,5 @@
 import pyufw as ufw
-import os
+import os, subprocess
 from utils_cosmetics import cinput, cprint
 from utils_yaml import Yaml
 
@@ -13,10 +13,36 @@ Should read rules from config.yml
 
 from config import CONFIG
 
+import platform
+def checkIfSystemIsUbuntuOrArch() -> str:
+    distr = platform.dist()[0]
+    if distr in ['Ubuntu', "Debian"]:
+        return "apt-get install"
+    elif distr in ['Arch']:
+        return "pacman -S"
+    else:
+        return '<package manager> install'
+
+def isUFWinstalled() -> bool:
+    try:
+        subprocess.check_call(['ufw', 'status'])
+    except:
+        cprint("&cUFW is not installed on this system.")
+        cprint(f"&e{checkIfSystemIsUbuntuOrArch()} ufw")
+        exit(1)
+
+def isUserRoot():
+    if os.geteuid() != 0:
+        print("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
+        return False
+    return True
+
 class Firewall():
     def __init__(self):
-        self.config = CONFIG # get this from CONFIG in utils.file_utils
-        firewallSettings = self.config.get("firewall")
+        if isUserRoot() == False:
+            exit(1)
+
+        firewallSettings = CONFIG.get("firewall")
         # print(firewallSettings)
         self.openAccessPorts = firewallSettings['allow-ports']
         self.ExternalIPFullAccess = firewallSettings['full-access-ip-connections']
@@ -93,6 +119,20 @@ class Firewall():
             if debug: cprint(f"Opened full access to {ip}")
 
         self.allowPort(-1, "127.0.0.1") # Default always allow 127.0.0.1 to connect to itself
+
+    def isPortClosedCheck(port, hostIP="127.0.0.1", debug=False) -> bool:
+        '''
+        Checks if a port is open using telnet
+        '''
+        from socket import socket, create_connection
+        sock = socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = create_connection((hostIP, port))
+        if result == 0: # port is not closed
+            if debug: print(f"Port {port} is open on {hostIP}")
+            return False
+        else:
+            if debug: print(f"Port {port} is closed on {hostIP}")
+            return True
 
     def print(self):
         print(self.__str__())  

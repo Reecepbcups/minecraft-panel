@@ -4,9 +4,13 @@ import os
 # from yaml_utils import *
 from utils_yaml import Yaml
 
+from utils_cosmetics import cprint
+
+from config import CONFIG
+
 # Move this to main console.py prob
-CONFIG = Yaml(os.getcwd() + "/src/config.yml")
-CONFIG.loadConfig()
+# CONFIG = Yaml(os.getcwd() + "/src/config.yml")
+# CONFIG.loadConfig()
 
 def download(link, name=None, return_json=False, no_download=False):
     '''
@@ -48,7 +52,7 @@ def chdir(dir):
     return wd
 
 
-def fetch_servers() -> list:
+def fetch_servers() -> list:    
     serverloc = CONFIG.get("serverloc")
 
     servers = []
@@ -57,8 +61,8 @@ def fetch_servers() -> list:
         cprint(
             f'''
             &cYou don't have any servers yet create servers using 
-            the server creator or change the paths in the config.yml
-            your config location is: {os.getcwd() + "/configs/config.yml"}
-            ''')
-
+            the server creator or change the paths in the config,yml
+            your config location is: {os.getcwd() + "/configs/config.yml"} 
+            ''') # update this to actually be right
+ 
     return os.listdir(serverloc)

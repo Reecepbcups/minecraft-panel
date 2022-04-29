@@ -3,7 +3,16 @@ Rewrite of features in 1 file for now based on past BASH script?
 https://github.com/Reecepbcups/bash-minecraft-panel
 
 sudo pacman -S jre-openjdk
+
+Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
+
+# PATH_TO_CONFIG_FILE = "/root/minecraft-panel/config.yml"
+
+# from utils_yaml import Yaml
+# CONFIG = Yaml(PATH_TO_CONFIG_FILE).loadConfig()
+
+from config import CONFIG
 
 from utils_cosmetics import cfiglet, cprint, cinput
 # from utils.file_utils import chdir
@@ -12,7 +21,7 @@ from utils_cosmetics import cfiglet, cprint, cinput
 from utils_file import fetch_servers
 
 # from utils_yaml import Yaml
-from utils_file import CONFIG
+# from utils_file import CONFIG
 
 from server import Server
 from firewall import Firewall
@@ -49,6 +58,7 @@ adminPanel = {
         "exit": exit,
     }
 '''
+
 
 __version__ = "1.0.0"
 def getVersion() -> str:

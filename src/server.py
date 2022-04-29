@@ -3,9 +3,11 @@ from utils_file import chdir
 import subprocess, time, os, sys
 from utils_killable_thread import thread_with_trace
 from utils_screen import is_screen_running
-from utils_file import CONFIG
 
-# from ... import main
+from utils_yaml import Yaml
+# from console import main # would infinite loop
+
+from config import CONFIG
 
 class Server:
     def __init__(self, server_name):
@@ -138,7 +140,7 @@ class Server:
         # This is a proxy, do this then return
         proxyYML = self.path + "/waterfall.yml"        
         if os.path.exists(proxyYML):
-            proxyConfig = self.path + "/config.yml"
+            proxyConfig = self.path + "/config.yml" # bungee config yml, is not the panels
 
             config = Yaml(proxyConfig).loadConfig(); #print(config)
             for key in config.keys():

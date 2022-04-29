@@ -1,9 +1,8 @@
 from src.utils_cosmetics import color, cfiglet, cprint, color_dict, cinput
 import pyfiglet, time, os
-from utils.util_screen import is_screen_running
+from utils_screen import is_screen_running
 # from utils.file_utils import fetch_servers
 from src.utils_file import CONFIG, chdir, download
-from utils.panel_utils import FileInstallException
 import shutil, requests
 
 # TODO: Make this a class

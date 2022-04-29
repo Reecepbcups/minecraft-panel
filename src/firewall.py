@@ -11,9 +11,11 @@ Should read rules from config.yml
 # Part of Server logic.
 '''
 
+from config import CONFIG
+
 class Firewall():
     def __init__(self):
-        self.config = Yaml("src/config.yml").loadConfig() # get this from CONFIG in utils.file_utils
+        self.config = CONFIG # get this from CONFIG in utils.file_utils
         firewallSettings = self.config.get("firewall")
         # print(firewallSettings)
         self.openAccessPorts = firewallSettings['allow-ports']

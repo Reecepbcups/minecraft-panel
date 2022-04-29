@@ -18,10 +18,18 @@ servers:
   - ""
 
 
-firewall: # not done
-  allow-ports: "21 22 80 443 25565"
-  whitelisted-server-ips: "127.0.0.1"
-  bungee-backend-ports: "25570 30000" # This should be auto done when starting / creating a server which is bungee compatible.
+firewall:
+  # Allow full access from any IP address to these ports 
+  allow-ports: 
+  - 21
+  - 22 # SSH
+  - 80
+  - 443
+  - 25565 # Bungee
+  # IPs which get full access to all backend ports INCLUDING bungee backends
+  full-access-ip-connections: 
+  - "127.0.0.1"
+
 
 web-shortner: # not done
   location: /var/www/html/l

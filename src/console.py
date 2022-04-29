@@ -12,13 +12,13 @@ Ensure just to edit PATH_TO_CONFIG_FILE from here
 # from utils_yaml import Yaml
 # CONFIG = Yaml(PATH_TO_CONFIG_FILE).loadConfig()
 
-from config import CONFIG
+from utils.config import CONFIG
 
-from utils_cosmetics import cfiglet, cprint, cinput
+from utils.cosmetics import cfiglet, cprint, cinput
 # from utils.file_utils import chdir
 # from utils_killable_thread import thread_with_trace
 # from utils_screen import is_screen_running
-from utils_file import fetch_servers
+from utils.file import fetch_servers
 
 # from utils_yaml import Yaml
 # from utils_file import CONFIG
@@ -102,15 +102,15 @@ def main():
     # dummyConsole()
     # startAllServers()
 
-    # controlPanel = {        
-    #     "1": ["Console", dummyConsole],
-    #     "2": ["List Running Servers", dummyConsole],
-    # }
-    # cfiglet("&3", "Control Panel")
-    # for k, v in controlPanel.items():
-    #     cprint(f"[{k}] {v[0]}")
-    # request = input("CP> ")
-    # controlPanel[request][1]()
+    controlPanel = {        
+        "1": ["Console", dummyConsole],
+        "2": ["List Running Servers", dummyConsole],
+    }
+    cfiglet("&3", "Control Panel")
+    for k, v in controlPanel.items():
+        cprint(f"[{k}] {v[0]}")
+    request = input("CP> ")
+    controlPanel[request][1]()
     pass
 
 def getServers(print_output=False) -> dict:
@@ -306,4 +306,4 @@ def addConsoleAliasToBashProfileIfNotThereAlready():
 
 if __name__ == "__main__":
     addConsoleAliasToBashProfileIfNotThereAlready()
-    # main()
+    main()

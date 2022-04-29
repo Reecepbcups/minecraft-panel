@@ -1,7 +1,7 @@
 import pyufw as ufw
 import os, subprocess
-from utils_cosmetics import cinput, cprint
-from utils_yaml import Yaml
+from utils.cosmetics import cinput, cprint
+from utils.yaml import Yaml
 
 '''
 Should read rules from config.yml
@@ -11,8 +11,7 @@ Should read rules from config.yml
 # Part of Server logic.
 '''
 
-from config import CONFIG
-
+from utils.config import CONFIG
 import platform
 def checkIfSystemIsUbuntuOrArch() -> str:
     distr = platform.dist()[0]
@@ -36,6 +35,16 @@ def isUserRoot():
         print("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
         return False
     return True
+
+
+def main():
+    f = Firewall()
+    # f.allowPort(52, "134.5.5.5")
+    # print(f.getRulesList())
+    # f.allowFullAccessToWhitelistedConfigAddresses()
+    f.print()
+    print("xiting @ firewall.py main()")
+    exit()
 
 class Firewall():
     def __init__(self):
@@ -138,62 +147,59 @@ class Firewall():
         print(self.__str__())  
 
 
-f = Firewall()
-# f.allowPort(52, "134.5.5.5")
-# print(f.getRulesList())
-# f.allowFullAccessToWhitelistedConfigAddresses()
-f.print()
-exit()
+# def open_port():
+#     while True:
+#         # rules()
+#         cprint("&4Open a port")
+#         cprint("&4type exit to exit")
+#         cprint("&7------------------------")
+#         port = cinput("&2Enter a port: ")
+#         if port.lower() == "exit":
+#             return
+#         where = cinput("&2What IP can this port be accessed from (default localhost): ")
+#         cprint("&7------------------------")
+#         if where == "all":
+#             ufw.add(f'allow {port}')
+#         else:
+#             ufw.add(f'allow from {where} to any port {port} proto tcp')
+#         ufw.add('allow 22/tcp')
+#         ufw.reload()
 
-def open_port():
-    while True:
-        # rules()
-        cprint("&4Open a port")
-        cprint("&4type exit to exit")
-        cprint("&7------------------------")
-        port = cinput("&2Enter a port: ")
-        if port.lower() == "exit":
-            return
-        where = cinput("&2What IP can this port be accessed from (default localhost): ")
-        cprint("&7------------------------")
-        if where == "all":
-            ufw.add(f'allow {port}')
-        else:
-            ufw.add(f'allow from {where} to any port {port} proto tcp')
-        ufw.add('allow 22/tcp')
-        ufw.reload()
 
-def deny_port():
-    running = True
-    while running:
-        rules()
-        cprint("&4Close a Port")
-        cprint("&4type exit to exit")
-        cprint("&7------------------------")
-        port = cinput("&2Enter a port: ")
-        if port.lower() == "exit":
-            running = False
-            return
-        cprint("&7------------------------")
-        ufw.add(f'deny {port}')
-        ufw.add('allow 22/tcp') # always ensure we can ssh
-        ufw.reload()
 
-def delete_rule():
-    running = True
-    while running:
-        rules()
-        cprint("&4Delete a Rule")
-        cprint("&4* -> delete all rules")
-        cprint("&4exit -> exit section")
-        cprint("&7------------------------")
-        rule = cinput("&2Enter a rule: ")
-        if rule.lower() == "exit":
-            running = False
-            return
-        cprint("&7------------------------")
-        ufw.delete(rule)
-        ufw.reload()
+# def deny_port():
+#     running = True
+#     while running:
+#         rules()
+#         cprint("&4Close a Port")
+#         cprint("&4type exit to exit")
+#         cprint("&7------------------------")
+#         port = cinput("&2Enter a port: ")
+#         if port.lower() == "exit":
+#             running = False
+#             return
+#         cprint("&7------------------------")
+#         ufw.add(f'deny {port}')
+#         ufw.add('allow 22/tcp') # always ensure we can ssh
+#         ufw.reload()
+
+
+
+# def delete_rule():
+#     running = True
+#     while running:
+#         rules()
+#         cprint("&4Delete a Rule")
+#         cprint("&4* -> delete all rules")
+#         cprint("&4exit -> exit section")
+#         cprint("&7------------------------")
+#         rule = cinput("&2Enter a rule: ")
+#         if rule.lower() == "exit":
+#             running = False
+#             return
+#         cprint("&7------------------------")
+#         ufw.delete(rule)
+#         ufw.reload()
 
 
 # rules()
@@ -246,3 +252,7 @@ def enableFirewall():
 
 # enableFirewall()
 # rules()
+
+
+if __name__ == "__main__":
+    main()

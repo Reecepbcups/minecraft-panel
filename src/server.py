@@ -1,13 +1,13 @@
-from utils_cosmetics import color, cfiglet, cprint, color_dict, cinput
-from utils_file import chdir
+from utils.cosmetics import color, cfiglet, cprint, color_dict, cinput
+from utils.file import chdir
 import subprocess, time, os, sys
-from utils_killable_thread import thread_with_trace
-from utils_screen import is_screen_running
+from utils.killable_thread import thread_with_trace
+from utils.screen import is_screen_running
 
-from utils_yaml import Yaml
+from utils.yaml import Yaml
 # from console import main # would infinite loop
 
-from config import CONFIG
+from utils.config import CONFIG
 
 class Server:
     def __init__(self, server_name):
@@ -100,6 +100,8 @@ class Server:
         console.join(timeout=0.05)
 
         if user_input == "exit":
+            # main()
+            from console import main
             main()
             print("sys exit line 103 of server.py")
             sys.exit(0)

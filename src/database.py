@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from pymongo import database
 from pymongo.typings import _DocumentType
 
-from utils_cosmetics import cinput, cprint
+from utils.cosmetics import cinput, cprint
 
 class Database:
 

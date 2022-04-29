@@ -1,12 +1,9 @@
 import requests
 import os
 
-# from yaml_utils import *
-from utils_yaml import Yaml
+from utils.cosmetics import cprint
 
-from utils_cosmetics import cprint
-
-from config import CONFIG
+from utils.config import CONFIG
 
 # Move this to main console.py prob
 # CONFIG = Yaml(os.getcwd() + "/src/config.yml")
@@ -52,8 +49,10 @@ def chdir(dir):
     return wd
 
 
+from utils.config import PATH_TO_CONFIG_FILE
+
 def fetch_servers() -> list:    
-    serverloc = CONFIG.get("serverloc")
+    serverloc = CONFIG.get("SERVER_DIRECTORY")
 
     servers = []
 
@@ -62,7 +61,7 @@ def fetch_servers() -> list:
             f'''
             &cYou don't have any servers yet create servers using 
             the server creator or change the paths in the config,yml
-            your config location is: {os.getcwd() + "/configs/config.yml"} 
+            your config location is: {PATH_TO_CONFIG_FILE} 
             ''') # update this to actually be right
  
     return os.listdir(serverloc)

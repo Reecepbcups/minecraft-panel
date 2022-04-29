@@ -1,5 +1,5 @@
 import pyufw as ufw
-import yaml
+import os
 from utils.cosmetics import cinput, cprint
 from utils.yaml_utils import Yaml
 
@@ -13,21 +13,101 @@ Should read rules from config.yml
 # Part of Server logic.
 '''
 
+class Firewall():
+    def __init__(self):
+        self.config = Yaml("config.yml").loadConfig() # get this from CONFIG in utils.file_utils
+        firewallSettings = self.config.get("firewall")
+        # print(firewallSettings)
+        self.openAccessPorts = firewallSettings['allow-ports']
+        self.ExternalIPFullAccess = firewallSettings['full-access-ip-connections']
+
+    def __str__(self) -> str:
+        openPorts = self.openAccessPorts
+        fullAccessIPs = self.ExternalIPFullAccess
+        return f"Firewall; {openPorts=}; {fullAccessIPs=}"  
+
+    def getRulesList(self) -> list:
+        rules = ufw.get_rules()
+        ipv4Rules = []
+        for idx in rules:
+            rule = rules[idx]
+            if rule not in ipv4Rules:
+                ipv4Rules.append(rule)
+        return ipv4Rules
+
+    def getRulesEnumerated(self) -> dict:
+        return ufw.get_rules()
+
+    def printRules(self) -> None:
+        os.system("ufw status numbered")
+
+    def _port(self, port=0, hostIP="", action="allow", debug=False):
+        '''
+        Builds a rule for ufw.
+        - Set port = -1 to allow all ports from a host
+        - action should = 'allow', 'deny', 'reject', 'limit', 'route'        
+        '''
+        if port == -1:
+            ufw.add(f"allow from {hostIP} to any")
+        elif port == 0:
+            cprint("No port specified")
+            return
+
+        strOutput = f"{action}ing port {port}"
+        output = f"{action} {port}"
+
+        if len(hostIP) > 0:
+            strOutput = f"{action}ing {hostIP} to access port {port}"
+            output = f"{action} from {hostIP} to any port {port}"
+
+        if debug: print(strOutput)
+        ufw.add(output)
+
+    def allowPort(self, port, hostIP=""):
+        self._port(port, hostIP, "allow")
+
+    def denyPort(self, port, hostIP=""):
+        self._port(port, hostIP, "deny")
+ 
+    def deleteRule(self, rule=""):
+        ufw.delete(rule)
+
+    def allowPortsFromConfig(self, debug=False):
+        if len(self.openAccessPorts) == 0:
+            cprint("No ports to open from config.yml")
+            return
+
+        for port in self.openAccessPorts:
+            self.allowPort(port)
+            if debug:
+                cprint(f"Opened port {port}")
+        self.allowPort(22)
+
+    def allowFullAccessToWhitelistedConfigAddresses(self, debug=False):
+        if len(self.ExternalIPFullAccess) == 0:
+            cprint("No IPs to open full access to from config.yml")
+            return
+
+        for ip in self.ExternalIPFullAccess:
+            self.allowPort(-1, ip)
+            if debug: cprint(f"Opened full access to {ip}")
+
+        self.allowPort(-1, "127.0.0.1") # Default always allow 127.0.0.1 to connect to itself
+
+    def print(self):
+        print(self.__str__())  
 
 
-def rules(): # TODO: Remove duplicates values in the rules set
-    rules = ufw.get_rules()
-    cprint("&4UFW Network Rules")
-    cprint("&7------------------------")
-    print(rules)
-    for idx in rules:
-        cprint("&4"+str(idx)+":"+str(rules[idx]))
-
-    cprint("&7------------------------")
+f = Firewall()
+# f.allowPort(52, "134.5.5.5")
+# print(f.getRulesList())
+# f.allowFullAccessToWhitelistedConfigAddresses()
+f.print()
+exit()
 
 def open_port():
     while True:
-        rules()
+        # rules()
         cprint("&4Open a port")
         cprint("&4type exit to exit")
         cprint("&7------------------------")
@@ -93,17 +173,11 @@ def delete_rule():
 
 
 # Testing
-v = Yaml("config.yml").loadConfig() # get this from CONFIG in utils.file_utils
 
-firewallSettings = v.get("firewall")
-# print(firewallSettings)
-allowOpenAccess = firewallSettings['allow-ports']
-allowExternalAccess = firewallSettings['full-access-ip-connections']
 
-def allowPortsFromConfig():
-    for port in allowOpenAccess:
-        ufw.add(f'allow {port}')
-    ufw.add(f'allow 22') # always ensure we can SSH in.
+
+
+
 
 def allowExternalFullAccess():
     for ip in allowExternalAccess:
@@ -130,5 +204,5 @@ def enableFirewall():
 # allowPortsFromConfig()
 # rules()
 
-enableFirewall()
-rules()
+# enableFirewall()
+# rules()

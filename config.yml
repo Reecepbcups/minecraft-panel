@@ -19,7 +19,7 @@ servers:
 
 
 firewall:
-  # Allow full access from any IP address to these ports 
+  # Allow full access from any IP address to these port.
   allow-ports: 
   - 21
   - 22 # SSH
@@ -27,7 +27,7 @@ firewall:
   - 443
   - 25565 # Bungee
   # IPs which get full access to all backend ports INCLUDING bungee backends
-  full-access-ip-connections: 
+  full-access-ip-connections:
   - "127.0.0.1"
 
 

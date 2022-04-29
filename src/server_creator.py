@@ -1,11 +1,12 @@
-from utils.cosmetics import color, cfiglet, cprint, color_dict, cinput
+from src.utils_cosmetics import color, cfiglet, cprint, color_dict, cinput
 import pyfiglet, time, os
-from utils.screen import is_screen_running
+from utils.util_screen import is_screen_running
 # from utils.file_utils import fetch_servers
-from utils.file_utils import CONFIG, chdir, download
+from src.utils_file import CONFIG, chdir, download
 from utils.panel_utils import FileInstallException
 import shutil, requests
 
+# TODO: Make this a class
 
 cprint("&3Server Installer! (Press enter to accept the default value)")
 

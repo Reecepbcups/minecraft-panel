@@ -1,14 +1,11 @@
 import requests
-import time
 import os
-import re
-import subprocess
-from utils.yaml_utils import Yaml
-from utils.cosmetics import cprint
-from utils.panel_utils import FileInstallException
+
+# from yaml_utils import *
+from utils_yaml import Yaml
 
 # Move this to main console.py prob
-CONFIG = Yaml(os.getcwd() + "/config.yml")
+CONFIG = Yaml(os.getcwd() + "/src/config.yml")
 CONFIG.loadConfig()
 
 def download(link, name=None, return_json=False, no_download=False):
@@ -29,7 +26,7 @@ def download(link, name=None, return_json=False, no_download=False):
         os.chdir(wd)
 
     if data.status_code == 404:
-        raise FileInstallException(link, data.status_code, data.reason)
+        raise Exception(link, data.status_code, data.reason)
 
     if return_json:
         return data.status_code, data.json()

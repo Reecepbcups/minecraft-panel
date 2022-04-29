@@ -1,12 +1,10 @@
 import pyufw as ufw
 import os
-from utils.cosmetics import cinput, cprint
-from utils.yaml_utils import Yaml
+from utils_cosmetics import cinput, cprint
+from utils_yaml import Yaml
 
 '''
 Should read rules from config.yml
-
-
 
 # On a server startup IF behind bungee,
 #  we should automatically check if that port is backlisted from outside connections.
@@ -15,7 +13,7 @@ Should read rules from config.yml
 
 class Firewall():
     def __init__(self):
-        self.config = Yaml("config.yml").loadConfig() # get this from CONFIG in utils.file_utils
+        self.config = Yaml("src/config.yml").loadConfig() # get this from CONFIG in utils.file_utils
         firewallSettings = self.config.get("firewall")
         # print(firewallSettings)
         self.openAccessPorts = firewallSettings['allow-ports']

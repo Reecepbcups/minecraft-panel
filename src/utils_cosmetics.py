@@ -1,4 +1,5 @@
 import pyfiglet
+import re
 
 color_dict = {
     '&1': '\u001b[38;5;4m',
@@ -45,3 +46,8 @@ def cprint(text):
 
 def cinput(text):
     return input(color(str(text)))
+
+def splitColors(myStr) -> list:
+    # "&at&bt&ct" -> ['', '&a', 't', '&b', 't', '&c', 't']
+    # _str = "&at&bt&ct"; splitColors(_str)
+    return re.split("(&[a-zA-Z0-9])", myStr)

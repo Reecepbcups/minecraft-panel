@@ -7,9 +7,8 @@ sudo pacman -S jre-openjdk
 Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
 
+# from utils.yaml import Yaml
 # PATH_TO_CONFIG_FILE = "/root/minecraft-panel/config.yml"
-
-# from utils_yaml import Yaml
 # CONFIG = Yaml(PATH_TO_CONFIG_FILE).loadConfig()
 
 from utils.config import CONFIG
@@ -27,6 +26,7 @@ from server import Server
 from firewall import Firewall
 from server_creator import ServerCreator
 from database import Database
+from utils.system import checkIfRequirementsAreInstalled
 
 import time, os
 
@@ -60,13 +60,11 @@ adminPanel = {
 '''
 
 
-__version__ = "1.0.0"
-def getVersion() -> str:
-    return __version__
+
 
 def main():
 
-    isSpigotServerOnBungee("test")
+    # isSpigotServerOnBungee("test")
     
     # # 'Enable Access Control' `mongodb://myDBReader:password@127.0.0.1:27017/?authSource=admin`.
     # # mongo -u myUserAdmin -p OR mongo, then 'use admin; db.auth("myUserAdmin", "password123");'
@@ -153,38 +151,6 @@ def clear_all_logs():
     for server in ALL:
         Server(server).clear_logs()
 
-
-# == MongoDB ==
-# python -m pip install pymongo dnspython (so we can use srv URI)
-# sudo pacman -S --needed base-devel git nano vi
-
-# You could also run as a docker container, prob easier... install mongo client
-# sudo systemctl start docker
-# docker run -d -p 27017:27017 -v data:/data/db mongo
-
-# https://www.maketecheasier.com/use-aur-in-arch-linux/
-# useradd -m software -p myPassword19191 --shell /bin/false
-# usermod -aG wheel software # this is adding sudo to user
-# nano /etc/sudoers # (really you should use visudo, but you'll be okay)
-# uncomment the following lines: 
-# # %wheel ALL=(ALL:ALL) ALL
-# # %wheel ALL=(ALL:ALL) NOPASSWD: ALL
-# ctrl+x, y, enter
-
-# su software -s /bin/bash
-# cd ~
-# git clone https://aur.archlinux.org/mongodb-bin.git
-# cd mongodb-bin
-# makepkg -si
-
-# exit # gets you back to root user
-# cd /home/software/mongodb-bin/ && sudo pacman -U --noconfirm mongodb-bin-*.tar.zst
-# systemctl start mongodb.service
-# systemctl status mongodb # should return active
-# if so:
-# systemctl enable mongodb.service
-# mongo
-
 def console(server_name):
     if server_name in ALL:
         Server(server_name).enter_console()
@@ -223,59 +189,16 @@ def firewallApplyRules():
 def serverReboot(server_name):
     pass
 
-# == Debug ==
-def otherStuff():
-    # kilall -9 java;  
-    pass
-
-
-def getStorageAmount():
-    storage = os.popen("""df -h / | grep /""").read().strip().split()
-    size = storage[1]
-    used = storage[2]
-    free = storage[3]
-    percentUsed = storage[4]
-    print(f"{size=} {used=} {free=} {percentUsed=}")
-    return size, used, free
-
-def getRamUsage():
-    totalRam = os.popen("""free -h | grep Mem | awk '{print $2}'""").read().strip()
-    usedRam = os.popen("""free -h | grep Mem | awk '{print $3}'""").read().strip()
-
-    ramUsed = os.popen("""free -m | grep Mem | awk '{print (($3/$2)*100)}'""").read().strip()
-    print(f"System is using {ramUsed}% of TOTAL RAM ({usedRam}/{totalRam})")
-    pass
-
-def getNetworkUsage():
-    usage = os.popen("""ip -h -s link""").read()
-    print(usage)
-
-def getAllJavaPIDs():
-    v = os.popen("ps aux | grep java").read()
-    print(v)
-    pass
-
-def killAll():
-    v = os.popen("killall -9 java").read()
-    print(v)
-    pass
-
-# getRamUsage()
-# getStorageAmount()
-# getNetworkUsage()
-# killAll()
-
-
-
 # get the users linux home directory
 homeDir = os.path.expanduser('~')
 profile = os.path.join(homeDir, '.bashrc')
 screenfile = os.path.join(homeDir, '.screenrc')
 
 
+# Add to system utils in future?
+def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
+    # ensure profile file is there. Returns False if `console` being run would not run it
 
-def addConsoleAliasToBashProfileIfNotThereAlready():
-    # ensure profile file is there
     if not os.path.exists(profile):
         cprint(f"&c[!] File {profile} not found.. creating")
         open(profile, 'x') # creates file
@@ -295,15 +218,38 @@ def addConsoleAliasToBashProfileIfNotThereAlready():
     # then source
 
     if alias in open(profile, 'r').read():        
-        cprint(f"&cConsole already added. If you need to source: &e`source {profile}`")
-        return
+        # cprint(f"&cConsole already added. If you need to source: &e`source {profile}`")
+        return True
 
     with open(profile, 'a') as bashprofile:
         bashprofile.write(alias)
         print(f"Added alias 'console' to {profile}.")
-    
-    cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
+        cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
+    return False
+
+
+
+__version__ = "1.0.0"
+def getVersion() -> str:
+    return __version__
+
+import sys
+from CLI import call
 
 if __name__ == "__main__":
-    addConsoleAliasToBashProfileIfNotThereAlready()
+
+    # Ensures Java & pip are installed
+    if(checkIfRequirementsAreInstalled() == False):
+        exit(1)
+
+    # Ensure 'console' points to this console file location. If not it adds it.
+    if(addConsoleAliasToBashProfileIfNotThereAlready() == False):
+        exit(1)
+    
+    # check if there are any system arguments
+    if len(sys.argv) > 1:        
+        call(list(sys.argv)[1::])
+        exit(0) # true or false we also return so no main call is done
+        
+    # Call the main console fo the user if the above are good
     main()

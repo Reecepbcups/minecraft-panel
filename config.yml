@@ -1,36 +1,24 @@
-# Do not end locations with a /
-
 PANEL_DIRECTORY: /root/minecraft-panel
-
 SERVER_DIRECTORY: /root/minecraft-panel/servers
-
 BACKUP_DIRECTORY: /root/minecraft-panel/backups
-
 DOWNLOAD_CACHE: /root/minecraft-panel/downloads
-
 servers:
   proxy:
-  - "proxy-1"
+  - proxy-1
   spigot:
-  - "testing"
-  - "economy-1"
-  standalone: # servers which are not started with start-all command. Not done yet
-  - ""
-
-
+  - testing
+  - economy-1
+  standalone:
+  - ''
 firewall:
-  # Allow full access from any IP address to these port.
-  allow-ports: 
+  allow-ports:
   - 21
-  - 22 # SSH
+  - 22
   - 80
   - 443
-  - 25565 # Bungee
-  # IPs which get full access to all backend ports INCLUDING bungee backends
+  - 25565
   full-access-ip-connections:
-  - "127.0.0.1"
-
-
-web-shortner: # not done
+  - 127.0.0.1
+web-shortner:
   location: /var/www/html/l
-  domain: "reece.sh/l"
+  domain: reece.sh/l

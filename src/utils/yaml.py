@@ -5,12 +5,11 @@ def getYaml(path: str):
         return yaml.safe_load(file)
 
 class Yaml():
-    
+
     def __init__(self, path):
         self.path: str = path
         self.config = None
-        
-    
+            
     def loadConfig(self):
         with open(self.path, 'r') as file:
             self.config = yaml.safe_load(file)

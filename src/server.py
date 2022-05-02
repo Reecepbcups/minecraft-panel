@@ -16,6 +16,13 @@ class Server:
         self.values = {} # from properties & spigot.yml
         self.getInformation() # populates values in a dict
 
+    # Gets a property value. not pythonic but is needed for console
+    def get(self, value: str):
+        try:
+            return self.values[value]
+        except:
+            return "ERROR: Property not found"
+
     def start_server(self):
         if is_screen_running(self.server_name):
             cprint("&cYou can't start a server that is already running")
@@ -49,7 +56,9 @@ class Server:
         cprint(f"&aServer '{self.server_name}' Stopped")
 
     def enter_console(self):
-        cfiglet("&a", self.server_name)
+        statusColor = '&a' if is_screen_running(self.server_name) else '&c'
+
+        cfiglet(statusColor, self.server_name)
 
         cprint(f"&f - {self.path}\n")
         cprint("&6 Console:")
@@ -57,12 +66,20 @@ class Server:
         cprint("&6 -> 'stop-server'")
         cprint("&6 -> 'exit' &f(ctrl + x + enter)")
 
-        cprint(f"\n&bserver-port={self.values['server-port']}")
-        cprint(f"&bview-distance={self.values['view-distance']}")
-        cprint(f"&bon-bungeecord={self.values['bungeecord']}")
-        cprint(f"&bmax-players={self.values['max-players']}")
-        cprint(f"&bMEMORY={self.values['MEM_HEAP']}")
-        cprint(f"&bPID=")
+        output = [
+            f"\n&bserver-port={self.get('server-port')}", 
+            f"&bview-distance={self.get('view-distance')}",
+            f"&bon-bungeecord={self.get('bungeecord')}",
+            f"&bmax-players={self.get('max-players')}",
+            f"&bMEMORY={self.get('MEM_HEAP')}",
+            f"&bPID=",
+        ]
+
+        for property in output:
+            try:
+                cprint(property)
+            except:
+                pass        
         print()
 
         console = thread_with_trace(target=self.follow)
@@ -85,7 +102,7 @@ class Server:
                         break
                     continue
                 
-                elif user_input == "\x18":
+                elif user_input == "\x18": # ctrl + c
                     break
 
                 elif user_input == "exit": # brings you to main() after console killed
@@ -99,12 +116,16 @@ class Server:
         console.kill()
         console.join(timeout=0.05)
 
-        if user_input == "exit":
-            # main()
-            from console import main
-            main()
-            print("sys exit line 103 of server.py")
-            sys.exit(0)
+        try:
+            if user_input == "exit":
+                # main()
+                from console import main
+                main()
+                print("sys exit line 103 of server.py")
+                sys.exit(0)
+        except:
+            cprint("&eClosing...")
+            pass # user control c'ed out
 
     def send_console_command(self, user_input):
         subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015'])
@@ -117,8 +138,15 @@ class Server:
             # write to path, including any nested folders
             open(path, 'w')
             
+        # Could add `show-logs`` command, show last X logs from file + print file name at bottom
+
+        # read the last 10 lines of the file to show before waiting for logs
+        with open(path, 'r') as f:            
+            for line in f.readlines()[-20:]:
+                cprint(line.replace("\n", ""))
+
         with open(path, 'r') as log:
-            log.seek(0, os.SEEK_END)
+            log.seek(0, os.SEEK_END)            
             while True:
                 line = log.readline()
                 if not line:

@@ -65,105 +65,34 @@ adminPanel = {
                     #  authSource='the_database',
                     #  authMechanism='SCRAM-SHA-256')
 
-def userAccessControl():
-    # Add check here to see if UAC is enabled
-    adminUsername = input("Admin Username: ")
-    adminPassword = input("Admin Password: ")
-    db = Database("mongodb://127.0.0.1:27017/") # bc no auth yet
-    db.enableMongoDBAuthentication(adminUsername, adminPassword)
-    # Then you do what it says to do in this functiuon ^
 
-def databasePanel():
-    databaseFunctions = {
-        "1": ["Create DB", print],
-        "2": ["Delete DB", print],
-        "3": ["Show DBS", print],
 
-        "4": ["Create User", print],
-        "5": ["Delete User", print],
-        "6": ["Show Users\n", print],
-
-        "UAC": ["Enable user access control", userAccessControl],
-        # find collection
-    }
-
-    # Login to database. Input Username. If so, show the user that database.
-    # Confirm. Then ask for password. Put into URI
-
-    ## Login
-    user = 'myUserAdmin' #input("Username: ")
-
-    users = CONFIG.get("Mongo-Authentication")
-    if user in users:
-        authSource = users[user]
-    else:
-        authSource = input("Authentication Database: ")
-
-    password = 'password123' #input("Password: ")
-    ip_addr = "127.0.0.1:27017" #input("Auth IP (127.0.0.1:27017): ")
-    uri = f"mongodb://{user}:{password}@{ip_addr}/?authSource={authSource}"
-    dbObj = Database(uri)
-
-    databases = dbObj.listDatabases()
-    print(databases)
-
-    # print(dbObj.listUsers('test'))
-
-    # dbObj.createNewUser('newDB', 'mynewDBUser', 'test', [])
-
-    # cfiglet("&a", "Database Panel", clearScreen=True)
-    # for k, v in databaseFunctions.items():
-    #     cprint(f"[{k}]\t {v[0]}")
-    # request = input("\nDATABASE> ")
-    # databaseFunctions[request][1] # check if is object or is a function with (). Then do the opposite?
-
+# def databasePanel():
+#   pass
 
 def adminpanel():
     # "l": ["ClearAllLogs", clear_all_logs],
+    # "port": ["Fix Broken Port\n", print],
     pass
 
 def main():
 
     # databasePanel(); exit(0)
-
     from utils.screen import get_all_active_screens
+    from panels.database_panel import DatabasePanel
     controlPanel = {        
         "1": ["Console", ServerSelector],
         "2": ["List Running Servers", get_all_active_screens],
         "3": ["StartAllServers", startAllServers],
-        "port": ["Fix Broken Port\n", print],
+        
 
         "ADMIN": ["&cAdmin Panel&r", adminpanel],
-        "DB": ["&aDatabase Functions&r", databasePanel],
+        "DB": ["&aDatabase Functions&r", DatabasePanel],
     }
 
     # isSpigotServerOnBungee("test")
     
-    # # 'Enable Access Control' `mongodb://myDBReader:password@127.0.0.1:27017/?authSource=admin`.
-    # # mongo -u myUserAdmin -p OR mongo, then 'use admin; db.auth("myUserAdmin", "password123");'
-    # database = Database("mongodb://myUserAdmin:password123@127.0.0.1:27017/?authSource=admin") 
-    # # database = Database("mongodb://127.0.0.1:27017/")
-    # dbs = database.listDatabases()
-    # print(dbs)
-    # database.dropDatabase("test_db", debug=True)
-    # # print(database.listDatabaseRoles("admin"))
-    # print("admin db users:", database.listUsers(database_name="admin"))
-    # database.enableMongoDBAuthentication()
-    # # creates user on the test database, with roles to access other databases as well. This means the myTester user MUST auth with the test database in the uri
-    # # mongo -u myTester -p --authenticationDatabase test OR mongo, then 'use test; db.auth("myTester", "myPassXYZ");'
-    # database.createNewUser("test", "myTester", "myPassXYZ", [{'role': 'readWrite', 'db': 'test'}, {'role': 'read', 'db': 'test_db'}])
-    # print("test db users:", database.listUsers(database_name="test"))
-    # database.changeUsersPassword("test", "myTester")
-    # database.createTestCollection(collection_name="test-s", database_name="test")
-    # print("="*20)
-    # # database.createNewUser("test", "testingacc", "myPassXYZ", [{'role': 'readWrite', 'db': 'test'}])
-    # print("test db users:", database.listUsers(database_name="test"))
-    # database.deleteUser("test", "testingacc")
-    # print("test db users:", database.listUsers(database_name="test"))
 
-
-    # collections = database.listCollections("admin")
-    # print(collections)
 
     # print(Server('proxy').getInformation())
     # print(is_screen_running("test"))

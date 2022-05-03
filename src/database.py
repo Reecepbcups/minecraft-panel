@@ -4,7 +4,7 @@ from pymongo.typings import _DocumentType
 
 from utils.cosmetics import cinput, cprint
 
-
+from utils.config import CONFIG
 
 class Database:
 
@@ -20,10 +20,16 @@ class Database:
         # self.CONNECTION_URI = uri   
         self.client = MongoClient(uri)
 
+    def getClient(self):
+        return self.client
+
     def listDatabases(self) -> list:
         return self.client.list_database_names()
 
     def getDatabase(self, database_name) -> database.Database[_DocumentType]:
+        '''
+        Returns a database, or a new one if not created already
+        '''
         return self.client[database_name]
 
     def dropDatabase(self, database_name, debug=False) -> bool:
@@ -70,19 +76,15 @@ class Database:
         return self.client[database_name][collection_name]
 
     # Users
-    def createNewUser(self, database_name, username, password, roles) -> bool:
+    def createNewUser(self, database_name, username, password, roles=[]) -> bool:
         if username in self.listUsers(database_name):
             cprint(f"&c[!] User {username} already exsist in {database_name}")
             return False
-
-        from utils.config import CONFIG
 
         # ymlConfig = Yaml(PATH_TO_CONFIG_FILE)
         if CONFIG.get("Mongo-Authentication") == None:
             CONFIG["Mongo-Authentication"] = {}
 
-        
-        
         authUsers = CONFIG.get("Mongo-Authentication")
         if username in authUsers:  # if the user is already in the config for a database            
             database = authUsers[username] 
@@ -96,12 +98,18 @@ class Database:
             # print(authUsers)
 
             # maybe do this first and ensure it works before adding to config?
-            self.getDatabase(database_name).command({
+            v = self.getDatabase(database_name).command({
                 'createUser': username,
                 'pwd': password,
                 'roles': roles
             })
-            print(f"&aUser {username} has been created in {database_name}\n&fAdded to config")
+            print(v)
+            print(f"&aUser {username} has been created in {database_name} w/ roles {roles}.")
+            print("It will not show until a collection is created\n&fAdded to config")
+
+            # check if user was created
+            if username in self.listUsers(database_name):
+                print(f"&aUser {username} was found in  self.listUsers of {database_name}")
 
         return True
 
@@ -122,15 +130,15 @@ class Database:
         cprint(output)
         return status
 
-    def createTestCollection(self, database_name, collection_name):
+    def createTestCollection(self, database_name, collection_name, show_output=False):
         db = self.getDatabase(database_name)
 
         if not collection_name in db.list_collection_names():
             db.create_collection(collection_name)
 
         col = db.get_collection(collection_name)
-        col.insert_one({'name': 'test'})
-        print(col.find_one())
+        col.insert_one({'example': 'collection-for-showcase'})
+        if show_output: print(col.find_one())
 
     def deleteUser(self, database_name, user):        
         if user not in self.listUsers(database_name):

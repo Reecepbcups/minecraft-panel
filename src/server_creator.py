@@ -197,7 +197,10 @@ def downloadResourceFromSpigot(resourceID, folderPath=os.getcwd()):
         jar.write(response.content)
 
     print(f"Downloaded {pluginName} to {jarName}")
-downloadResourceFromSpigot(95853)
+
+if __name__ == "__main__":
+    # TEst dwnload
+    downloadResourceFromSpigot(95853)
 
 def writeToDefaultConfig():
     luckpermsConfig = f"""

@@ -24,4 +24,4 @@ web-shortner:
 Mongo-Authentication:
   myUserAdmin: admin
   myTester: test
-  mynewDBUser: newDB
+  y: y

@@ -55,7 +55,17 @@ def paper_install():
         print(e)
 
 
+nameToID = { # Spigot IDS from url. Uses spiget API to get
+    "BungeeServerManager": 7388,
+    "ServerTools": 95853,
+    "Plugman": 88135,
+    "Luckperms": 28140,
+    "Vault": 34315,
+    "ProtocolLib": 1997,
+}
+IDtoName = {v: k for k, v in nameToID.items()}
 
+# TODO: Break this up into chunks
 class ServerCreator():
     # move inputs into console.py
     # cprint("&3Server Installer! (Press enter to accept the default value)")
@@ -152,16 +162,47 @@ class ServerCreator():
         # change terminal to server_path and exit
         os.chdir(server_path)
         os.mkdir("logs")
+        os.mkdir("plugins")
 
+        
+        # Ask user if they want to preisntall some plugins
+        installPlugins = cinput("&3Install common plugins? ( yes / (no) )> ") or 'no'
+        if installPlugins.lower() == 'yes':
+            self.installPluginPanel()
 
-        # TODO: if we are making a spigot server & it is behind the proxy,
-        # print out here the commands to add it to the proxy:
-        # svm server add <server_name> <ip>:<port>
-
+        # Send command to hook into proxy
         if isBehindBungee == "true":
             cprint(f"&aAdd {server_name} to the BungeeCord proxy with the command:")
             cprint(f"&a'svm server add {server_name} 127.0.0.1:{port}'")
         else:
             cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}")
 
+    def installPluginPanel(self):
+        for idx, name, id in enumerate(nameToID):
+            print(f"{idx+1}. {name} ({id})")
+
+
+
+
+# import requests
+def downloadResourceFromSpigot(resourceID, folderPath=os.getcwd()):
+    url = f"https://api.spiget.org/v2/resources/{resourceID}/download"
+
+    response = requests.get(url)
+
+    pluginName = IDtoName[resourceID]
+    jarName = f"{folderPath}/{pluginName}.jar"
+
+    with open(jarName, "wb") as jar:
+        jar.write(response.content)
+
+    print(f"Downloaded {pluginName} to {jarName}")
+downloadResourceFromSpigot(95853)
+
+def writeToDefaultConfig():
+    luckpermsConfig = f"""
+    Put values here which are in the luckperms config, then you can easily make them.
+    Ensure when the server starts with these values predefined it works as expected.
+    Database, username, password, server type, etc.
+    """
 

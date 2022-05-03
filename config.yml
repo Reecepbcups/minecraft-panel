@@ -4,10 +4,9 @@ BACKUP_DIRECTORY: /root/minecraft-panel/backups
 DOWNLOAD_CACHE: /root/minecraft-panel/downloads
 servers:
   proxy:
-  - proxy-1
+  - proxy
   spigot:
   - testing
-  - economy-1
   standalone:
   - ''
 firewall:
@@ -22,3 +21,7 @@ firewall:
 web-shortner:
   location: /var/www/html/l
   domain: reece.sh/l
+Mongo-Authentication:
+  myUserAdmin: admin
+  myTester: test
+  mynewDBUser: newDB

@@ -1,5 +1,6 @@
 import pyfiglet
 import re
+import os
 
 color_dict = {
     '&1': '\u001b[38;5;4m',
@@ -37,7 +38,9 @@ def color(text):
     return formatted + color_dict['&r']
 
 
-def cfiglet(clr, figlet):
+def cfiglet(clr, figlet, clearScreen=False):
+    if clearScreen:
+        os.system('clear')
     print(color(clr+pyfiglet.figlet_format(figlet)))
 
 

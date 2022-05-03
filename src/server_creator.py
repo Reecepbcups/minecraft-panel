@@ -6,8 +6,6 @@ from utils.file import CONFIG, chdir, download
 import shutil, requests
 import datetime
 
-# TODO: Make this a class
-
 def paper_install():
     PAPER_LINK = "https://papermc.io/api/v2/projects/{project}"
     PAPER_V2_API_VERSION = "https://papermc.io/api/v2/projects/{project}/versions/{version}"

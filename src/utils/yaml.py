@@ -1,21 +1,21 @@
 import yaml
 
-def getYaml(path: str):
-    with open(path, 'r') as file:
+def getYaml(self):
+    with open(self.path, 'r') as file:
         return yaml.safe_load(file)
 
 class Yaml():
 
     def __init__(self, path):
         self.path: str = path
-        self.config = None
-            
-    def loadConfig(self):
+        self.config = None # This yaml object
+ 
+    def loadConfig(self): # returns self object
         with open(self.path, 'r') as file:
             self.config = yaml.safe_load(file)
             if self.config == None:
                 self.config = {}
-            return self.config
+            return self
     
     def set(self, key, value):
         self.config[key] = value

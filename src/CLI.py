@@ -8,13 +8,18 @@ def startAllServers(listOfArgs):
     print("Starting all servers " + str(listOfArgs))
     pass
 
+from utils.config import CONFIG
+def path(empyList):
+    print(f"{CONFIG['PANEL_DIRECTORY']}")
+
 possibleArgs = {
     "start-all": startAllServers,
+    "path": path,
 }
 
 def _printValidUsage():
     cprint("&cCLI Usage: ")
-    for arg, func in possibleArgs.items():
+    for arg in possibleArgs.keys():
         cprint(f"&fconsole {arg}")
     print()
 

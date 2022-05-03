@@ -20,7 +20,7 @@ def is_screen_running(name: str) -> bool:
         return True
     return False
 
-def get_all_active_screens() -> list:
+def get_all_active_screens(printOutput=True) -> list:
     '''
     get a list of all running screens with subprocess
     then print them out & return the list
@@ -34,6 +34,6 @@ def get_all_active_screens() -> list:
         server = match[1].split("\t")[0]
         server_list.append(server)
     
-    # print(server_list)
+    if printOutput: print(server_list)
     return server_list
     

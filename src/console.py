@@ -59,10 +59,84 @@ adminPanel = {
     }
 '''
 
+# client = MongoClient('example.com',
+                    #  username='user',
+                    #  password='password',
+                    #  authSource='the_database',
+                    #  authMechanism='SCRAM-SHA-256')
+
+def userAccessControl():
+    # Add check here to see if UAC is enabled
+    adminUsername = input("Admin Username: ")
+    adminPassword = input("Admin Password: ")
+    db = Database("mongodb://127.0.0.1:27017/") # bc no auth yet
+    db.enableMongoDBAuthentication(adminUsername, adminPassword)
+    # Then you do what it says to do in this functiuon ^
+
+def databasePanel():
+    databaseFunctions = {
+        "1": ["Create DB", print],
+        "2": ["Delete DB", print],
+        "3": ["Show DBS", print],
+
+        "4": ["Create User", print],
+        "5": ["Delete User", print],
+        "6": ["Show Users\n", print],
+
+        "UAC": ["Enable user access control", userAccessControl],
+        # find collection
+    }
+
+    # Login to database. Input Username. If so, show the user that database.
+    # Confirm. Then ask for password. Put into URI
+
+    ## Login
+    user = 'myUserAdmin' #input("Username: ")
+
+    users = CONFIG.get("Mongo-Authentication")
+    if user in users:
+        authSource = users[user]
+    else:
+        authSource = input("Authentication Database: ")
+
+    password = 'password123' #input("Password: ")
+    ip_addr = "127.0.0.1:27017" #input("Auth IP (127.0.0.1:27017): ")
+    uri = f"mongodb://{user}:{password}@{ip_addr}/?authSource={authSource}"
+    dbObj = Database(uri)
+
+    databases = dbObj.listDatabases()
+    print(databases)
+
+    # print(dbObj.listUsers('test'))
+
+    # dbObj.createNewUser('newDB', 'mynewDBUser', 'test', [])
+
+    # cfiglet("&a", "Database Panel", clearScreen=True)
+    # for k, v in databaseFunctions.items():
+    #     cprint(f"[{k}]\t {v[0]}")
+    # request = input("\nDATABASE> ")
+    # databaseFunctions[request][1] # check if is object or is a function with (). Then do the opposite?
 
 
+def adminpanel():
+    # "l": ["ClearAllLogs", clear_all_logs],
+    pass
 
 def main():
+
+    databasePanel()
+    exit(0)
+
+    from utils.screen import get_all_active_screens
+    controlPanel = {        
+        "1": ["Console", ServerSelector],
+        "2": ["List Running Servers", get_all_active_screens],
+        "3": ["StartAllServers", startAllServers],
+        "port": ["Fix Broken Port\n", print],
+
+        "ADMIN": ["&cAdmin Panel&r", adminpanel],
+        "DB": ["&aDatabase Functions&r", databasePanel],
+    }
 
     # isSpigotServerOnBungee("test")
     
@@ -92,22 +166,13 @@ def main():
     # collections = database.listCollections("admin")
     # print(collections)
 
-    # clear_all_logs()
     # print(Server('proxy').getInformation())
     # print(is_screen_running("test"))
-    # get_all_active_screens()
 
-    # dummyConsole()
-    # startAllServers()
-
-    controlPanel = {        
-        "1": ["Console", dummyConsole],
-        "2": ["List Running Servers", dummyConsole],
-    }
-    cfiglet("&3", "Control Panel")
+    cfiglet("&3", "Control Panel", clearScreen=True)
     for k, v in controlPanel.items():
-        cprint(f"[{k}] {v[0]}")
-    request = input("CP> ")
+        cprint(f"[{k}]\t {v[0]}")
+    request = input("\nCP> ")
     controlPanel[request][1]()
     pass
 
@@ -119,12 +184,12 @@ def getServers(print_output=False) -> dict:
             print(f"[{idx}] {server}")
     return choices
 
-def dummyConsole():
-    cfiglet("&a", "Console")
+def ServerSelector():
+    cfiglet("&a", "Console", clearScreen=True)
 
     choices = getServers(print_output=True)
 
-    server = cinput("Server Selector:")
+    server = cinput("\nServer Selector > ")
     if server not in choices:
         cprint("&cInvalid Selection")
 
@@ -147,8 +212,9 @@ def stopAllServers():
     for server in ALL:
         Server(server).stop_server() 
 
-def clear_all_logs():
+def clear_all_logs(printOutput=False):
     for server in ALL:
+        if printOutput: print(f"Clearing {server}'s logs")
         Server(server).clear_logs()
 
 def console(server_name):
@@ -159,9 +225,10 @@ def console(server_name):
 
 def isSpigotServerOnBungee(server_name): # do in server object
     check = Server(server_name).values['bungeecord']
-
-	# if so, return 1 - will ufw block it on startup for security
+	# if so, return 1 - UFW will block port from outside world, but ensure localhost can access it. Or do I do this in firewallBungeeServer?
     return check
+
+
 def firewallBungeeServer(server_name):
     port = Server(server_name).values['server-port']
     if port == "25565":
@@ -211,11 +278,9 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
             sf.write("termcapinfo xterm* ti@:te@")
 
     panelDir = CONFIG.get("PANEL_DIRECTORY"); # print(f"{thisDirectory=}")
-    alias = f"alias console='python {panelDir}/console-*.py'\n"
-
+    alias = f"alias console='python {panelDir}/src/console.py'\n"
     # .bashrc | checks if you have an alias for a given command and runs the aliased command instead of the literal one with sudo in that case
-    # sudo() { if alias "$1" &> /dev/null ; then $(type "$1" | sed -E 's/^.*`(.*).$/\1/') "${@:2}" ; else command sudo $@ ; fi }
-    # then source
+    sudoAlias = """sudo() { if alias "$1" &> /dev/null ; then $(type "$1" | sed -E 's/^.*`(.*).$/\1/') "${@:2}" ; else command sudo $@ ; fi }\n"""
 
     if alias in open(profile, 'r').read():        
         # cprint(f"&cConsole already added. If you need to source: &e`source {profile}`")
@@ -223,6 +288,7 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
 
     with open(profile, 'a') as bashprofile:
         bashprofile.write(alias)
+        bashprofile.write(sudoAlias) # `sudo console` then works too
         print(f"Added alias 'console' to {profile}.")
         cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
     return False

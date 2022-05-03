@@ -4,6 +4,8 @@ from pymongo.typings import _DocumentType
 
 from utils.cosmetics import cinput, cprint
 
+
+
 class Database:
 
     '''
@@ -41,24 +43,24 @@ class Database:
         return False
 
     # Roles
-    def enableMongoDBAuthentication(self):
-        # Add input here in the future
-        notCreated = self.createNewUser("admin", "myUserAdmin", "password123", [{'role': 'userAdminAnyDatabase', 'db': 'admin'}, "readWriteAnyDatabase"])
+    def enableMongoDBAuthentication(self, username, password):
+        # TODO: Add input here in the future
+        notCreated = self.createNewUser("admin", username, password, [{'role': 'userAdminAnyDatabase', 'db': 'admin'}, "readWriteAnyDatabase"])
         if notCreated:
             cprint("\n\n&e[!] You should now stop the mongodb (docker or service file) and start with authetication")
             cprint("&e - nano /etc/mongodb.conf")
             cprint("&e - add the following\n\nsecurity:\n\tauthorization: \"enabled\"")
             cprint("&e - systemctl restart mongodb.service && journalctl -u mongodb\n\n\n")    
 
-    def getRoleInfo(self, database_name, role):
+    def getRoleInfo(self, database_name="", role=""):
         # return self.getDatabase(database_name).command({
         #     'rolesInfo': {'role': role, 'db': database_name},
         #     'showPrivileges': True, 'showBuiltinRoles': True
         # })
         return ["dbAdmin", "dbOwner", "read", "readWrite", "userAdmin"]
 
-    def authenticate(self, database_name, username, password):
-        return self.getDatabase(database_name).authenticate(username, password)
+    # def authenticate(self, database_name, username, password):
+    #     return self.getDatabase(database_name).authenticate(username, password)
 
     # Collections
     def listCollections(self, database_name) -> list:
@@ -73,12 +75,34 @@ class Database:
             cprint(f"&c[!] User {username} already exsist in {database_name}")
             return False
 
-        # create a new user
-        self.getDatabase(database_name).command({
-            'createUser': username,
-            'pwd': password,
-            'roles': roles
-        })
+        from utils.config import CONFIG
+
+        # ymlConfig = Yaml(PATH_TO_CONFIG_FILE)
+        if CONFIG.get("Mongo-Authentication") == None:
+            CONFIG["Mongo-Authentication"] = {}
+
+        
+        
+        authUsers = CONFIG.get("Mongo-Authentication")
+        if username in authUsers:  # if the user is already in the config for a database            
+            database = authUsers[username] 
+            cprint(f"&cUser already exists in config.yml &e({username} in '{database}' db)")
+            return False
+        else: 
+            # update authUsers dict, set to CONFIG, and save. Then add to database            
+            authUsers[username] = database_name 
+            CONFIG.set("Mongo-Authentication", authUsers)
+            CONFIG.save()
+            # print(authUsers)
+
+            # maybe do this first and ensure it works before adding to config?
+            self.getDatabase(database_name).command({
+                'createUser': username,
+                'pwd': password,
+                'roles': roles
+            })
+            print(f"&aUser {username} has been created in {database_name}\n&fAdded to config")
+
         return True
 
     def changeUsersPassword(self, database, user):

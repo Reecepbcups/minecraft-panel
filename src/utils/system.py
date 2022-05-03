@@ -6,6 +6,11 @@ from utils.cosmetics import cprint
 
 # from utils.config import CONFIG, CONFIG_OBJECT
 
+import requests
+def getPublicIPAddress():
+    r = requests.get('https://api.ipify.org')
+    return r.text
+
 def checkIfRequirementsAreInstalled() -> bool:
     # check if pip is installed
     pip_check = bool(subprocess.run([sys.executable, "-m", "pip"], stdout=subprocess.DEVNULL))
@@ -21,6 +26,10 @@ def checkIfRequirementsAreInstalled() -> bool:
 
     return True
 
+import datetime
+def get_time() -> str:
+    now = datetime.datetime.now()
+    return f"{now.hour}-{now.minute}-{now.second}"
 
 def getStorageAmount():
     storage = os.popen("""df -h / | grep /""").read().strip().split()

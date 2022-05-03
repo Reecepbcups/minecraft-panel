@@ -124,8 +124,7 @@ def adminpanel():
 
 def main():
 
-    databasePanel()
-    exit(0)
+    # databasePanel(); exit(0)
 
     from utils.screen import get_all_active_screens
     controlPanel = {        
@@ -173,7 +172,8 @@ def main():
     for k, v in controlPanel.items():
         cprint(f"[{k}]\t {v[0]}")
     request = input("\nCP> ")
-    controlPanel[request][1]()
+
+    controlPanel[request][1]() # Could make args here & pass into all sub options. Then the underlying functions can use
     pass
 
 def getServers(print_output=False) -> dict:

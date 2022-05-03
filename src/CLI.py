@@ -3,6 +3,8 @@
 
 from utils.cosmetics import cprint
 
+from server import Server
+
 def startAllServers(listOfArgs):
     # This is not actually used here, but useful for sub command arguments
     print("Starting all servers " + str(listOfArgs))
@@ -12,9 +14,15 @@ from utils.config import CONFIG
 def path(empyList):
     print(f"{CONFIG['PANEL_DIRECTORY']}")
 
+def showLogs(args):
+    serverName, numOfLines = args[0], int(args[1])
+    s = Server(serverName)
+    s.showLogOnce(numOfLines)
+
 possibleArgs = {
     "start-all": startAllServers,
     "path": path,
+    "show-logs": showLogs,
 }
 
 def _printValidUsage():

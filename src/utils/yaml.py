@@ -5,6 +5,15 @@ def getYaml(self):
         return yaml.safe_load(file)
 
 class Yaml():
+    '''
+    A Yaml class to do Yaml things
+
+    pathToConfig = self.path + "/config.yml"
+    proxyConfig = Yaml(pathToConfig).loadConfig().getConfig()
+    for key in proxyConfig.keys():
+        self.values[key] = proxyConfig[key]
+    '''
+
 
     def __init__(self, path):
         self.path: str = path
@@ -16,6 +25,9 @@ class Yaml():
             if self.config == None:
                 self.config = {}
             return self
+
+    def getConfig(self):
+        return self.config
     
     def set(self, key, value):
         self.config[key] = value
@@ -26,6 +38,11 @@ class Yaml():
         except Exception:
             return []
 
+    def keys(self):
+        return self.config.keys()
+
     def save(self):
         with open(self.path, 'w') as file:
             yaml.dump(self.config, file, sort_keys=False)
+
+

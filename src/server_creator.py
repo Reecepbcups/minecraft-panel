@@ -4,9 +4,12 @@ from utils.screen import is_screen_running
 # from utils.file_utils import fetch_servers
 from utils.file import CONFIG, chdir, download
 import shutil, requests
-import datetime
+from utils.system import get_time, getPublicIPAddress
 
 def paper_install():
+    '''
+    Downloads Paper spigot or Waterfall Proxy
+    '''
     PAPER_LINK = "https://papermc.io/api/v2/projects/{project}"
     PAPER_V2_API_VERSION = "https://papermc.io/api/v2/projects/{project}/versions/{version}"
     PAPER_V2_API = "https://papermc.io/api/v2/projects/{project}/versions/{version}/builds/{build}/downloads/{download}"
@@ -51,13 +54,10 @@ def paper_install():
     except Exception as e:
         print(e)
 
-def get_time() -> str:
-    now = datetime.datetime.now()
-    return f"{now.hour}-{now.minute}-{now.second}"
+
 
 class ServerCreator():
     # move inputs into console.py
-
     # cprint("&3Server Installer! (Press enter to accept the default value)")
 
     def __init__(self, server_name):
@@ -119,7 +119,7 @@ class ServerCreator():
 
         # spigot.yml
         with open(server_path+"/spigot.yml", "a") as file:
-            isBehindBungee = cinput("&3Behind Bungee? [true/(false)] >> ") or "false"
+            isBehindBungee = cinput("&3Behind Bungee? [(true)/false] >> ") or "true"
             file.write(f"""settings:
             bungeecord: {isBehindBungee}
             restart-on-crash: false"""
@@ -146,7 +146,7 @@ class ServerCreator():
 
             # use-native-transport=false if you get spam for unable to access address of buffer
 
-        # cprint(f"&aServer created at {server_path=}")
+        cprint(f"&aServer created at {server_path=}")
 
         # ask if we should add to config? default yes
         # change terminal to server_path and exit
@@ -154,23 +154,14 @@ class ServerCreator():
         os.mkdir("logs")
 
 
+        # TODO: if we are making a spigot server & it is behind the proxy,
+        # print out here the commands to add it to the proxy:
+        # svm server add <server_name> <ip>:<port>
+
+        if isBehindBungee == "true":
+            cprint(f"&aAdd {server_name} to the BungeeCord proxy with the command:")
+            cprint(f"&a'svm server add {server_name} 127.0.0.1:{port}'")
+        else:
+            cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}")
 
 
-
-
-    # get the current hour and minute time
-
-
-
-
-
-
-
-    # print(f"{file_path=} {server_path=}")
-
-    # move the jar into the server folder
-
-
-    # os.system(f"{server_path}/start.sh")
-
-    # ask to if we should change dir to it

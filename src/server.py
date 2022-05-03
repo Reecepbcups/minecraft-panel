@@ -30,11 +30,18 @@ class Server:
 
         # if on bungeecord, ensure that its firewalled
 
-        os.chdir(self.path) #; print(os.getcwd())
-        v = os.system(f'screen -dmS {self.server_name} ./start.sh')
-        if v != 0:
-            cprint(f"&cSome error when starting server")
-            return
+        os.chdir(self.path) #;print(os.getcwd())
+        cmd = f'screen -dmS {self.server_name} ./start.sh'
+        print(cmd)
+
+        # run command & get stdfout
+        p = os.popen(cmd)
+        print(p)
+
+        # v = os.system(cmd)
+        # if v != 0:
+        #     cprint(f"&cSome error when starting server")
+        #     return
         cprint(f"&aServer '{self.server_name}' Started")
 
     def stop_server(self):
@@ -128,7 +135,8 @@ class Server:
             pass # user control c'ed out
 
     def send_console_command(self, user_input):
-        subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015'])
+        #\015 = new line character unicode
+        subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015']) 
 
     def follow(self):
         path = f'{self.path}/logs/latest.log'
@@ -138,12 +146,10 @@ class Server:
             # write to path, including any nested folders
             open(path, 'w')
             
-        # Could add `show-logs`` command, show last X logs from file + print file name at bottom
+        # Could add `show-logs` command, show last X logs from file + print file name at bottom
 
-        # read the last 10 lines of the file to show before waiting for logs
-        with open(path, 'r') as f:            
-            for line in f.readlines()[-20:]:
-                cprint(line.replace("\n", ""))
+        # read the last X lines of the log file
+        self.showLogOnce(20)
 
         with open(path, 'r') as log:
             log.seek(0, os.SEEK_END)            
@@ -153,6 +159,13 @@ class Server:
                     time.sleep(0.1)
                     continue
                 
+                cprint(line.replace("\n", ""))
+
+    def showLogOnce(self, numOfLines):
+        '''Shows the last X number of lines in the log file 1 time'''
+        path = f'{self.path}/logs/latest.log'
+        with open(path, 'r') as f:            
+            for line in f.readlines()[-numOfLines:]:
                 cprint(line.replace("\n", ""))
 
     def getInformation(self):
@@ -169,12 +182,11 @@ class Server:
 
         # This is a proxy, do this then return
         proxyYML = self.path + "/waterfall.yml"        
-        if os.path.exists(proxyYML):
-            proxyConfig = self.path + "/config.yml" # bungee config yml, is not the panels
-
-            config = Yaml(proxyConfig).loadConfig(); #print(config)
-            for key in config.keys():
-                self.values[key] = config[key]
+        if os.path.exists(proxyYML):            
+            # bungee config yml, is not the panels
+            proxyConfig = Yaml(self.path + "/config.yml").loadConfig().getConfig(); #print(proxyConfig.keys())
+            for key in proxyConfig.keys():
+                self.values[key] = proxyConfig[key]
 
             # Retrurn early since its not a spigot server
             return self.values
@@ -190,7 +202,7 @@ class Server:
                 if len(pair) > 1:
                     self.values[pair[0]] = pair[1].strip()
 
-        # open spigotYML & check if the bungeecord key is set
+        # open spigotYML & check if the bungeecord key is set. No need to do YAML since its just 1 value rn
         with open(spigotYML, 'r') as f:
             for line in f:
                 if line.startswith("bungeecord:"):

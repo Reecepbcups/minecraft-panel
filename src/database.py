@@ -7,7 +7,6 @@ from utils.cosmetics import cinput, cprint
 from utils.config import CONFIG
 
 class Database:
-
     '''
     config.yml
 
@@ -103,13 +102,13 @@ class Database:
                 'pwd': password,
                 'roles': roles
             })
-            print(v)
-            print(f"&aUser {username} has been created in {database_name} w/ roles {roles}.")
-            print("It will not show until a collection is created\n&fAdded to config")
+            cprint(v)
+            cprint(f"&aUser {username} has been created in {database_name} w/ roles {roles}.")
+            cprint("It will not show until a collection is created\n&fAdded to config")
 
             # check if user was created
             if username in self.listUsers(database_name):
-                print(f"&aUser {username} was found in  self.listUsers of {database_name}")
+                cprint(f"&aUser {username} was found in  self.listUsers of {database_name}")
 
         return True
 
@@ -148,7 +147,7 @@ class Database:
         status = self.getDatabase(database_name).command({
             'dropUser': user
         })
-        return  self._getDocumentStatus(status)
+        return self._getDocumentStatus(status)
 
     def listUsers(self, database_name):
         listing = self.getDatabase(database_name).command("usersInfo")

@@ -24,4 +24,3 @@ web-shortner:
 Mongo-Authentication:
   myUserAdmin: admin
   myTester: test
-  y: y

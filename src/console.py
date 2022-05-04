@@ -59,17 +59,6 @@ adminPanel = {
     }
 '''
 
-# client = MongoClient('example.com',
-                    #  username='user',
-                    #  password='password',
-                    #  authSource='the_database',
-                    #  authMechanism='SCRAM-SHA-256')
-
-
-
-# def databasePanel():
-#   pass
-
 def adminpanel():
     # "l": ["ClearAllLogs", clear_all_logs],
     # "port": ["Fix Broken Port\n", print],
@@ -100,7 +89,7 @@ def main():
     cfiglet("&3", "Control Panel", clearScreen=True)
     for k, v in controlPanel.items():
         cprint(f"[{k}]\t {v[0]}")
-    request = input("\nCP> ")
+    request = cinput("\nCP> ")
 
     controlPanel[request][1]() # Could make args here & pass into all sub options. Then the underlying functions can use
     pass

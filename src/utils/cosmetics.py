@@ -47,7 +47,7 @@ def cfiglet(clr, figlet, clearScreen=False):
 def cprint(text):  
     print(color(str(text)))  
 
-def cinput(text):
+def cinput(text=""):
     msg = color(str(text))
     try:
         user_input = input(msg)

@@ -59,23 +59,19 @@ adminPanel = {
     }
 '''
 
-def adminpanel():
-    # "l": ["ClearAllLogs", clear_all_logs],
-    # "port": ["Fix Broken Port\n", print],
-    pass
+
 
 def main():
 
     # databasePanel(); exit(0)
     from utils.screen import get_all_active_screens
     from panels.database_panel import DatabasePanel
+    from panels.admin_panel import AdminPanel
     controlPanel = {        
         "1": ["Console", ServerSelector],
         "2": ["List Running Servers", get_all_active_screens],
         "3": ["StartAllServers", startAllServers],
-        
-
-        "ADMIN": ["&cAdmin Panel&r", adminpanel],
+        "ADMIN": ["&cAdmin Panel&r", AdminPanel],
         "DB": ["&aDatabase Functions&r", DatabasePanel],
     }
 

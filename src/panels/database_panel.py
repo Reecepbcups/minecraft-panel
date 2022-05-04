@@ -3,10 +3,7 @@ from database import Database
 from utils.config import CONFIG
 from utils.cosmetics import cprint, cinput
 
-'''
-This file is the user panel which wraps Database class.
-That class should be used for CLI arguments, this is for user input
-'''
+
 
 def userAccessControl():
     # Add check here to see if UAC is enabled
@@ -17,12 +14,10 @@ def userAccessControl():
     # Then you do what it says to do in this functiuon ^
 
 class DatabasePanel:
-
-    
-
-    # Login to database. Input Username. If so, show the user that database.
-    # Confirm. Then ask for password. Put into URI
-    # def __init__(self, user="", password="", authSource="admin", hostIP="127.0.0.1", port=27017):
+    '''
+    This class is the user panel which wraps Database class.
+    This is for user input & should wrap those functions
+    '''
     def __init__(self):
         self.databaseFunctions = {
             "1": ["Create DB", print],
@@ -77,39 +72,69 @@ class DatabasePanel:
     def createNewUser(self):
         username = input("New User Username: ")
         password = input("New User Password: ")
-        database = input("Database: ")
+        database = input("Database (admin): ") or 'admin'
 
-        print("""ROLES:
-          [{'role': 'readWrite', 'db': 'test'}, {'role': 'read', 'db': 'test_db'}]
+        print("""ROLES:""")
 
-            Input as:
-            rw test;r test_db
-        """)
-
-        shortHand = {
-            "rw": "readWrite",
-            "r": "read",
-            "w": "write",
-            "d": "dbOwner",
+        # TODO: Auto create roles if not already done?
+        shortHand = { # https://www.mongodb.com/docs/manual/reference/built-in-roles/
+            # "rw": "readWrite",
+            # "r": "read",
+            # "w": "write",
+            "dbo": "dbOwner",
+            "backup": "backup",
+            "restore": "restore",
+            "-": "", # seperator
+            "rad": "readAnyDatabase",
+            "rwad": "readWriteAnyDatabase",
+            "uad": "userAdminAnyDatabase",
+            "dbaad": "dbAdminAnyDatabase",
+            "--": "", # seperator
+            "dba": "dbAdmin",            
+            "ua": "userAdmin",
+            "---": "", # seperator
+            "ca": "clusterAdmin",
+            "cm": "clusterManager",
+            "root": "root",
+            
         }
 
-        userRoles = input("Roles: ") # make copy paste / builder for this?
+        for k, v in shortHand.items():
+            if '-' in k:
+                print(); continue
+            print(f"[{k} ({v})]", end=" ")
+            
+        cprint(f"\n\n&eExample Input as>>> &frad;  &7(if no db is provided, {database} is used)")
+
+        userRoles = cinput("Roles: ") # make copy paste / builder for this?
         
         if userRoles.endswith(";"): # remove last ;
             userRoles = userRoles[:-1]
 
         roles = []
         for action in userRoles.split(";"):
-            permission = action.split(" ")[0] # rw, r, w, d, etc
-            db = action.split(" ")[1] # databaseName
+            values = action.split(" ") # rw, r, w, d, etc
+            
+            permission = values[0] # rw (even if its the only thing, it has to be index 0)
+            db = database # our database name by default
+            
+            print(f"{values}=")
+
+            if len(values) != 1: # ['rw']
+                db = values[1] # supplied name ['rw', 'myDB']
 
             if permission in shortHand:
                 permission = shortHand[permission]
 
             roles.append({"role": permission, "db": db})
 
-        self.dbObj.createNewUser(username, password, database, roles)
-        # dbObj.createNewUser('newDB', 'mynewDBUser', 'test', [])
+        # confirm roles is correct:
+        cprint(f"\n\nRoles: {roles}")
+        confirm = input("\nConfirm? (y/n): ")
+        if confirm.lower() != "y":
+            self.createNewUser()
+
+        self.dbObj.createNewUser(database, username, password, roles)
 
         placeholderCollection = input("Create a placeholder collection so the database appears? ((y)/n)")
         if placeholderCollection == "y":

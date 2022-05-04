@@ -45,10 +45,18 @@ def cfiglet(clr, figlet, clearScreen=False):
 
 
 def cprint(text):  
-    print(color(text))  
+    print(color(str(text)))  
 
 def cinput(text):
-    return input(color(str(text)))
+    msg = color(str(text))
+    try:
+        user_input = input(msg)
+        if user_input == "\x18": # ctrl + c
+            exit(0)
+        return user_input
+    except KeyboardInterrupt:
+        cprint("\n&cKeyboard Interup, Exiting...\n")
+        exit(0)
 
 def splitColors(myStr) -> list:
     # "&at&bt&ct" -> ['', '&a', 't', '&b', 't', '&c', 't']

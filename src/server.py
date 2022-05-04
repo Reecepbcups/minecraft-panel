@@ -101,7 +101,7 @@ class Server:
 
         try:
             while True:
-                user_input = input()
+                user_input = cinput()
 
                 if user_input in options:
                     options[user_input][0]()

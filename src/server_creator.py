@@ -38,21 +38,31 @@ def paper_install():
     
     try: # Download the jar file
         start = time.time()
-        paper_version = PAPER_V2_API_VERSION.format(project=project, version=version)
-        
+
+        # Download latest build for specified version
+        paper_version = PAPER_V2_API_VERSION.format(project=project, version=version)        
         _, json_response = download(paper_version, return_json=True, no_download=True) #;print(json_response)
 
         build = str(json_response["builds"][len(json_response["builds"])-1])
+        print(f"{build}=")
 
         jarName = project+"-"+version+"-"+build+".jar"
-        download_url = PAPER_V2_API.format(project=project, version=version, build=build, download=jarName)
-        cprint(f'&eDownloading {project}:{version}:{build} from {download_url}')
-        download(download_url)
+
+        # check if file
+        if os.path.isfile(CONFIG.get("DOWNLOAD_CACHE") + "/" + jarName):
+            cprint(f"&aFound {jarName} in cache... Using {jarName} from there")
+        else:
+            download_url = PAPER_V2_API.format(project=project, version=version, build=build, download=jarName)
+            cprint(f'&eDownloading {project}:{version}:{build} from {download_url}')
+            download(download_url)
+
         end = time.time()
-        cprint(f'&aInstalled {project}:{version}:{build} from {download_url} in {round(end-start, 3)} seconds')
-        return download_url.split('/')[-1]
+        cprint(f'&aInstalled {jarName} in {round(end-start, 3)} seconds')
+        # return download_url.split('/')[-1]
+        return jarName
     except Exception as e:
         print(e)
+        return ""
 
 
 nameToID = { # Spigot IDS from url. Uses spiget API to get

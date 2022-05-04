@@ -15,7 +15,7 @@ def download(link, name=None, return_json=False, no_download=False):
     More details about this script in the file itself
     '''
 
-    wd = chdir(CONFIG.get("downloadloc"))
+    wd = chdir(CONFIG.get("DOWNLOAD_CACHE"))
     data = requests.get(link)
 
     if not no_download:

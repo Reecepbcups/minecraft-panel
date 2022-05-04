@@ -1,4 +1,4 @@
-from utils.cosmetics import cprint, cinput
+from utils.cosmetics import cfiglet, cprint, cinput
 
 
 from server_creator import ServerCreator    
@@ -13,10 +13,15 @@ class AdminPanel:
             # "l": ["ClearAllLogs", clear_all_logs],
             # "port": ["Fix Broken Port\n", print],
 
-            'new': ["Create New Instance", ServerCreator]
+            'new': ["Create New Instance\n", ServerCreator],
+
+            "cp": ["Main Menu", print],
+            "exit": ["Exit", exit]
 
             # "UAC": ["Enable user access control", userAccessControl],
         }
+
+        cfiglet("&c", "Admin Panel", clearScreen=True)
 
         while True:
             # cfiglet("&3", "Control Panel", clearScreen=True)
@@ -24,5 +29,8 @@ class AdminPanel:
                 cprint(f"[{k}]\t {v[0]}")
 
             # Split it into args so we can pass through functions? This needed?
-            request = input("\nADMIN> ")
+            request = cinput("\nADMIN> ")
+            if request == "cp":
+                from console import main
+                main()
             self.adminFunctions[request][1]() 

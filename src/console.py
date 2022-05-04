@@ -23,9 +23,9 @@ from utils.file import fetch_servers
 # from utils_file import CONFIG
 
 from server import Server
-from firewall import Firewall
-from server_creator import ServerCreator
-from database import Database
+# from firewall import Firewall
+# from server_creator import ServerCreator
+# from database import Database
 from utils.system import checkIfRequirementsAreInstalled
 
 import time, os
@@ -59,10 +59,7 @@ adminPanel = {
     }
 '''
 
-
-
 def main():
-
     # databasePanel(); exit(0)
     from utils.screen import get_all_active_screens
     from panels.database_panel import DatabasePanel
@@ -77,15 +74,16 @@ def main():
 
     # isSpigotServerOnBungee("test")
     
-
-
     # print(Server('proxy').getInformation())
     # print(is_screen_running("test"))
 
     cfiglet("&3", "Control Panel", clearScreen=True)
     for k, v in controlPanel.items():
         cprint(f"[{k}]\t {v[0]}")
+        
     request = cinput("\nCP> ")
+    if request == "exit":
+        cprint("&cExiting Panel"); exit(0)
 
     controlPanel[request][1]() # Could make args here & pass into all sub options. Then the underlying functions can use
     pass

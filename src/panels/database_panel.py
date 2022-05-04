@@ -29,6 +29,9 @@ class DatabasePanel:
             "6": ["Show Users\n", print],
 
             "UAC": ["Enable user access control", userAccessControl],
+
+            "cp": ["Main Menu", print],
+            "exit": ["Main Menu", exit]
             # find collection
         }
 
@@ -66,6 +69,8 @@ class DatabasePanel:
 
             # Split it into args so we can pass through functions? This needed?
             request = input("\nDATABASE> ")
+            if request == "cp":
+                from console import main; main()
             self.databaseFunctions[request][1]() 
     
 

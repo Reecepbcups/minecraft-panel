@@ -57,11 +57,8 @@ def fetch_servers() -> list:
     servers = []
 
     if not os.path.exists(serverloc):
-        cprint(
-            f'''
+        cprint(f'''
             &cYou don't have any servers yet create servers using 
             the server creator or change the paths in the config,yml
-            your config location is: {PATH_TO_CONFIG_FILE} 
-            ''') # update this to actually be right
- 
+            your config location is: {PATH_TO_CONFIG_FILE}''')
     return os.listdir(serverloc)

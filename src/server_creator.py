@@ -1,3 +1,5 @@
+from tracemalloc import start
+from xmlrpc.client import Server
 from utils.cosmetics import color, cfiglet, cprint, color_dict, cinput
 import pyfiglet, time, os
 from utils.screen import is_screen_running
@@ -5,6 +7,10 @@ from utils.screen import is_screen_running
 from utils.file import CONFIG, chdir, download
 import shutil, requests
 from utils.system import get_time, getPublicIPAddress
+
+from server import Server
+
+from pick import pick
 
 def paper_install():
     '''
@@ -141,6 +147,8 @@ done'''
 
         os.system(f"chmod +x {server_path}/start.sh")
 
+        # TODO: Add proxy stuff here
+
         # spigot.yml
         with open(server_path+"/spigot.yml", "a") as file:
             isBehindBungee = cinput("&3Behind Bungee? [(true)/false] >> ") or "true"  
@@ -148,13 +156,17 @@ done'''
                 isBehindBungee = "false"          
             file.write(f"""settings:\n  bungeecord: {isBehindBungee}\n  restart-on-crash: false""")
 
+        with open(server_path+"/bukkit.yml", "a") as bukkitFile:
+            allowEnd = cinput("&3Allow end? [(true)/false] >> ") or "true"          
+            bukkitFile.write(f"""settings:\n  allow-end: {allowEnd}""")
+
         # server.properties
         with open(server_path+"/server.properties", "a") as file:
             # Add check to ensure port can not be set if another one uses it
-            port = int(cinput("&3Port: [(25565)] >> ") or 25565)
-            allow_nether = cinput("&3Allow Nether [(true)/false]>> ") or "true"
+            allow_nether = cinput("&3Allow Nether [(true)/false]>> ") or "true"            
             max_players = cinput("&3Max Players (200) >> ") or "200"
             view_distance = cinput("&3View Distance (8)>> ") or "8"
+            port = int(cinput("&3Port: [(25565)] >> ") or 25565)
             file.write(f"server-port={str(port)}\n")
             file.write(f"allow-nether={allow_nether}\n")
             file.write(f"max-players={max_players}\n")
@@ -169,8 +181,6 @@ done'''
 
             # use-native-transport=false if you get spam for unable to access address of buffer
 
-        cprint(f"&aServer created at {server_path=}")
-
         # ask if we should add to config? default yes
         # change terminal to server_path and exit
         os.chdir(server_path)
@@ -179,8 +189,8 @@ done'''
 
         
         # Ask user if they want to preisntall some plugins
-        installPlugins = cinput("&3Install common plugins? ( yes / (no) )> ") or 'no'
-        if installPlugins.lower() == 'yes':
+        installPlugins = cinput("&3Install common plugins? [(yes)/no]> ") or 'yes'
+        if installPlugins.lower().startswith('y'):
             self.installPluginsToServer()
 
         # Send command to hook into proxy
@@ -189,25 +199,27 @@ done'''
             cprint(f"&a'svm server add {SERVER_NAME} 127.0.0.1:{port}'")
         else:
             cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}:{port}")
+        cprint(f"&aServer created at {server_path=}")
+
+        doStart = cinput("&3Start server now? [yes/(no)] >> ") or "yes"
+        s = Server(SERVER_NAME)
+        if doStart.lower().startswith('y'):
+            s.start_server()
+            cprint("&aServer {SERVER_NAME} started")
+
+        connectToConsoleOfServer = cinput("&3Connect to console of server? [yes/(no)] >> ") or "no"
+        if connectToConsoleOfServer.lower().startswith('y'):
+            s.enter_console()
+
 
     def installPluginsToServer(self):
-        easyMap = {} # Maps single int to -> long ID
-        for idx, (pID, name) in enumerate(IDtoName.items()):
-            # cprint(f"&f[{idx}] - {name}\t({id})")
-            cprint('&f[%2s]  &e%-20s  &7%12s' % (idx, pID, name)) # [ 0]  BungeeServerManager           7388
-            easyMap[idx] = id
-
-        print(IDtoName.keys())
-
-        # Enter the plugin IDS you wish to download
-        ids = cinput("&3Enter plugins to download, separated by spaces. (ex: 1 2 3) >> ").strip().split(" ")
-        for id in ids:
-            id = easyMap[int(id)]
-            if id in IDtoName.keys():
-                cprint(f"&aDownloading {IDtoName[id]}")
-                downloadResourceFromSpigot(id, f"{self.server_path}/plugins")
-            else:
-                cprint(f"&cInvalid ID: {id}")
+        title = 'Please choose which plugins you want to download (press SPACE to select, ENTER to continue): '
+        options = list(nameToID.keys())
+        selected = pick(options, title, indicator=' =>', multiselect=True, min_selection_count=0)
+        for name, idx in selected:
+            pluginID = nameToID[name]
+            cprint(f"&aDownloading {name} ({pluginID})")
+            downloadResourceFromSpigot(pluginID, f"{self.server_path}/plugins")
 
 
 

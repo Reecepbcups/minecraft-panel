@@ -33,10 +33,11 @@ class Yaml():
         self.config[key] = value
     
     def get(self, key):
-        try:
+        if key in self.config:
             return self.config[key]
-        except Exception:
-            return []
+        
+        print(f"{key} not found in config from: {self.path}")
+        return []
 
     def keys(self):
         return self.config.keys()

@@ -21,7 +21,6 @@ def paper_install():
         cprint(f"&4Invalid server type: {project}")
         paper_install()
 
-    # make a get request to PAPER_LINK
     jsonReply = requests.get(PAPER_LINK.format(project=project)).json()
     versionGroupString = ', '.join(jsonReply['versions'])
 
@@ -66,7 +65,7 @@ def paper_install():
 
 
 nameToID = { # Spigot IDS from url. Uses spiget API to get
-    "BungeeServerManager": 7388,
+    "BungeeServerManager (Proxy Only)": 7388,
     "ServerTools": 95853,
     "Plugman": 88135,
     "Luckperms": 28140,
@@ -80,37 +79,42 @@ class ServerCreator():
     # move inputs into console.py
     # cprint("&3Server Installer! (Press enter to accept the default value)")
 
-    def __init__(self, server_name):
+    def __init__(self):
+        server_loc = CONFIG.get("SERVER_DIRECTORY")
         SERVER_NAME = cinput("&bServer Name: ") or ("myServer-" + get_time())
 
-        server_loc = CONFIG.get("SERVER_DIRECTORY")
         if not os.path.exists(server_loc):
             os.mkdir(server_loc)
         server_path = f'{server_loc}/{SERVER_NAME}'
+        self.server_path = server_path # so isntallplugins works
+
         if os.path.exists(server_path):
             cprint(f"&cThis is already a server {server_path=}")
             exit(1) 
 
         # Add config check where if serverloc is not found, it will ask the user for the location of servers & make config
+        
         jarName = paper_install()
-        file_path = f'{CONFIG.get("DOWNLOAD_CACHE")}/{jarName}'
-
         os.mkdir(server_path)
-        shutil.move(file_path, server_path)
+        # print(jarName); exit()
 
+        # Download jar into server directly
+        downloadCache = str(CONFIG.get("DOWNLOAD_CACHE"))
+        file_path = f'{downloadCache}/{jarName}'
+        shutil.copyfile(file_path,f"{server_path}/{jarName}") 
 
         # other inputs
         RAM = cinput("&3Ram amount: [500M/(2G) etc...] >> ") or "2G"
         JAR_NAME=f"{jarName}"
 
-        # Start file creation
+        # Start file creation.
         startFile = f'''#!/bin/sh
-        # Reecepbcups - start.sh script for servers. EULA Auto Accepted.
-                    
-        MEM_HEAP="{RAM}"
-        JAR_FILE="{JAR_NAME}"
+# Reecepbcups - start.sh script for servers. EULA Auto Accepted.
+            
+MEM_HEAP="{RAM}"
+JAR_FILE="{JAR_NAME}"
 
-        '''
+'''
 
         # If RAM usage is >12GB, optomized java arguments are used
         if 'g' in RAM.lower() and int(''.join(filter(str.isdigit, RAM))) > 12: # remove all letters from RAM, so its only the #    
@@ -120,13 +124,13 @@ class ServerCreator():
 
         startFile += f'''
 
-        while true; do
-            java -Xms$MEM_HEAP -Xmx$MEM_HEAP $JAVA_ARGS -jar $JAR_FILE nogui
-            echo "Restarting server in 5 seconds"
-            sleep 4
-            echo "Restarting..."
-            sleep 1
-        done'''
+while true; do
+    java -Xms$MEM_HEAP -Xmx$MEM_HEAP $JAVA_ARGS -jar $JAR_FILE nogui
+    echo "Restarting server in 5 seconds"
+    sleep 4
+    echo "Restarting..."
+    sleep 1
+done'''
 
         # print(startFile)
 
@@ -139,11 +143,10 @@ class ServerCreator():
 
         # spigot.yml
         with open(server_path+"/spigot.yml", "a") as file:
-            isBehindBungee = cinput("&3Behind Bungee? [(true)/false] >> ") or "true"
-            file.write(f"""settings:
-            bungeecord: {isBehindBungee}
-            restart-on-crash: false"""
-            )
+            isBehindBungee = cinput("&3Behind Bungee? [(true)/false] >> ") or "true"  
+            if isBehindBungee != "true":
+                isBehindBungee = "false"          
+            file.write(f"""settings:\n  bungeecord: {isBehindBungee}\n  restart-on-crash: false""")
 
         # server.properties
         with open(server_path+"/server.properties", "a") as file:
@@ -157,12 +160,12 @@ class ServerCreator():
             file.write(f"max-players={max_players}\n")
             file.write(f"view-distance={view_distance}\n")
 
-            if isBehindBungee == "true":
-                file.write("network-compression-threshold=-1")
-                file.write("online-mode=false")
+            if isBehindBungee != "true": # standalone server, secure it                
+                file.write("online-mode=true\n")
+                file.write("network-compression-threshold=256\n")
             else:
-                file.write("online-mode=true")
-                file.write("network-compression-threshold=256")
+                file.write("online-mode=false\n")
+                file.write("network-compression-threshold=-1\n")                
 
             # use-native-transport=false if you get spam for unable to access address of buffer
 
@@ -178,18 +181,33 @@ class ServerCreator():
         # Ask user if they want to preisntall some plugins
         installPlugins = cinput("&3Install common plugins? ( yes / (no) )> ") or 'no'
         if installPlugins.lower() == 'yes':
-            self.installPluginPanel()
+            self.installPluginsToServer()
 
         # Send command to hook into proxy
         if isBehindBungee == "true":
-            cprint(f"&aAdd {server_name} to the BungeeCord proxy with the command:")
-            cprint(f"&a'svm server add {server_name} 127.0.0.1:{port}'")
+            cprint(f"&aAdd {SERVER_NAME} to the BungeeCord proxy with the command:")
+            cprint(f"&a'svm server add {SERVER_NAME} 127.0.0.1:{port}'")
         else:
-            cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}")
+            cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}:{port}")
 
-    def installPluginPanel(self):
-        for idx, name, id in enumerate(nameToID):
-            print(f"{idx+1}. {name} ({id})")
+    def installPluginsToServer(self):
+        easyMap = {} # Maps single int to -> long ID
+        for idx, (pID, name) in enumerate(IDtoName.items()):
+            # cprint(f"&f[{idx}] - {name}\t({id})")
+            cprint('&f[%2s]  &e%-20s  &7%12s' % (idx, pID, name)) # [ 0]  BungeeServerManager           7388
+            easyMap[idx] = id
+
+        print(IDtoName.keys())
+
+        # Enter the plugin IDS you wish to download
+        ids = cinput("&3Enter plugins to download, separated by spaces. (ex: 1 2 3) >> ").strip().split(" ")
+        for id in ids:
+            id = easyMap[int(id)]
+            if id in IDtoName.keys():
+                cprint(f"&aDownloading {IDtoName[id]}")
+                downloadResourceFromSpigot(id, f"{self.server_path}/plugins")
+            else:
+                cprint(f"&cInvalid ID: {id}")
 
 
 

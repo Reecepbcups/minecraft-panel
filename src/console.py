@@ -28,6 +28,8 @@ from server import Server
 # from database import Database
 from utils.system import checkIfRequirementsAreInstalled
 
+from akash_servers import AkashConsole
+
 import time, os
 
 # Load this before anything else
@@ -46,10 +48,11 @@ def main():
     # databasePanel(); exit(0)
 
     controlPanel = {        
-        "1": ["Console", ServerSelector],        
+        "1": ["Console", ServerSelector],              
         "2": ["List Running Servers", get_all_active_screens],
-        "3": ["StartAllServers", startAllServers],
-        "d": ["Docker Connect", DockerSelector],
+        "3": ["StartAllServers\n", startAllServers],
+
+        "a": ["Akash Docker Connect\n", AkashServerSelector],
 
         "ADMIN": ["&cAdmin Panel&r", AdminPanel],
         "DB": ["&aDatabase Functions&r", DatabasePanel],
@@ -79,6 +82,17 @@ def getServers(print_output=False) -> dict:
             print(f"[{idx}] {server}")
     return choices
 
+def getAkashServers(print_output=False) -> dict:
+    choices = {}
+
+    servers = CONFIG.get('akash-servers')
+
+    for idx, server in enumerate(servers):
+        choices[str(idx)] = server
+        if print_output:
+            print(f"[{idx}] {server}")
+    return choices
+
 def ServerSelector():
     cfiglet("&a", "Console", clearScreen=True)
 
@@ -91,9 +105,21 @@ def ServerSelector():
     panel = Server(choices[server])
     panel.enter_console()
 
+def AkashServerSelector():
+    cfiglet("&b", "Akash Selector", clearScreen=True)
+
+    choices = getAkashServers(print_output=True)
+
+    server = cinput("\nAkash Server Selector > ")
+    if server not in choices:
+        cprint("&cInvalid Selection")
+
+    panel = AkashConsole(choices[server])
+    panel.enter_console()
+
 
 def DockerSelector():
-    from docker_servers import DockerConsole
+    from akash_servers import DockerConsole
     import pick
     '''
     cd paper-docker-build

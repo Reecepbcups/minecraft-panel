@@ -3,6 +3,19 @@ from utils.cosmetics import cfiglet, cprint, cinput
 
 from server_creator import ServerCreator    
 
+'''
+adminPanel = {
+        "1": newServerInstance,
+        "2": stopAllServers,
+        # "3": "dailyRebootSetup",
+        # "WEB": "webLinkShortener",
+        "RESET-FIREWALL": firewallReset,
+        "CHANGE-JAVA-VERSION": changeJavaVersion,
+        # "KILL-ALL-JAVA": ,
+        "APPLY-FIREWALL": firewallApplyRules,
+    }
+'''
+
 class AdminPanel:
     '''
     This class is the user panel which wraps Database class.

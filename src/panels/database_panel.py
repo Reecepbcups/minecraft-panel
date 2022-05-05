@@ -13,6 +13,18 @@ def userAccessControl():
     db.enableMongoDBAuthentication(adminUsername, adminPassword)
     # Then you do what it says to do in this functiuon ^
 
+'''
+databasePanel = {
+        "1": createDatabase,
+        "2": deleteDatabase,
+        "3": showDatabases,
+        "4": createNewUser,
+        "5": deleteUser,
+        "6": showUser,
+        "exit": exit,
+    }
+'''
+
 class DatabasePanel:
     '''
     This class is the user panel which wraps Database class.

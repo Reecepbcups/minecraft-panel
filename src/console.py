@@ -37,33 +37,14 @@ SERVERS = serverGroups['spigot']
 ALL = list(PROXIES) + list(SERVERS)
 # /////
 
-'''
-adminPanel = {
-        "1": newServerInstance,
-        "2": stopAllServers,
-        # "3": "dailyRebootSetup",
-        # "WEB": "webLinkShortener",
-        "RESET-FIREWALL": firewallReset,
-        "CHANGE-JAVA-VERSION": changeJavaVersion,
-        # "KILL-ALL-JAVA": ,
-        "APPLY-FIREWALL": firewallApplyRules,
-    }
-    databasePanel = {
-        "1": createDatabase,
-        "2": deleteDatabase,
-        "3": showDatabases,
-        "4": createNewUser,
-        "5": deleteUser,
-        "6": showUser,
-        "exit": exit,
-    }
-'''
+
+from utils.screen import get_all_active_screens
+from panels.database_panel import DatabasePanel
+from panels.admin_panel import AdminPanel
 
 def main():
     # databasePanel(); exit(0)
-    from utils.screen import get_all_active_screens
-    from panels.database_panel import DatabasePanel
-    from panels.admin_panel import AdminPanel
+
     controlPanel = {        
         "1": ["Console", ServerSelector],        
         "2": ["List Running Servers", get_all_active_screens],
@@ -87,7 +68,7 @@ def main():
     if request == "exit":
         cprint("&cExiting Panel"); exit(0)
 
-    controlPanel[request][1]() # Could make args here & pass into all sub options. Then the underlying functions can use
+    controlPanel[request][1]()
     pass
 
 def getServers(print_output=False) -> dict:

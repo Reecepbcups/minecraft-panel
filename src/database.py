@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from pymongo import database
-from pymongo.typings import _DocumentType
+# from pymongo.typings import _DocumentType
 
 from utils.cosmetics import cinput, cprint
 
@@ -25,7 +25,7 @@ class Database:
     def listDatabases(self) -> list:
         return self.client.list_database_names()
 
-    def getDatabase(self, database_name) -> database.Database[_DocumentType]:
+    def getDatabase(self, database_name):
         '''
         Returns a database, or a new one if not created already
         '''

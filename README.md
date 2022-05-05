@@ -18,8 +18,9 @@ timedatectl set-timezone America/Chicago
 # Setup
 ### Arch
 ```
-pacman -S ufw python-pip sudo curl screen zip unzip lsof jq dos2unix jre-openjdk docker
+pacman -S ufw python-pip sudo curl git screen zip unzip lsof jq dos2unix jre-openjdk docker
 
+git clone https://github.com/Reecepbcups/minecraft-panel.git
 python -m pip install -r requirements.txt
 
 Optional:

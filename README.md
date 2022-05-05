@@ -18,12 +18,32 @@ timedatectl set-timezone America/Chicago
 # Setup
 ### Arch
 ```
-pacman -S ufw python-pip sudo curl screen zip unzip lsof jq dos2unix jre-openjdk
+pacman -S ufw python-pip sudo curl screen zip unzip lsof jq dos2unix jre-openjdk docker
 
 python -m pip install -r requirements.txt
 
 Optional:
 pacman -S redis iotop atop docker dstat glances
+
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+sudo usermod -aG docker $USER
+docker run hello-world
+
+nano /etc/docker/daemon.json
+{"hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}
+
+nano /etc/systemd/system/docker.service.d/override.conf
+ [Service]
+ ExecStart=
+ ExecStart=/usr/bin/dockerd
+
+systemctl daemon-reload
+systemctl restart docker.service
+
+Now you can docker -H XYZ:2375 ps
+
+(Or you can `docker -H HOST:2375 attach mc2` for console, however have to be careful about ctrl+p ctrl+q to exit tmux session)
 ```
 
 ### Arch MongoDB Setup Guide (Since arch does not have license for mongodb)
@@ -62,7 +82,7 @@ mongo
 
 ### Ubuntu / Debian
 ```
-sudo apt install ufw python3-pip sudo curl screen zip unzip lsof jq dos2unix <someJREHere>
+sudo apt install ufw python3-pip sudo curl screen zip unzip lsof jq dos2unix docker <someJREHere>
 
 python3 -m pip install -r requirements.txt
 

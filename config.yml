@@ -1,7 +1,7 @@
-PANEL_DIRECTORY: /root/minecraft-panel
-SERVER_DIRECTORY: /root/minecraft-panel/servers
-BACKUP_DIRECTORY: /root/minecraft-panel/backups
-DOWNLOAD_CACHE: /root/minecraft-panel/downloads
+PANEL_DIRECTORY: /home/reece/Desktop/minecraft-panel
+SERVER_DIRECTORY: /home/reece/Desktop/minecraft-panel/servers
+BACKUP_DIRECTORY: /home/reece/Desktop/minecraft-panel/backups
+DOWNLOAD_CACHE: /home/reece/Desktop/minecraft-panel/downloads
 servers:
   proxy:
   - proxy
@@ -9,6 +9,11 @@ servers:
   - testing
   standalone:
   - ''
+akash-servers:
+  reece-test-akash-1: 
+    dseq: 5753968 # Akashalytics raw_data panel
+    owner: "akash1rpv97xasy7px29ccdhy93ar6aj0t8a6895d4n3"
+    provider: "akash1r7y2msa9drwjss5umza854he5vwr2czunye9de"
 firewall:
   allow-ports:
   - 21

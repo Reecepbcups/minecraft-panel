@@ -1,9 +1,6 @@
 # minecraft-panel
 
 Original - https://github.com/Reecepbcups/bash-minecraft-panel
-
-Update to Python - https://github.com/Y2Kwastaken/mcpython-panel
-
 Continued production for CraftEconomy's needs - here
 
 
@@ -18,42 +15,41 @@ timedatectl set-timezone America/Chicago
 # Setup
 ### Arch
 ```
-pacman -S ufw python-pip sudo curl git screen zip unzip lsof jq dos2unix jre-openjdk docker
+sudo pacman -S ufw python-pip sudo curl git screen zip unzip lsof jq dos2unix jre-openjdk base-devel git nano vi
 
 git clone https://github.com/Reecepbcups/minecraft-panel.git
 python -m pip install -r requirements.txt
 
 Optional:
-pacman -S redis iotop atop docker dstat glances
+pacman -S redis iotop atop dstat glances
+```
 
-sudo systemctl start docker.service
-sudo systemctl enable docker.service
-sudo usermod -aG docker $USER
-docker run hello-world
 
-nano /etc/docker/daemon.json
-{"hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}
+### Akash Setup
+```
+# Install the Client (https://docs.akash.network/guides/cli/streamlined-steps/install-the-akash-client)
 
-nano /etc/systemd/system/docker.service.d/override.conf
- [Service]
- ExecStart=
- ExecStart=/usr/bin/dockerd
+cd ~/Downloads
+AKASH_VERSION="$(curl -s "https://raw.githubusercontent.com/ovrclk/net/master/mainnet/version.txt")"
+curl https://raw.githubusercontent.com/ovrclk/akash/master/godownloader.sh | sh -s -- "v$AKASH_VERSION"; sudo mv ./bin/akash /usr/local/bin
 
-systemctl daemon-reload
-systemctl restart docker.service
+# IDK If this is needed or not, may just be a ubuntu Things
+# go get golang.org/x/crypto/pbkdf2; go get golang.org/x/crypto/scrypt; go get github.com/youmark/pkcs8
 
-Now you can docker -H XYZ:2375 ps
-
-(Or you can `docker -H HOST:2375 attach mc2` for console, however have to be careful about ctrl+p ctrl+q to exit tmux session)
+akash keys add hot-wallet --recover
+akash tx cert generate client --from hot-wallet --overwrite
+akash tx cert publish client --from hot-wallet --gas-prices="0.025uakt" --gas="auto" --gas-adjustment=1.15 --node http://135.181.181.122:28957 --chain-id akashnet-2
+# new cert is at ~/.akash/<YOUR-ADDRESS>.pem
 ```
 
 ### Arch MongoDB Setup Guide (Since arch does not have license for mongodb)
 ```
 python -m pip install pymongo dnspython (so we can use srv URI)
-sudo pacman -S --needed base-devel git nano vi
 
 You could also run as a docker container, prob easier... install mongo client
+pacman -S docker
 sudo systemctl start docker
+sudo systemctl enable docker
 docker run -d -p 27017:27017 -v data:/data/db mongo
 
 https://www.maketecheasier.com/use-aur-in-arch-linux/

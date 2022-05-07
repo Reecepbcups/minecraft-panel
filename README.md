@@ -79,7 +79,9 @@ mongo
 
 ### Ubuntu / Debian
 ```
-sudo apt install ufw python3-pip sudo curl screen zip unzip lsof jq dos2unix docker <someJREHere>
+sudo apt install ufw python3-pip sudo curl screen zip unzip lsof jq dos2unix software-properties-common screen zip unzip sudo htop nano
+
+# Install java in # Debian Things section
 
 python3 -m pip install -r requirements.txt
 
@@ -102,21 +104,20 @@ echo "* soft nofile 150000" >> /etc/security/limits.conf
 ### Debian Things
 #### Need to go through this and see what is required
 ```
-# Java 11 - doesnt work for my 1.8 MC
-echo 'deb http://ftp.debian.org/debian stretch-backports main' | sudo tee /etc/apt/sources.list.d/stretch-backports.list
-sudo apt update && apt-get upgrade
-sudo apt install openjdk-11-jdk
-sudo apt-get install openjdk-11-jre
+# The following was done for akash
 
-# Java 8 / Java8
-wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
-sudo apt-get update && sudo apt-get install adoptopenjdk-8-hotspot
-
-# https://stackoverflow.com/questions/57031649/how-to-install-openjdk-8-jdk-on-debian-10-buster
-sudo apt-add-repository 'deb http://security.debian.org/debian-security stretch/updates main'
+apt-get update
+apt install software-properties-common screen zip unzip sudo htop nano
 sudo apt-get update
-sudo apt-get install openjdk-8-jdk
+
+
+wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+tar xvf openjdk-17.0.2_linux-x64_bin.tar.gz
+sudo mv jdk-17.0.2/ /opt/jdk-17/
+echo 'export JAVA_HOME=/opt/jdk-17' | sudo tee /etc/profile.d/java17.sh
+echo 'export PATH=$JAVA_HOME/bin:$PATH'|sudo tee -a /etc/profile.d/java17.sh
+source /etc/profile.d/java17.sh
+java -version
 
 sudo update-alternatives --config java
 ```

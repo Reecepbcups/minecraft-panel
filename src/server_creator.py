@@ -74,10 +74,14 @@ def paper_install():
 nameToID = { # Spigot IDS from url. Uses spiget API to get
     "BungeeServerManager (Proxy Only)": 7388,
     "ServerTools": 95853,
+    "Spark": 57242,
     "Plugman": 88135,
     "Luckperms": 28140,
     "Vault": 34315,
     "ProtocolLib": 1997,
+    "placeholderapi": 6245,
+    "dynmap": 274,
+    "fast-async-worldedit": 13932,
 }
 IDtoName = {v: k for k, v in nameToID.items()}
 

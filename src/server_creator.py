@@ -223,7 +223,7 @@ class ServerCreator():
         # Moves file from the cache folder -> the server parent folder
         downloadCache = str(CONFIG.get("DOWNLOAD_CACHE"))
         file_path = f'{downloadCache}/{jarName}'
-        shutil.copyfile(file_path,f"{self.server_path}/{jarName}")
+        shutil.copyfile(file_path, f"{self.server_path}/{jarName}")
         return jarName
 
     def createStartFile(self, RAM, JAR_NAME):

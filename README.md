@@ -7,7 +7,7 @@ Original Bash Version - https://github.com/Reecepbcups/bash-minecraft-panel
 ```
 pacman -S ufw python-pip sudo curl git screen zip \
 unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
-iotop atop dstat glances
+iotop atop dstat glances maven
 
 # optional: redis
 
@@ -58,4 +58,17 @@ build-essential nginx htop glances nodejs cpufrequtils figlet redis default-jre 
 
 cpufreq-set -r -g performance	
 timedatectl set-timezone America/Chicago
+```
+
+
+### Stress Test A Server
+```
+git clone https://github.com/PureGero/minecraft-stress-test.git
+cd minecraft-stress-test && mvn
+
+# Ensure your server.properties is the following:
+online-mode=false
+allow-flight=true
+
+java -Dbot.protocol.version=758 -Dbot.ip=127.0.0.1 -Dbot.port=25678 -Dbot.radius=1000 -Dbot.count=1000 -jar target/minecraft-stress-test-1.0.0-SNAPSHOT-jar-with-dependencies.jar
 ```

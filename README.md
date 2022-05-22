@@ -6,19 +6,19 @@ Original Bash Version - https://github.com/Reecepbcups/bash-minecraft-panel
 ### Arch
 ```
 pacman -S ufw python-pip sudo curl git screen zip \
-    unzip lsof jq dos2unix jre-openjdk base-devel git nano vi
+unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
+iotop atop dstat glances
+
+# optional: redis
 
 git clone https://github.com/Reecepbcups/minecraft-panel.git
-python -m pip install -r requirements.txt
+cd minecraft-panel && python -m pip install -r requirements/requirements.txt
 
-Optional:
-pacman -S redis iotop atop dstat glances
-
+hostnamectl hostname MACHINENAME
 
 git config --global user.name "NAME"
 git config --global user.email "NAME@tld.com"
 git config credential.helper store
-git push
 
 # You can view all params to change with `sysctl -a`
 echo "65535" > /proc/sys/fs/file-max

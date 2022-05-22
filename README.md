@@ -13,6 +13,7 @@ iotop atop dstat glances
 
 git clone https://github.com/Reecepbcups/minecraft-panel.git
 cd minecraft-panel && python -m pip install -r requirements/requirements.txt
+# Then update minecraft-panel/config.yml to your values
 
 hostnamectl hostname MACHINENAME
 

@@ -1,7 +1,7 @@
-PANEL_DIRECTORY: /home/reece/Desktop/minecraft-panel
-SERVER_DIRECTORY: /home/reece/Desktop/minecraft-panel/servers
-BACKUP_DIRECTORY: /home/reece/Desktop/minecraft-panel/backups
-DOWNLOAD_CACHE: /home/reece/Desktop/minecraft-panel/downloads
+PANEL_DIRECTORY: /root/minecraft-panel
+SERVER_DIRECTORY: /root/minecraft-panel/servers
+BACKUP_DIRECTORY: /root/minecraft-panel/backups
+DOWNLOAD_CACHE: /root/minecraft-panel/downloads
 servers:
   proxy:
   - proxy

@@ -7,7 +7,7 @@ Original Bash Version - https://github.com/Reecepbcups/bash-minecraft-panel
 ```
 pacman -S ufw python-pip sudo curl git screen zip \
 unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
-iotop atop dstat glances maven
+iotop atop dstat glances maven cpio pahole
 
 # optional: redis
 

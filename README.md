@@ -15,10 +15,10 @@ timedatectl set-timezone America/Chicago
 # Setup
 ### Arch
 ```
-sudo pacman -S ufw python-pip sudo curl git screen zip unzip lsof jq dos2unix jre-openjdk base-devel git nano vi
+pacman -S ufw python-pip sudo curl git screen zip unzip lsof jq dos2unix jre-openjdk base-devel git nano vi
 
 git clone https://github.com/Reecepbcups/minecraft-panel.git
-python -m pip install -r requirements.txt
+cd minecraft-panel && python -m pip install -r requirements/requirements.txt
 
 Optional:
 pacman -S redis iotop atop dstat glances

@@ -28,3 +28,14 @@ auth[username] = database_name # auth db
 CONFIG.set("Mongo-Authentication", auth)
 CONFIG.save()
 '''
+
+
+'''
+# To set a value nested, do the following:
+# For now it only supports down 2 sections
+serverGroups = CONFIG.get("servers")
+SERVERS = serverGroups['spigot']            
+SERVERS.append(SERVER_NAME)
+CONFIG.set("servers.spigot", SERVERS)
+CONFIG.save()
+'''

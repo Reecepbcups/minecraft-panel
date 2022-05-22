@@ -30,7 +30,11 @@ class Yaml():
         return self.config
     
     def set(self, key, value):
-        self.config[key] = value
+        if '.' in key: # only works 2 down like: CONFIG.set("servers.spigot", SERVERS)
+            keys = key.split('.')
+            self.config[keys[0]][keys[1]] = value        
+        else:
+            self.config[key] = value
     
     def get(self, key):
         if key in self.config:

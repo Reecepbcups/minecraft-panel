@@ -43,18 +43,21 @@ def main():
     # print(f.getRulesList())
     # f.allowFullAccessToWhitelistedConfigAddresses()
     f.print()
-    print("xiting @ firewall.py main()")
+    print("exiting @ firewall.py main()")
     exit()
 
 class Firewall():
     def __init__(self):
         if isUserRoot() == False:
+            print("You must be root to use the firewall feature!")
             exit(1)
 
         firewallSettings = CONFIG.get("firewall")
         # print(firewallSettings)
         self.openAccessPorts = firewallSettings['allow-ports']
         self.ExternalIPFullAccess = firewallSettings['full-access-ip-connections']
+        self.allowPort(25565)
+        self.allowPort(22)
 
     def __str__(self) -> str:
         openPorts = self.openAccessPorts
@@ -76,6 +79,9 @@ class Firewall():
     def printRules(self) -> None:
         os.system("ufw status numbered")
 
+    def isEnabled(self) -> bool:
+        return 'inactive' in os.popen('ufw status numbered')
+
     def _port(self, port=0, hostIP="", action="allow", debug=False):
         '''
         Builds a rule for ufw.
@@ -84,6 +90,7 @@ class Firewall():
         '''
         if port == -1:
             ufw.add(f"allow from {hostIP} to any")
+            return
         elif port == 0:
             cprint("No port specified")
             return

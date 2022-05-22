@@ -7,7 +7,7 @@ Original Bash Version - https://github.com/Reecepbcups/bash-minecraft-panel
 ```
 pacman -S ufw python-pip sudo curl git screen zip \
 unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
-iotop atop dstat glances maven cpio pahole
+iotop atop dstat glances maven cpio pahole htop btop
 
 # optional: redis
 
@@ -54,7 +54,7 @@ akash tx cert publish client --from hot-wallet --gas-prices="0.025uakt" --gas="a
 
 ### Look into if they should be added
 ```
-build-essential nginx htop glances nodejs cpufrequtils figlet redis default-jre sysstat slurm speedometer software-properties-common
+build-essential nginx glances nodejs cpufrequtils figlet redis default-jre sysstat slurm speedometer software-properties-common
 
 cpufreq-set -r -g performance	
 timedatectl set-timezone America/Chicago
@@ -77,12 +77,17 @@ java -Dbot.protocol.version=758 -Dbot.ip=127.0.0.1 -Dbot.port=25678 -Dbot.radius
 
 ### Arch Custom Kernel
 ```
-git clone https://aur.archlinux.org/linux-lqx.git
-mv linux-lqx /home/test
-chmod 777 /home/test/linux-lqx
-sudo useradd -m test
-su test
+sudo pacman -S linux-zen linux-zen-headers
 
-cd linux-lqx
-mkpkg --skippgpcheck
+sudo nano /etc/default/grub
+
+# Change:
+GRUB_DEFAULT=saved # change from =0
+GRUB_SAVEDEFAULT=true # uncomment
+GRUB_DISABLE_SUBMENU=y # uncomment
+
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+reboot
+
+uname -r
 ```

@@ -14,6 +14,10 @@ iotop atop dstat glances
 git clone https://github.com/Reecepbcups/minecraft-panel.git
 cd minecraft-panel && python -m pip install -r requirements/requirements.txt
 # Then update minecraft-panel/config.yml to your values
+# Update src/utils/config.py PATH_TO_CONFIG_FILE if you want to use a custom config, else it will use thee default
+
+python minecraft-panel/src/console.py
+# First run it will prompt you to source the bashrc file for the console alias
 
 hostnamectl hostname MACHINENAME
 

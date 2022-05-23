@@ -1,4 +1,4 @@
-## Install docker
+## Install via docker
 ```
 pacman -S docker
 sudo systemctl start docker
@@ -6,6 +6,7 @@ sudo systemctl enable docker
 docker run -d -p 27017:27017 -v data:/data/db mongo
 ```
 
+## Install via AUR
 ```
 https://www.maketecheasier.com/use-aur-in-arch-linux/
 useradd -m software -p myPassword19191 --shell /bin/false

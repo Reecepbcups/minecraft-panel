@@ -1,4 +1,5 @@
 ## Install via docker
+best option to run is with Akash persistant storage!
 ```
 pacman -S docker
 sudo systemctl start docker

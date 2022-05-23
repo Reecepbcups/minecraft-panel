@@ -43,16 +43,37 @@ self.databaseFunctions = {
 '''
 
 '''
-databasePanel = {
-        "1": createDatabase,
-        "2": deleteDatabase,
-        "3": showDatabases,
-        "4": createNewUser,
-        "5": deleteUser,
-        "6": showUser,
-        "exit": exit,
-    }
+
 '''
+
+class DatabasePanel():
+    def __init__(self):
+        databasePanel = {
+            "1": self.showDatabases,
+            "2": self.createNewUser,
+            "3": self.deleteDatabase,
+            "4": self.deleteUser,
+            "5": self.showUsers,
+            "exit": exit,
+        }
+        while True:
+            self.run()
+
+    def run(self):
+        choice = input("Choice: ")
+        self.databasePanel[choice]()
+
+    # These can not have any arguments
+    def showDatabases(self):
+        pass
+    def createNewUser(self):
+        pass
+    def deleteDatabase(self):
+        pass
+    def deleteUser(self):
+        pass
+    def showUsers(self):
+        pass
 
 def main():
     # m = MongoServerCache()

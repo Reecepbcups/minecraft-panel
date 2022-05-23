@@ -3,10 +3,29 @@ import json, os
 import ast
 import pymongo
 
+## ! not attached to the main panel yet, just testing
+
 '''
 Class to save an encrypted dict via password
 https://pymongo.readthedocs.io/en/stable/api/pymongo/database.html#pymongo.database.Database.command
 '''
+
+
+def main():
+    m = MongoServerCache()
+    # m.newServer()
+    # m.decryptServer()
+    uri = m.serverInfoToURI(m.decryptServer())
+    
+    # m.connectToServer(uri)
+
+    a = MongoStuff(uri)
+    a.insert('test', 'reece2', {"name": "reece", 'age': 25})
+
+    print(f'Databaseas: {a.getDatabases()}')
+    
+    a.getUsers(Database(a.client, 'admin'))
+
 
 def userAccessControl():
     # Add check here to see if UAC is enabled
@@ -71,15 +90,16 @@ class MongoStuff():
 
     # maybe just have a func to insert? since the DB stuff will auto be handled?
     # unless we find a way to get all roles
-    def createCollection(self, dbName, collectionName, values={}) -> InsertOneResult:
-        myDB = self.createDatabase(dbName)
-        myCol = myDB.create_collection(collectionName)
+    # def createCollection() -> InsertOneResult:    
+    #     return x.inserted_id
+
+    def insert(self, dbName, collectionName, values={}) -> InsertOneResult:
+        myCol = self.client[dbName][collectionName]
         x = myCol.insert_one(values)
-        print(x.inserted_id)
         return x.inserted_id
 
 class MongoServerCache:
-    def __init__(self, file_name="MongoDBCache.json"):
+    def __init__(self, file_name="MongoDBSCache.json"):
         # Gets current folder held location
         self.location = os.path.dirname(os.path.abspath(__file__))
         self.FILE_NAME = f"{self.location}/{file_name}"
@@ -87,7 +107,7 @@ class MongoServerCache:
 
         self.servers = self._loadServersFromJSON()  
 
-    def _askPassword(self, text="Enter your password to enc/dec: "):
+    def _askPassword(self, text="Enter your password to encrypt: "):
         return input(text)
 
     def decryptServer(self, server='') -> dict:
@@ -98,18 +118,18 @@ class MongoServerCache:
             print("Server not found")
             self.decryptServer()
         else:
-            dec_obj_str = decrypt(self.servers[server], self._askPassword())
+            dec_obj_str = decrypt(self.servers[server], self._askPassword("Enter password to unlock: "))
             print(f"{dec_obj_str}")
         # converts object to a dict from string
         return ast.literal_eval(dec_obj_str)
 
     def serverInfoToURI(self, decryptedServerInfo: dict) -> str:
-        fmt = "mongodb://{addr}:{port} -u {user} --authenticationDatabase {authdb} -p {password}"
+        fmt = "mongodb://{user}:{password}@{addr}:{port}/?authSource={authdb}"
         uri = fmt.format(**decryptedServerInfo)
         print(uri)
         return uri
 
-    def runMongoCommand(self, uri):
+    def connectToServer(self, uri):
         os.system(f"mongo {uri}")
 
     def printServers(self):
@@ -119,21 +139,26 @@ class MongoServerCache:
         server_name = input("Enter Server Name: ") or 'myServer'
         tempObj = {
             "addr": input("Enter IP Address: ") or '127.0.0.1',
-            "port": input("Enter Port: ") or '27017',
+            "port": input("Enter Port: ") or 27017,
             "user": input("Enter Username: ") or 'admin',
             "authdb": input("Enter AuthDB: ") or 'admin',
             "password": input("Enter Password: ") or 'password'
         }
 
-        print("Confirm the values are correct:")
-        print(f"server_name={server_name}")
-        for k in tempObj.keys():
-            if k == "password":
-                print(f"{k}= ******")
-            else:
-                print(f"{k}= {tempObj[k]}")
+        # removes http(s):// & the / at the end
+        if tempObj['addr'].startswith("http"):
+            tempObj['addr'] = tempObj['addr'].split("//")[-1]
+        if tempObj['addr'].endswith("/"):
+            tempObj['addr'] = tempObj['addr'][:-1]
+
+        tempObj['port'] = int(tempObj['port'])
 
         myPass = self._askPassword()
+        confirmPass = self._askPassword("Confirm Password: ")
+        if myPass != confirmPass:
+            print("Passwords do not match")
+            self.newServer()
+
         enc_obj = encrypt(str(tempObj), myPass)
 
         self.servers[server_name] = enc_obj
@@ -142,7 +167,6 @@ class MongoServerCache:
         print(f"Saved {server_name} as {enc_obj}")
     
     def _saveServersToJSON(self):
-        # print(self.FILE_NAME, "saving dump")
         with open(self.FILE_NAME, "w") as f:
             json.dump(self.servers, f, indent=4)
 
@@ -157,11 +181,4 @@ class MongoServerCache:
 
 
 if __name__ == "__main__":
-    m = MongoServerCache()
-    m.newServer()
-    # m.decryptServer()
-    uri = m.serverInfoToURI(m.decryptServer())
-    
-
-    a = MongoStuff(uri)
-    a.createCollection("test", "reece", { "placeholder": "value"})
+    main()

@@ -16,6 +16,37 @@ adminPanel = {
     }
 '''
 
+import os
+def _saveENVPairs(pairs: dict):
+    print(pairs)
+    home = os.path.expanduser("~") + "/.bashrc"
+
+    for k, v in pairs.items():
+        print("Setting ENV Variable in bashrc: " + f"export {k}={v}")    
+        with open(home, "a") as f:
+            f.write(f"export {k}={v}\n")
+
+    cprint(f"\n\n&c[!] RUN: &asource {home}")
+    exit()
+
+def setENVVariable():
+    pairs = {}
+
+    cprint("&cAdd as many key,value pairs as you want.")
+    cprint("&f- Type 'exit' to stop & save to file")
+    cprint("&f- Type 'show' to show all pairs")
+    while True:
+        cprint("-"*25)
+        key = cinput("&f\nEnter the ENV Variable &ekey &f> ")
+        value = cinput("&fEnter the ENV Variable &evalue &f> ")
+        if key == "exit" or value == "exit":
+            _saveENVPairs(pairs)
+        elif key == "show" or value == "show":
+            print(pairs)
+        else:
+            pairs[key] = value
+    
+
 class AdminPanel:
     '''
     This class is the user panel which wraps Database class.
@@ -27,6 +58,12 @@ class AdminPanel:
             # "port": ["Fix Broken Port\n", print],
 
             'new': ["Create New Instance\n", ServerCreator],
+
+            'firewall': ["Firewall\n", print], # firewall panel with options to use the class
+
+            'web-short': ["Link Shortener\n", print],
+
+            'env': ["OS ENV Variables\n", setENVVariable],
 
             "cp": ["Main Menu", print],
             "exit": ["Exit", exit]

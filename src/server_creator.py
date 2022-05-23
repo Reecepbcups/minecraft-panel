@@ -72,7 +72,7 @@ def paper_install():
 
 
 nameToID = { # Spigot IDS from url. Uses spiget API to get
-    "BungeeServerManager (Proxy Only)": 7388,
+    "BungeeServerManager_proxy": 7388,
     "ServerTools": 95853,
     "Spark": 57242,
     "Plugman": 88135,
@@ -173,8 +173,9 @@ class ServerCreator():
                 CONFIG.save()
 
         # Ask user if they want to preisntall some plugins
-        installPlugins = cinput("&bInstall common plugins? [(yes)/no]> ") or 'yes'
+        installPlugins = cinput("\n&bInstall common plugins? &f[(yes)/no] &b>> ") or 'yes'
         if installPlugins.lower().startswith('y'):
+            print()
             self.installPluginsToServer()
 
         cprint(f"&aServer created at {server_path=}")
@@ -183,7 +184,7 @@ class ServerCreator():
             # firewall port here
             firewall = Firewall()
             firewall.denyPort(port)
-            print(f"Firewall has been denied port to {port}")
+            cprint(f"\n&cFirewall has been denied port to {port}")
             firewall.allowFullAccessToWhitelistedConfigAddresses() # ensures other servers can still connect. Not sure this is required
 
             cprint(f"\n&cAdd {SERVER_NAME} to the BungeeCord proxy with the command:")
@@ -192,7 +193,7 @@ class ServerCreator():
             cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}:{port}")
         
 
-        doStart = cinput("&bStart server now? [yes/(no)] &b>> ") or "yes"
+        doStart = cinput("\n&bStart server now? &f[yes/(no)] &b>> ") or "yes"
         s = Server(SERVER_NAME)
         if doStart.lower().startswith('y'):
             s.start_server()
@@ -258,23 +259,37 @@ class ServerCreator():
 
 
 
-# import requests
+from tqdm import tqdm
 def downloadResourceFromSpigot(resourceID, folderPath=os.getcwd(), debug=False):
     url = f"https://api.spiget.org/v2/resources/{resourceID}/download"
 
-    response = requests.get(url)
+    response = requests.get(url, stream=True)
+    total = int(response.headers.get('content-length', 0))
 
     pluginName = IDtoName[resourceID]
     jarName = f"{folderPath}/{pluginName}.jar"
 
-    with open(jarName, "wb") as jar:
-        jar.write(response.content)
+    # with open(jarName, "wb") as jar:
+    #     jar.write(response.content)
 
-    if debug: print(f"Downloaded {pluginName} to {jarName}")
+    with open(pluginName, 'wb') as file, tqdm(
+            desc=pluginName,
+            total=total,
+            unit='MiB',
+            unit_scale=True,
+            unit_divisor=1024,
+            bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}" # https://github.com/tqdm/tqdm/issues/585
+    ) as bar:
+        for data in response.iter_content(chunk_size=1024):
+            size = file.write(data)
+            bar.update(size)
+
+    if debug: 
+        print(f"Downloaded {pluginName} to {jarName}")
+
 
 if __name__ == "__main__":
-    # TEst dwnload
-    downloadResourceFromSpigot(95853)
+    downloadResourceFromSpigot(95853) # test download
 
 def writeToDefaultConfig():
     luckpermsConfig = f"""

@@ -9,3 +9,4 @@ pyyaml
 pyufw # sudo apt-get install ufw
 pick  # https://github.com/wong2/pick
 pymongo
+dnspython

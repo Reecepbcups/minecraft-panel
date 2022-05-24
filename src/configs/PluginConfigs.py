@@ -71,7 +71,7 @@ class PluginConfigs:
         if option.startswith('n'):
             secretLen = input(f'SecuredNetwork secret length (50): ') or 50
             secret = ''.join(random.choice(string.ascii_letters + "123456789_") for i in range(int(secretLen))) 
-            print(f'SecuredNetwork secret: {secret}. Ensure this is in your bungee as well')
+            print(f'SecuredNetwork secret: {secret}   --- Ensure this is in your bungee as well')
         else:
             while secret == "":
                 secret = input("SecuredNetwork, Your Secret: ") or ""

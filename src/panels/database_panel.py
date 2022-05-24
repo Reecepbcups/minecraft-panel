@@ -42,6 +42,8 @@ class DatabasePanel():
             # "ud": ["Delete User", self.deleteUser],
             "su": ["Show Users\n", self.showUsers],
 
+            "suri": ["Show URI\n", self.showURI],
+
             "ch": ["Change Active Instance", self._change_uri],
             "sh": [f"Server Shell", self.connectToServer],
             "add": ["Add a New Mongo Instance\n", self.addInstance],
@@ -71,6 +73,12 @@ class DatabasePanel():
                 continue
             self.databasePanel[request][1]() 
             cfiglet("&a", "MongoDB Panel", clearScreen=False)            
+
+    def showURI(self):
+        if len(self.uri) > 0:
+            print(self.uri)
+        else:
+            cprint("&cNo URI set yet")
 
     def connectToServer(self):        
         self._set_server_uri()

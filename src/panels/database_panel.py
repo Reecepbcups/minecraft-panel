@@ -5,7 +5,7 @@ import pymongo
 
 # from database import Database
 # from utils.config import CONFIG
-from utils.cosmetics import cprint, cinput
+from utils.cosmetics import cprint, cinput, cfiglet
 
 # TODO: Combine all this into 1 class?
 
@@ -42,26 +42,33 @@ self.databaseFunctions = {
         }
 '''
 
-'''
-
-'''
-
 class DatabasePanel():
     def __init__(self):
-        databasePanel = {
-            "1": self.showDatabases,
-            "2": self.createNewUser,
-            "3": self.deleteDatabase,
-            "4": self.deleteUser,
-            "5": self.showUsers,
-            "exit": exit,
+        self.uri = ""
+        self.databasePanel = {
+            '1': ["Show Databases", self.showDatabases],
+            "2": ["Create New User", self.createNewUser],
+            "3": ["Drop Database", self.deleteDatabase],
+            "4": ["Delete User", self.deleteUser],
+            "5": ["Show Users\n", self.showUsers],
+            "connect": ["Connect to server", self.connectToServer],
+            "exit": ["exit", exit],
         }
         while True:
             self.run()
 
-    def run(self):
-        choice = input("Choice: ")
-        self.databasePanel[choice]()
+    def run(self):        
+        while True:
+            cfiglet("&c", "MongoDB Panel", clearScreen=True)
+            for k, v in self.databasePanel.items():
+                cprint(f"[{k}]\t {v[0]}")
+
+            # Split it into args so we can pass through functions? This needed?
+            request = cinput("\nDB> ")
+            if request == "cp":
+                from console import main
+                main()
+            self.databasePanel[request][1]() 
 
     # These can not have any arguments
     def showDatabases(self):
@@ -75,6 +82,11 @@ class DatabasePanel():
     def showUsers(self):
         pass
 
+    def connectToServer(self):
+        m = MongoServerCache()
+        self.uri = m.serverInfoToURI(m.decryptServer())
+        m.connectToServer(self.uri)
+
 def main():
     # m = MongoServerCache()
     # m.newServer()
@@ -82,8 +94,8 @@ def main():
     # uri = m.serverInfoToURI(m.decryptServer())
     
     # m.connectToServer(uri)
-    uri = "mongodb://root:akashmongodb19pass@782sk60c31ell6dbee3ntqc9lo.ingress.provider-2.prod.ewr1.akash.pub:31543/?authSource=admin"
-    a = MongoStuff(uri)
+    # uri = "mongodb://root:akashmongodb19pass@782sk60c31ell6dbee3ntqc9lo.ingress.provider-2.prod.ewr1.akash.pub:31543/?authSource=admin"
+    # a = MongoStuff(uri)
     # a.insert('reece', 't2', {"name": "v", 'age': 12})
 
     # print(a.find_one('test', 'reece2', filter={"name": "reece"}))
@@ -98,8 +110,9 @@ def main():
 
     # a._actual_create_user('admin', username='reece', password='1234', roles=[{'role': 'readWrite', 'db': 'test'}])
 
-    print(f'Databases: {a.get_databases()}')
+    # print(f'Databases: {a.get_databases()}')
     # a.get_users(Database(a.client, 'admin'))
+    pass
 
 
 def userAccessControl():

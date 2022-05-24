@@ -41,7 +41,7 @@ ALL = list(PROXIES) + list(SERVERS)
 
 
 from utils.screen import get_all_active_screens
-# from panels.database_panel import DatabasePanel # not done yet
+from panels.database_panel import DatabasePanel 
 from panels.admin_panel import AdminPanel
 
 def main():
@@ -55,7 +55,7 @@ def main():
         "a": ["Akash Docker Connect\n", AkashServerSelector],
 
         "ADMIN": ["&cAdmin Panel&r", AdminPanel],
-        # "DB": ["&aDatabase Functions&r", DatabasePanel],
+        "DB": ["&aDatabase Functions&r", DatabasePanel],
     }
 
     # isSpigotServerOnBungee("test")

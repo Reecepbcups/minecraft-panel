@@ -272,7 +272,7 @@ def downloadResourceFromSpigot(resourceID, folderPath=os.getcwd(), debug=False):
     # with open(jarName, "wb") as jar:
     #     jar.write(response.content)
 
-    with open(pluginName, 'wb') as file, tqdm(
+    with open(jarName, 'wb') as file, tqdm(
             desc=pluginName,
             total=total,
             unit='MiB',

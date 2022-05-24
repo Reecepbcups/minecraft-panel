@@ -70,17 +70,19 @@ def paper_install():
         print(e)
         return ""
 
-
+# TODO
 nameToID = { # Spigot IDS from url. Uses spiget API to get
     "BungeeServerManager (proxy)": 7388,
     "BungeePluginManager (proxy)": 7288,
-    "SecuredNetwork (BungeeGuard Alt, REQ: Protocollib)": 65075,
+
+    "SecuredNetwork (*Protocollib)": 65075,
+    "Vault": 34315,
+    "ProtocolLib": 1997,
 
     "ServerTools (*Vault)": 95853, 
     "Luckperms (SPIGOT, *Vault)": 28140,           
     "Plugman": 88135,    
-    "Vault": 34315,
-    "ProtocolLib": 1997,
+        
     "placeholderapi": 6245,
     "Spark": 57242,
     "dynmap": 274,
@@ -145,6 +147,11 @@ class ServerCreator():
             network_compression_threshold = cinput("&bnetwork_compression_threshold &f(256) &b>> ") or "256"
             ip_forward = cinput("&bip_forward &f(true) &b>> ") or "true"
 
+            # TODO make a list in the future?
+            serverPriority = cinput("&bServer Priority &7[like a hub] &f(lobby) &b>> ") or "lobby"
+
+            serverPriorityAddr = input("&bServer Priority Address &f(127.0.0.1:30000) &b>> ") or "127.0.0.1:30000"
+
             with open(f"{server_path}/config.yml", "a") as conf:                
                 conf.write(f"player_limit: {player_limit}\n")
                 conf.write(f"remote_ping_timeout: {remote_ping_timeout}\n")
@@ -154,6 +161,28 @@ class ServerCreator():
                 conf.write(f"network_compression_threshold: {network_compression_threshold}\n")
                 conf.write(f"ip_forward: {ip_forward}\n")
                 conf.write(f"listeners:\n- host: 0.0.0.0:{port}\n")
+                
+                conf.write(f"""listeners:
+- host: 0.0.0.0:{port}
+  motd: '&bBungeee server from server_creator'
+  max_players: {player_limit}
+  force_default_server: false
+  tab_size: 60
+  forced_hosts:
+    pvp.md-5.net: pvp
+  tab_list: GLOBAL_PING
+  bind_local_address: true
+  ping_passthrough: false
+  query_enabled: false
+  query_port: 25577
+  proxy_protocol: false
+  priorities:
+  - {serverPriority}""")
+                conf.write(f"""\nservers:
+  {serverPriority}:
+    motd: ''
+    address: {serverPriorityAddr}
+    restricted: false""")
 
         os.chdir(server_path)
         os.mkdir("logs"); os.mkdir("plugins")

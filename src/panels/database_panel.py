@@ -44,6 +44,8 @@ self.databaseFunctions = {
 
 class DatabasePanel():
     def __init__(self):
+        self.m = MongoServerCache()
+        # self.mFuncs = MongoStuff() # mongoDB functions
         self.uri = ""
         self.databasePanel = {
             '1': ["Show Databases", self.showDatabases],
@@ -51,15 +53,15 @@ class DatabasePanel():
             "3": ["Drop Database", self.deleteDatabase],
             "4": ["Delete User", self.deleteUser],
             "5": ["Show Users\n", self.showUsers],
+            "6": ["Change DB Server\n", self._set_server_uri],
             "connect": ["Connect to server", self.connectToServer],
             "exit": ["exit", exit],
         }
-        while True:
-            self.run()
+        self.run()
 
-    def run(self):        
-        while True:
-            cfiglet("&c", "MongoDB Panel", clearScreen=True)
+    def run(self): 
+        cfiglet("&a", "MongoDB Panel", clearScreen=True)               
+        while True:         
             for k, v in self.databasePanel.items():
                 cprint(f"[{k}]\t {v[0]}")
 
@@ -69,23 +71,61 @@ class DatabasePanel():
                 from console import main
                 main()
             self.databasePanel[request][1]() 
+            cfiglet("&a", "MongoDB Panel", clearScreen=False) 
 
     # These can not have any arguments
-    def showDatabases(self):
-        pass
+    def showDatabases(self):    
+        self._set_server_uri()        
+        print("Databases", self.mFuncs.get_databases())
+        input("Enter to continue...")
+
     def createNewUser(self):
-        pass
+        self._set_server_uri()    
+        username = input("New User Username: ")
+        password = input("New User Password: ")
+        database = input("Database (admin): ") or 'admin'    
+        self.mFuncs.create_new_user(username, password, database)
+        input("Enter to continue...")
+
     def deleteDatabase(self):
         pass
+
     def deleteUser(self):
         pass
-    def showUsers(self):
-        pass
 
-    def connectToServer(self):
-        m = MongoServerCache()
-        self.uri = m.serverInfoToURI(m.decryptServer())
-        m.connectToServer(self.uri)
+    def showUsers(self):
+        self._set_server_uri()        
+        print("Databases:", self.mFuncs.get_databases())
+
+        db = input("Database you want to show users for: ")
+        if db not in self.mFuncs.get_databases():
+            print(f"Database {db} not in this server's mongodb")
+            self.showUsers()
+
+        print()
+        users = {}
+        for u in self.mFuncs.get_users(db):      
+            roles = []
+            for r in u['roles']:
+                roles.append(str(r['role']) + ": " + str(r['db']))
+            # print(f"{u['user']}\n\t{roles}")
+            users[u['user']] = roles
+
+        for k, v in users.items():
+            print(f"{k}\t{v}")
+
+        input("Enter to continue...")
+
+    def _set_server_uri(self):
+        if len(self.uri) > 0:
+            return self.uri
+        self.uri = self.m.serverInfoToURI(self.m.decryptServer(), debug=False)
+        self.mFuncs = MongoStuff(self.uri) # put in _set_server_uri?
+        return self.uri
+
+    def connectToServer(self):        
+        self._set_server_uri()
+        self.m.connectToServer(self.uri)
 
 def main():
     # m = MongoServerCache()
@@ -113,15 +153,6 @@ def main():
     # print(f'Databases: {a.get_databases()}')
     # a.get_users(Database(a.client, 'admin'))
     pass
-
-
-def userAccessControl():
-    # Add check here to see if UAC is enabled
-    adminUsername = input("Admin Username: ")
-    adminPassword = input("Admin Password: ")
-    db = Database("mongodb://127.0.0.1:27017/") # bc no auth yet
-    db.enableMongoDBAuthentication(adminUsername, adminPassword)
-    # Then you do what it says to do in this functiuon ^
 
 '''
 databasePanel = {
@@ -166,11 +197,14 @@ class MongoStuff():
     def get_collections(self, myDB: Database) -> list:
         return myDB.list_collection_names()
 
-    def get_users(self, db: Database):
+    def get_users(self, db: Database, debug=False):
+        if isinstance(db, str):
+            db = Database(self.client, db)        
+
         listing = db.command('usersInfo')
-        for document in listing['users']:
-            # print("user: " + document['user'] +" roles: "+ document['roles'][0]['role'])
-            print("user: " + document['user'] +" roles: "+ str(document['roles']))
+        if debug == True:
+            for document in listing['users']:
+                print("user: " + document['user'] +" roles: "+ str(document['roles']))
         return listing['users'] # what are other listings?
     # --------------
     def insert(self, dbName, collectionName, values={}) -> InsertOneResult:
@@ -211,11 +245,7 @@ class MongoStuff():
         myCol.update_one(filter, { "$set": newValue})
 
     ## -- test
-    def create_new_user(self):
-        username = input("New User Username: ")
-        password = input("New User Password: ")
-        database = input("Database (admin): ") or 'admin'
-
+    def create_new_user(self, username, password, database):
         print("""ROLES:""")
         shortHand = { # db.getRoles({showPrivileges:false,showBuiltinRoles: true})
             "rw": "readWrite",
@@ -303,14 +333,14 @@ class MongoServerCache:
             self.decryptServer()
         else:
             dec_obj_str = decrypt(self.servers[server], self._askPassword("Enter password to unlock: "))
-            print(f"{dec_obj_str}")
+            # print(f"{dec_obj_str}") # prints dict of all values
         # converts object to a dict from string
         return ast.literal_eval(dec_obj_str)
 
-    def serverInfoToURI(self, decryptedServerInfo: dict) -> str:
+    def serverInfoToURI(self, decryptedServerInfo: dict, debug=False) -> str:
         fmt = "mongodb://{user}:{password}@{addr}:{port}/?authSource={authdb}"
         uri = fmt.format(**decryptedServerInfo)
-        print(uri)
+        if debug: print(uri)
         return uri
 
     def connectToServer(self, uri):
@@ -389,3 +419,12 @@ if __name__ == "__main__":
     # print("test db users:", database.listUsers(database_name="test"))
     # database.deleteUser("test", "testingacc")
     # print("test db users:", database.listUsers(database_name="test"))
+
+
+# def userAccessControl():
+#     # Add check here to see if UAC is enabled
+#     adminUsername = input("Admin Username: ")
+#     adminPassword = input("Admin Password: ")
+#     db = Database("mongodb://127.0.0.1:27017/") # bc no auth yet
+#     db.enableMongoDBAuthentication(adminUsername, adminPassword)
+#     # Then you do what it says to do in this functiuon ^

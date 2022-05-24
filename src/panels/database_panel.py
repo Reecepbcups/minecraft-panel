@@ -3,65 +3,56 @@ import json, os
 import ast
 import pymongo
 
-# from database import Database
-# from utils.config import CONFIG
 from utils.cosmetics import cprint, cinput, cfiglet
 
-# TODO: Combine all this into 1 class?
+from typing import Tuple
 
-## ! not attached to the main panel yet, just testing
+from pymongo.database import Database
+from pymongo.results import InsertOneResult
+
+from pick import pick
 
 '''
-Class to save an encrypted dict via password
 https://pymongo.readthedocs.io/en/stable/api/pymongo/database.html#pymongo.database.Database.command
 
 Can delete / query with regex as well.
 myquery = { "address": {"$regex": "^S"} }
 
+"UAC": ["Enable user access control", userAccessControl],
 
 MongoDB Commands I always forget:
 - db.getUsers()
 - db.getRoles({showPrivileges:false,showBuiltinRoles: true})
 '''
 
-'''
-self.databaseFunctions = {
-            "1": ["Create DB", print],
-            "2": ["Delete DB", print],
-            "3": ["Show DBS\n", self.printDatabases],
-
-            "4": ["Create User", self.createNewUser],
-            "5": ["Delete User", print],
-            "6": ["Show Users\n", print],
-
-            "UAC": ["Enable user access control", userAccessControl],
-
-            "cp": ["Main Menu", print],
-            "exit": ["Main Menu", exit]
-            # find collection
-        }
-'''
-
 class DatabasePanel():
+    '''
+    Main panel for calling from the console
+    '''
     def __init__(self):
         self.m = MongoServerCache()
-        # self.mFuncs = MongoStuff() # mongoDB functions
         self.uri = ""
+        self.currentServer = "" # changes with each URI change
         self.databasePanel = {
-            '1': ["Show Databases", self.showDatabases],
-            "2": ["Create New User", self.createNewUser],
-            "3": ["Drop Database", self.deleteDatabase],
-            "4": ["Delete User", self.deleteUser],
-            "5": ["Show Users\n", self.showUsers],
-            "6": ["Change DB Server\n", self._set_server_uri],
-            "connect": ["Connect to server", self.connectToServer],
+            'ld': ["List Databases", self.showDatabases],            
+            # "drop": ["Drop Database", self.deleteDatabase],
+
+            "cu": ["Create User", self.createNewUser],
+            # "ud": ["Delete User", self.deleteUser],
+            "su": ["Show Users\n", self.showUsers],
+
+            "ch": ["Change Active Instance", self._change_uri],
+            "sh": [f"Server Shell", self.connectToServer],
+            "add": ["Add a New Mongo Instance", self.addInstance],
             "exit": ["exit", exit],
         }
         self.run()
 
     def run(self): 
         cfiglet("&a", "MongoDB Panel", clearScreen=True)               
-        while True:         
+        while True: 
+            if len(self.currentServer) > 0:
+                cprint(f"\t&eCurrent connected server: {self.currentServer}\n")        
             for k, v in self.databasePanel.items():
                 cprint(f"[{k}]\t {v[0]}")
 
@@ -70,14 +61,23 @@ class DatabasePanel():
             if request == "cp":
                 from console import main
                 main()
+            if request not in self.databasePanel.keys():
+                cprint(f"\t&c{request} not in database panel")
+                continue
             self.databasePanel[request][1]() 
-            cfiglet("&a", "MongoDB Panel", clearScreen=False) 
+            cfiglet("&a", "MongoDB Panel", clearScreen=False)            
 
-    # These can not have any arguments
+    def connectToServer(self):        
+        self._set_server_uri()
+        self.m.connectToServer(self.uri)
+
     def showDatabases(self):    
         self._set_server_uri()        
-        print("Databases", self.mFuncs.get_databases())
-        input("Enter to continue...")
+        cprint(f"\n&fDatabases: &b{self.mFuncs.get_databases()}")
+        cinput("\n&7Enter to continue...")
+
+    def addInstance(self):
+        self.m.newServer()
 
     def createNewUser(self):
         self._set_server_uri()    
@@ -89,7 +89,6 @@ class DatabasePanel():
 
     def deleteDatabase(self):
         pass
-
     def deleteUser(self):
         pass
 
@@ -97,9 +96,9 @@ class DatabasePanel():
         self._set_server_uri()        
         print("Databases:", self.mFuncs.get_databases())
 
-        db = input("Database you want to show users for: ")
+        db = cinput("&eDatabase you want to show users for &e>> ")
         if db not in self.mFuncs.get_databases():
-            print(f"Database {db} not in this server's mongodb")
+            cprint(f"&cDatabase {db} not in this server's mongodb")
             self.showUsers()
 
         print()
@@ -113,19 +112,21 @@ class DatabasePanel():
 
         for k, v in users.items():
             print(f"{k}\t{v}")
-
         input("Enter to continue...")
+
 
     def _set_server_uri(self):
         if len(self.uri) > 0:
             return self.uri
-        self.uri = self.m.serverInfoToURI(self.m.decryptServer(), debug=False)
-        self.mFuncs = MongoStuff(self.uri) # put in _set_server_uri?
+        self._change_uri()
         return self.uri
-
-    def connectToServer(self):        
-        self._set_server_uri()
-        self.m.connectToServer(self.uri)
+    def _change_uri(self):
+        server, serverName = self.m.decryptServer()
+        if server == {} and serverName == "":            
+            return
+        self.uri = self.m.serverInfoToURI(server, debug=False)
+        self.mFuncs = MongoHelper(self.uri)
+        self.currentServer = serverName
 
 def main():
     # m = MongoServerCache()
@@ -135,7 +136,7 @@ def main():
     
     # m.connectToServer(uri)
     # uri = "mongodb://root:akashmongodb19pass@782sk60c31ell6dbee3ntqc9lo.ingress.provider-2.prod.ewr1.akash.pub:31543/?authSource=admin"
-    # a = MongoStuff(uri)
+    # a = MongoHelper(uri)
     # a.insert('reece', 't2', {"name": "v", 'age': 12})
 
     # print(a.find_one('test', 'reece2', filter={"name": "reece"}))
@@ -154,40 +155,10 @@ def main():
     # a.get_users(Database(a.client, 'admin'))
     pass
 
-'''
-databasePanel = {
-        "1": createDatabase,
-        "2": deleteDatabase,
-        "3": showDatabases,
-        "4": createNewUser,
-        "5": deleteUser,
-        "6": showUser,
-        "exit": exit,
-    }
-
-
-def __init__(self):
-    self.databaseFunctions = {
-        "1": ["Create DB", print],
-        "2": ["Delete DB", print],
-        "3": ["Show DBS\n", self.printDatabases],
-
-        "4": ["Create User", self.createNewUser],
-        "5": ["Delete User", print],
-        "6": ["Show Users\n", print],
-
-        "UAC": ["Enable user access control", userAccessControl],
-
-        "cp": ["Main Menu", print],
-        "exit": ["Main Menu", exit]
-        # find collection
-    }
-'''
-
-
-from pymongo.database import Database
-from pymongo.results import InsertOneResult
-class MongoStuff():
+class MongoHelper():
+    '''
+    Helper class to make functions easier with MongoDB collections
+    '''
     def __init__(self, uri):
         self.client = pymongo.MongoClient(uri)
 
@@ -310,9 +281,15 @@ class MongoStuff():
             roles=roles
             # roles=[{'role': 'read', 'db': 'admin'}, {'role': 'readWrite', 'db': 'test'}]
         )
+    def drop_user(self, db, username):
+        db = self.client[db]
+        db.command('dropUser', username)
 
 
 class MongoServerCache:
+    '''
+    ServerCache which handles the file, encrypting, decrypting, and URI information
+    '''
     def __init__(self, file_name="MongoDBSCache.json"):
         # Gets current folder held location
         self.location = os.path.dirname(os.path.abspath(__file__))
@@ -321,21 +298,19 @@ class MongoServerCache:
 
         self.servers = self._loadServersFromJSON()  
 
-    def _askPassword(self, text="Enter your password to encrypt: "):
-        return input(text)
+    def _askPassword(self, text="&eEnter your password to encrypt >> "):
+        return cinput(text)
 
-    def decryptServer(self, server='') -> dict:
-        if len(server) == 0:
-            self.printServers()
-        server = input("Enter Server Name to connect: ")
-        if server not in self.servers:
-            print("Server not found")
-            self.decryptServer()
-        else:
-            dec_obj_str = decrypt(self.servers[server], self._askPassword("Enter password to unlock: "))
+    def decryptServer(self, server='') -> Tuple[dict, str]:      
+        if len(server) == 0:  
+            server, _ = pick(list(self.servers.keys()), 'Mongo Server to Connect too: ', multiselect=False, indicator=' =>')
+
+        cprint(f"\n&a[!] Selected server: {server}")
+        
+        dec_obj_str = decrypt(self.servers[server], self._askPassword("&eEnter password to unlock &f>> "))
             # print(f"{dec_obj_str}") # prints dict of all values
-        # converts object to a dict from string
-        return ast.literal_eval(dec_obj_str)
+        # converts object to a dict from string        
+        return ast.literal_eval(dec_obj_str), server
 
     def serverInfoToURI(self, decryptedServerInfo: dict, debug=False) -> str:
         fmt = "mongodb://{user}:{password}@{addr}:{port}/?authSource={authdb}"
@@ -350,13 +325,13 @@ class MongoServerCache:
         print(', '.join(self.servers.keys()))
 
     def newServer(self):
-        server_name = input("Enter Server Name: ") or 'myServer'
+        server_name = input("New MongoDB Instance Name: ") or 'myServer'
         tempObj = {
-            "addr": input("Enter IP Address: ") or '127.0.0.1',
-            "port": input("Enter Port: ") or 27017,
-            "user": input("Enter Username: ") or 'admin',
-            "authdb": input("Enter AuthDB: ") or 'admin',
-            "password": input("Enter Password: ") or 'password'
+            "addr": input("Enter IP Address/URL (127.0.0.1): ") or '127.0.0.1',
+            "port": input("Enter Port (27017): ") or 27017,
+            "user": input("Enter Username: ") or 'admin',            
+            "password": input("Enter Password: ") or 'password',
+            "authdb": input("Enter Authentication Database (admin): ") or 'admin',
         }
 
         # removes http(s):// & the / at the end

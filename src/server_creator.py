@@ -72,14 +72,17 @@ def paper_install():
 
 
 nameToID = { # Spigot IDS from url. Uses spiget API to get
-    "BungeeServerManager_proxy": 7388,
-    "ServerTools": 95853,
-    "Spark": 57242,
-    "Plugman": 88135,
-    "Luckperms": 28140,
+    "BungeeServerManager (proxy)": 7388,
+    "BungeePluginManager (proxy)": 7288,
+    "SecuredNetwork (BungeeGuard Alt, REQ: Protocollib)": 65075,
+
+    "ServerTools (*Vault)": 95853, 
+    "Luckperms (SPIGOT, *Vault)": 28140,           
+    "Plugman": 88135,    
     "Vault": 34315,
     "ProtocolLib": 1997,
     "placeholderapi": 6245,
+    "Spark": 57242,
     "dynmap": 274,
     "fast-async-worldedit": 13932,
 }
@@ -101,7 +104,7 @@ class ServerCreator():
         
         JAR_NAME = self.downloadPaper()        
         port = int(cinput("&bPort: &f(25565) &b>> ") or 25565)
-        RAM = cinput("&bRam amount: &f[500M/(4G) etc...] &b>> ") or "4G"
+        RAM = cinput("&bRam amount: &f[500M/(4G)] &b>> ") or "4G"
         self.createStartFile(RAM, JAR_NAME)
 
         if 'paper' in JAR_NAME.lower():
@@ -149,10 +152,8 @@ class ServerCreator():
                 conf.write(f"server_connect_timeout: {server_connect_timeout}\n")
                 conf.write(f"connection_throttle_limit: {connection_throttle_limit}\n")
                 conf.write(f"network_compression_threshold: {network_compression_threshold}\n")
-                conf.write(f"network_compression_threshold: {network_compression_threshold}\n")
                 conf.write(f"ip_forward: {ip_forward}\n")
                 conf.write(f"listeners:\n- host: 0.0.0.0:{port}\n")
-
 
         os.chdir(server_path)
         os.mkdir("logs"); os.mkdir("plugins")
@@ -181,16 +182,19 @@ class ServerCreator():
         cprint(f"&aServer created at {server_path=}")
         # Send command to hook into proxy
         if 'paper' in JAR_NAME.lower() and isBehindBungee == "true":
-            # firewall port here
-            firewall = Firewall()
-            firewall.denyPort(port)
-            cprint(f"\n&cFirewall has been denied port to {port}")
-            firewall.allowFullAccessToWhitelistedConfigAddresses() # ensures other servers can still connect. Not sure this is required
+            if input("Enable Firewall for this server? ([y]/n)").startswith('y'):      
+                # TODO: Still needs more testing                          
+                firewall = Firewall()
+                print("Is firewall enabled", firewall.isEnabled())
+                firewall.denyPort(port)
+                cprint(f"\n&cFirewall has been denied port to {port}")
+                firewall.allowFullAccessToWhitelistedConfigAddresses() # ensures other servers can still connect. Not sure this is required
 
             cprint(f"\n&cAdd {SERVER_NAME} to the BungeeCord proxy with the command:")
             cprint(f"&c'svm add {SERVER_NAME} 127.0.0.1:{port}'")
         else:
             cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}:{port}")
+            cprint(f"&cSince this is a proxy, you may need to tweak config.yml so the lobby server does not point to 25565.")
         
 
         doStart = cinput("\n&bStart server now? &f[yes/(no)] &b>> ") or "yes"
@@ -242,19 +246,35 @@ class ServerCreator():
         with open(self.server_path+'/start.sh', 'w') as file:
             file.write(startFile)
             # print("start.sh file made")
-        os.system(f"chmod +x {self.server_path}/start.sh")
-        
-
-
-
+        os.system(f"chmod +x {self.server_path}/start.sh")    
+    
     def installPluginsToServer(self):
         title = 'Please choose which plugins you want to download (press SPACE to select, ENTER to continue): '
         options = list(nameToID.keys())
         selected = pick(options, title, indicator=' =>', multiselect=True, min_selection_count=0)
-        for name, idx in selected:
-            pluginID = nameToID[name]
-            cprint(f"&aDownloading {name} ({pluginID})")
+        for name, idx in selected:            
+            pluginID = nameToID[name]            
+            cprint(f"&aDownloading {name.split(' ', 1)[0]} ({pluginID})")
             downloadResourceFromSpigot(pluginID, f"{self.server_path}/plugins")
+
+        option = cinput("&a[!] &fWould you like to pre-install some configuration settings? &f([y]/n)") or 'y'
+        if option.lower().startswith('y'):
+            self.setupBareBonesConfigurations()
+        
+    def setupBareBonesConfigurations(self):
+        from configs.PluginConfigs import PluginConfigs
+        pc = PluginConfigs()
+        title = 'Select which configurations you want to setup (press SPACE to select, ENTER to continue): '
+        selected = pick(pc.getAvailableConfigs(), title, indicator=' =>', multiselect=True, min_selection_count=0)
+        for plugin, idx in selected:
+            pluginPath = f"{self.server_path}/plugins/{plugin}/config.yml"
+            cfiglet('&a', f"{plugin} config.yml")
+            cprint(pluginPath)
+            configValuesToSave = pc.run(plugin)
+            os.mkdir(f"{self.server_path}/plugins/{plugin}")
+            with open(pluginPath, 'w') as file:
+                file.write(configValuesToSave)
+            
 
 
 
@@ -266,7 +286,7 @@ def downloadResourceFromSpigot(resourceID, folderPath=os.getcwd(), debug=False):
     response = requests.get(url, stream=True)
     total = int(response.headers.get('content-length', 0))
 
-    pluginName = IDtoName[resourceID]
+    pluginName = IDtoName[resourceID].split(' ', 1)[0]
     jarName = f"{folderPath}/{pluginName}.jar"
 
     # with open(jarName, "wb") as jar:
@@ -289,12 +309,5 @@ def downloadResourceFromSpigot(resourceID, folderPath=os.getcwd(), debug=False):
 
 
 if __name__ == "__main__":
-    downloadResourceFromSpigot(95853) # test download
-
-def writeToDefaultConfig():
-    luckpermsConfig = f"""
-    Put values here which are in the luckperms config, then you can easily make them.
-    Ensure when the server starts with these values predefined it works as expected.
-    Database, username, password, server type, etc.
-    """
-
+    # downloadResourceFromSpigot(95853) # test download
+    pass

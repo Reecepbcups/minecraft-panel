@@ -78,7 +78,7 @@ class DatabasePanel():
         if len(self.uri) > 0:
             print(self.uri)
         else:
-            cprint("&cNo URI set yet")
+            cprint("&cNo URI set yet") # prompt for login?
 
     def connectToServer(self):        
         self._set_server_uri()

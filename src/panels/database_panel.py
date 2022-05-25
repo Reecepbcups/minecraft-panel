@@ -47,9 +47,9 @@ class DatabasePanel():
             "ch": ["Change Active Instance", self._change_uri],
             "sh": [f"Server Shell", self.connectToServer],
             "add": ["Add a New Mongo Instance\n", self.addInstance],
-
-            # "dump": ["Dump DB Backup", self.dump],
-            # "rstr": ["Restore DB Backup", self.restore],
+            
+            "dump": ["Backup Database", self.backupDatabase],
+            "rstr": ["Backup Database", self.restoreFromBackup],
 
             "exit": ["exit", exit],
         }
@@ -75,10 +75,18 @@ class DatabasePanel():
             cfiglet("&a", "MongoDB Panel", clearScreen=False)            
 
     def showURI(self):
-        if len(self.uri) > 0:
-            print(self.uri)
-        else:
-            cprint("&cNo URI set yet") # prompt for login?
+        if len(self.uri) == 0:
+            self._change_uri()        
+        print(self.uri)
+
+    def backupDatabase(self):
+        # TODO: allow a user to select databases to backup?
+        # Allow user to change output DIR OR auto put in there from the one in config
+        os.system(f"mongodump --uri {self.uri}")
+
+    def restoreFromBackup(self):
+        cmd = 'mongorestore --uri mongodb://localhost:27017/dbName --db YOUR_DB_NAME YOUR_TARGET_FOLDER/YOUR_DB_NAME'
+        print("THIS COMMAND IS NOT DONE YET")
 
     def connectToServer(self):        
         self._set_server_uri()
@@ -418,46 +426,3 @@ if __name__ == "__main__":
 #     db = Database("mongodb://127.0.0.1:27017/") # bc no auth yet
 #     db.enableMongoDBAuthentication(adminUsername, adminPassword)
 #     # Then you do what it says to do in this functiuon ^
-
-
-
-'''
-
-FUTURE database dumping
-
-    # https://gist.github.com/Lh4cKg/939ce683e2876b314a205b3f8c6e8e9d
-    def dump(self):        
-        self._set_server_uri()
-        title = 'Select Databases you want to backup (press SPACE to select, ENTER to continue):'
-        selectedDBs = pick(list(self.mFuncs.get_databases()), title, multiselect=True, indicator=' =>', min_selection_count=0)
-        title = 'Select Collections you want to backup (press SPACE to select, ENTER to continue):'
-        for db in selectedDBs:
-            db = db[0]
-            collections = list(self.mFuncs.get_collections(myDB=db))
-            selectedCols = pick(collections, title, multiselect=True, indicator=' =>', min_selection_count=0)
-            collectionsWeBackup = [col[0] for col in selectedCols]
-            print(db, collectionsWeBackup)
-
-            for coll in collectionsWeBackup:
-                input(f"{coll} ...")
-                parentFolder = os.path.dirname(os.path.abspath(__file__)) + f"/{db}"
-
-                if os.path.exists(parentFolder) == False:
-                    os.mkdir(parentFolder)
-
-                with open( + f"{parentFolder}/{coll}.bson", 'wb+') as f:
-                    for doc in self.mFuncs.get_all_documents(db, coll, limit=0):
-                        f.write(bson.BSON.encode(doc))
-    def restore(self):
-        dirs = []
-        loc = os.listdir(os.path.dirname(os.path.abspath(__file__)))
-        for dir in loc:
-            print(dir)
-            if os.path.isdir(dir):
-                dirs.append(dir)
-        selectedDbs = pick(dirs, "Databases to restore", multiselect=True, indicator=' =>', min_selection_count=0)
-        for db in selectedDbs:
-            db = db[0]
-            for coll in os.listdir(loc + f"/{db}"):
-                print(f'coll {coll}')
-'''

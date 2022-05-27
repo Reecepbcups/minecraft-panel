@@ -109,9 +109,27 @@ class DatabasePanel():
         input("Enter to continue...")
 
     def deleteDatabase(self):
-        pass
+        dbToDelete = input("DB to delete:")
+        if dbToDelete not in self.mFuncs.get_databases():
+            cprint(f"\t&c{dbToDelete} not in this server's mongodb")
+            return
+
+        confirm = cinput(f"\n&c[!] Type 'delete {dbToDelete}' to confirm deletion\n>>").replace("\'", "").strip()
+        if dbToDelete == confirm:
+            self.mFuncs.drop_database(dbToDelete)
+            cprint(f"\t&aDatabase {dbToDelete} deleted")
+        else:
+            cprint(f"\t&cDatabase names do not match... {dbToDelete} != {confirm}")
+        
+
     def deleteUser(self):
-        pass
+        userToDel = input("User to delete:")
+        usersDatabase = input("Database they are in:")
+        usersInTheDB = self.mFuncs.get_users(usersDatabase)
+        if userToDel not in usersInTheDB:
+            cprint(f"\t&c{userToDel} not in this server's mongodb")
+            return
+        self.mFuncs.drop_user(usersDatabase, userToDel)
 
     def showUsers(self):
         self._set_server_uri()        
@@ -232,6 +250,9 @@ class MongoHelper():
 
     def drop_collection(self, dbName, collectionName) -> bool:
         return self.client[dbName][collectionName].drop()
+
+    def drop_database(self, dbName) -> bool:
+        return self.client[dbName].drop()
 
     def update_one(self, dbName, collectionName, filter={}, newValue={}):
         # update_one(db, collection, filter={"address": "123 street"}, newValue={"address": "124 main"})

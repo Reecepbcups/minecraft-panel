@@ -7,7 +7,6 @@ servers:
   - proxy
   spigot:
   - testing
-  - hub3
   standalone:
   - ''
 akash-servers:
@@ -27,6 +26,3 @@ firewall:
 web-shortner:
   location: /var/www/html/l
   domain: reece.sh/l
-Mongo-Authentication:
-  myUserAdmin: admin
-  myTester: test

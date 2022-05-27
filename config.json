@@ -37,9 +37,5 @@
   "web-shortner": {
     "location": "/var/www/html/l",
     "domain": "reece.sh/l"
-  },
-  "Mongo-Authentication": {
-    "myUserAdmin": "admin",
-    "myTester": "test"
   }
 }

@@ -5,6 +5,8 @@ from utils.cosmetics import cprint
 
 from server import Server
 
+from os.path import dirname as parentDir
+
 def startAllServers(listOfArgs):
     # This is not actually used here, but useful for sub command arguments
     print("Starting all servers " + str(listOfArgs))
@@ -12,7 +14,8 @@ def startAllServers(listOfArgs):
 
 from utils.config import CONFIG
 def path(empyList):
-    print(f"{CONFIG['PANEL_DIRECTORY']}")
+    # print(f"{CONFIG['PANEL_DIRECTORY']}")
+    print(parentDir(parentDir(__file__)))
 
 def showLogs(args):
     serverName, numOfLines = args[0], int(args[1])

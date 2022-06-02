@@ -24,6 +24,7 @@ from utils.system import checkIfRequirementsAreInstalled
 from akash_servers import AkashConsole
 
 import time, os
+from os.path import dirname as parentDir
 
 # Load this before anything else
 serverGroups = CONFIG['servers'] # 'proxy' & 'spigot'
@@ -98,8 +99,11 @@ def ServerSelector():
     if server not in choices:
         cprint("&cInvalid Selection")
 
-    panel = Server(choices[server])
-    panel.enter_console()
+    if len(server) > 0:
+        panel = Server(choices[server])
+        panel.enter_console()
+    else:
+        cprint("&cNo server selected")
 
 def AkashServerSelector():
     cfiglet("&b", "Akash Selector", clearScreen=True)
@@ -224,7 +228,8 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
         with open(screenfile, 'a') as sf:
             sf.write("termcapinfo xterm* ti@:te@")
 
-    panelDir = CONFIG["PANEL_DIRECTORY"]; # print(f"{thisDirectory=}")
+    # gets the root folder of this program
+    panelDir = parentDir(parentDir(__file__)); # print(f"{thisDirectory=}")
     alias = f"alias console='python {panelDir}/src/console.py'\n"
     # .bashrc | checks if you have an alias for a given command and runs the aliased command instead of the literal one with sudo in that case
     sudoAlias = """sudo() { if alias "$1" &> /dev/null ; then $(type "$1" | sed -E 's/^.*`(.*).$/\1/') "${@:2}" ; else command sudo $@ ; fi }\n"""
@@ -247,7 +252,7 @@ def getVersion() -> str:
     return __version__
 
 import sys
-from CLI import call
+from CLI_API import call
 
 if __name__ == "__main__":
 

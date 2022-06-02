@@ -1,17 +1,10 @@
 {
-    "PANEL_DIRECTORY": "/root/minecraft-panel",
     "SERVER_DIRECTORY": "/root/minecraft-panel/servers",
     "BACKUP_DIRECTORY": "/root/minecraft-panel/backups",
     "DOWNLOAD_CACHE": "/root/minecraft-panel/downloads",
     "servers": {
-        "proxy": [
-            "proxy"
-        ],
-        "spigot": [
-            "testing",
-            "hub3",
-            "myServer-15-31-56"
-        ],
+        "proxy": [],
+        "spigot": [],
         "standalone": []
     },
     "akash-servers": {

@@ -1,5 +1,7 @@
 # May be easier to just put all config locations in here to reduce complexity of config.yml having some & here having 1.
+import json
 import os
+from os.path import dirname as parentDir
 
 PATH_TO_CONFIG_FILE = "/home/reece/Desktop/minecraft-panel/config.yml"
 
@@ -11,11 +13,10 @@ if not os.path.isfile(PATH_TO_CONFIG_FILE):
     PATH_TO_CONFIG_FILE = os.path.dirname(os.path.dirname(path)) + "/config.json" # get parent directory (minecraft_panel/config.yml)
     print(PATH_TO_CONFIG_FILE)
 
-from os.path import dirname
-import json
+
 
 CONFIG = {}
-FILE = f"{dirname(dirname(dirname(__file__)))}/config.json"
+FILE = f"{parentDir(parentDir(parentDir(__file__)))}/config.json"
 with open(FILE) as f:
     CONFIG = json.load(f)
     print(f"Loaded CONFIG with {CONFIG}")

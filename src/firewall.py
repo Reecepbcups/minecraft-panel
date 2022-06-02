@@ -1,5 +1,10 @@
+import os
+import platform
+import subprocess
+
 import pyufw as ufw
-import os, subprocess
+
+from utils.config import CONFIG
 from utils.cosmetics import cinput, cprint
 
 '''
@@ -10,8 +15,6 @@ Should read rules from config.yml
 # Part of Server logic.
 '''
 
-from utils.config import CONFIG
-import platform
 def checkIfSystemIsUbuntuOrArch() -> str:
     distr = platform.dist()[0]
     if distr in ['Ubuntu', "Debian"]:
@@ -139,7 +142,7 @@ class Firewall():
         '''
         Checks if a port is open using telnet
         '''
-        from socket import socket, create_connection
+        from socket import create_connection, socket
         sock = socket(socket.AF_INET, socket.SOCK_STREAM)
         result = create_connection((hostIP, port))
         if result == 0: # port is not closed

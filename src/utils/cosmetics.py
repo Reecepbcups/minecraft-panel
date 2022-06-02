@@ -1,6 +1,7 @@
-import pyfiglet
-import re
 import os
+import re
+
+import pyfiglet
 
 color_dict = {
     '&1': '\u001b[38;5;4m',

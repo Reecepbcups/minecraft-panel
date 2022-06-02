@@ -1,6 +1,7 @@
-import subprocess
-import re
 import os
+import re
+import subprocess
+
 
 def get_screen_pid(name: str):
     server = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE)

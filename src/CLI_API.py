@@ -1,11 +1,11 @@
 
 # Make an API for when a user types in CLI arguments, to do that here
 
-from utils.cosmetics import cprint
+from os.path import dirname as parentDir
 
 from server import Server
+from utils.cosmetics import cprint
 
-from os.path import dirname as parentDir
 
 def startAllServers(listOfArgs):
     # This is not actually used here, but useful for sub command arguments
@@ -13,6 +13,8 @@ def startAllServers(listOfArgs):
     pass
 
 from utils.config import CONFIG
+
+
 def path(empyList):
     # print(f"{CONFIG['PANEL_DIRECTORY']}")
     print(parentDir(parentDir(__file__)))

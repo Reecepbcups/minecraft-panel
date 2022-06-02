@@ -1,9 +1,10 @@
-import requests
 import os
 
-from utils.cosmetics import cprint
+import requests
 
 from utils.config import CONFIG
+from utils.cosmetics import cprint
+
 
 def download(link, name=None, return_json=False, no_download=False):
     '''
@@ -46,6 +47,7 @@ def chdir(dir):
 
 
 from utils.config import PATH_TO_CONFIG_FILE
+
 
 def fetch_servers() -> list:    
     serverloc = CONFIG["SERVER_DIRECTORY"]

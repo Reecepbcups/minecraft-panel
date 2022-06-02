@@ -1,20 +1,23 @@
-from utils.cosmetics import color, cfiglet, cprint, color_dict, cinput
-from utils.file import chdir
-import subprocess, time, os, sys
-from utils.killable_thread import thread_with_trace
-from utils.screen import is_screen_running
-
-import sys
 import json
+import os
+import subprocess
+import sys
+import time
+
 import yaml
 
 from utils.config import CONFIG
+from utils.cosmetics import cfiglet, cinput, color_dict, cprint
+from utils.file import chdir
+from utils.killable_thread import thread_with_trace
+from utils.screen import is_screen_running
+
 
 class Server:
     def __init__(self, server_name):
         self.server_name = server_name
         self.path = f"""{CONFIG["SERVER_DIRECTORY"]}/{server_name}"""
-        self.values = {} # from properties & spigot.yml
+        self.values = {} # fr0m properties & spigot.yml
         self.getInformation() # populates values in a dict
 
     # Gets a property value. not pythonic but is needed for console

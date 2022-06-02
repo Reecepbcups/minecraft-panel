@@ -1,18 +1,18 @@
+import os
+import shutil
+import time
 from xmlrpc.client import Server
-from utils.cosmetics import color, cfiglet, cprint, color_dict, cinput
-import pyfiglet, time, os
-from utils.screen import is_screen_running
-# from utils.file_utils import fetch_servers
-from utils.file import chdir, download
-from utils.config import CONFIG, saveConfig
-import shutil, requests
-from utils.system import get_time, getPublicIPAddress
+
+import requests
+from pick import pick
 
 from firewall import Firewall
-
 from server import Server
+from utils.config import CONFIG, saveConfig
+from utils.cosmetics import cfiglet, cinput, color_dict, cprint
+from utils.file import download
+from utils.system import get_time, getPublicIPAddress
 
-from pick import pick
 
 def paper_install():
     '''
@@ -311,6 +311,8 @@ class ServerCreator():
 
 
 from tqdm import tqdm
+
+
 def downloadResourceFromSpigot(resourceID, folderPath=os.getcwd(), debug=False):
     url = f"https://api.spiget.org/v2/resources/{resourceID}/download"
 

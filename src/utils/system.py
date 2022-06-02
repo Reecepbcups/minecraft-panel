@@ -1,13 +1,13 @@
-import subprocess
-import shlex
-import sys
 import os
+import shlex
+import subprocess
+import sys
+
+import requests
 
 from utils.cosmetics import cprint
 
-# from utils.config import CONFIG, CONFIG_OBJECT
 
-import requests
 def getPublicIPAddress():
     r = requests.get('https://api.ipify.org')
     return r.text
@@ -28,6 +28,8 @@ def checkIfRequirementsAreInstalled() -> bool:
     return True
 
 import datetime
+
+
 def get_time() -> str:
     now = datetime.datetime.now()
     return f"{now.hour}-{now.minute}-{now.second}"

@@ -1,9 +1,6 @@
-from utils.killable_thread import thread_with_trace
-
-from utils.cosmetics import cprint
-
 from utils.config import CONFIG
-
+from utils.cosmetics import cprint
+from utils.killable_thread import thread_with_trace
 from utils.system import os_command, run_os_command
 
 RPC_NODE = "http://135.181.181.122:28957"

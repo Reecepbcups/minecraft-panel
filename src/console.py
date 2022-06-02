@@ -7,24 +7,15 @@ sudo pacman -S jre-openjdk
 Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
 
-from utils.config import CONFIG
-
-from utils.cosmetics import cfiglet, cprint, cinput
-# from utils.file_utils import chdir
-# from utils_killable_thread import thread_with_trace
-# from utils_screen import is_screen_running
-from utils.file import fetch_servers
-
-from server import Server
-# from firewall import Firewall
-# from server_creator import ServerCreator
-# from database import Database
-from utils.system import checkIfRequirementsAreInstalled
+import os
+from os.path import dirname as parentDir
 
 from akash_servers import AkashConsole
-
-import time, os
-from os.path import dirname as parentDir
+from server import Server
+from utils.config import CONFIG
+from utils.cosmetics import cfiglet, cinput, cprint
+from utils.file import fetch_servers
+from utils.system import checkIfRequirementsAreInstalled
 
 # Load this before anything else
 serverGroups = CONFIG['servers'] # 'proxy' & 'spigot'
@@ -34,10 +25,11 @@ ALL = list(PROXIES) + list(SERVERS)
 # /////
 
 
-from utils.screen import get_all_active_screens
-from panels.database_panel import DatabasePanel 
-from panels.redis_panel import RedisPanel
 from panels.admin_panel import AdminPanel
+from panels.database_panel import DatabasePanel
+from panels.redis_panel import RedisPanel
+from utils.screen import get_all_active_screens
+
 
 def main():
     # databasePanel(); exit(0)
@@ -119,8 +111,9 @@ def AkashServerSelector():
 
 
 def DockerSelector():
-    from akash_servers import DockerConsole
     import pick
+
+    from akash_servers import DockerConsole
     '''
     cd paper-docker-build
     docker build . -t test-server
@@ -252,6 +245,7 @@ def getVersion() -> str:
     return __version__
 
 import sys
+
 from CLI_API import call
 
 if __name__ == "__main__":

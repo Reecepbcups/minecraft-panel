@@ -2,7 +2,7 @@
 ### Setup
 ```
 apt-get update
-sudo apt install ufw python3-pip sudo curl screen zip unzip lsof jq dos2unix software-properties-common screen zip unzip sudo htop nano
+sudo apt install ufw python3-pip sudo curl screen zip unzip lsof jq dos2unix software-properties-common screen zip unzip sudo htop nano redis redis-tools
 sudo apt-get upgrade
 
 git clone https://github.com/Reecepbcups/minecraft-panel.git

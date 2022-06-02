@@ -85,8 +85,11 @@ class DatabasePanel():
         os.system(f"mongodump --uri {self.uri}")
 
     def restoreFromBackup(self):
-        cmd = 'mongorestore --uri mongodb://localhost:27017/dbName --db YOUR_DB_NAME YOUR_TARGET_FOLDER/YOUR_DB_NAME'
-        print("THIS COMMAND IS NOT DONE YET")
+        # TODO Not tested yet
+        print("This has not been tested yet, it uses ../../dump which idk if its good or not")
+        input("press [enter] to try and restore from a backup folder...")
+        location = cinput("Path of the backup folder (../../dump): ") or "../../dump"
+        os.system(f"mongorestore --uri {self.uri} {location}")
 
     def connectToServer(self):        
         self._set_server_uri()

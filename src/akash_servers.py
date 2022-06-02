@@ -12,7 +12,7 @@ WALLET_NAME = "hot-wallet"
 class AkashConsole():
     def __init__(self, server):
 
-        akashServers = CONFIG.get('akash-servers')
+        akashServers = CONFIG['akash-servers']
 
         if server not in akashServers:
             print("Server not found...")

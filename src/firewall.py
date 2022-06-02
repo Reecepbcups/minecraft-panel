@@ -1,7 +1,6 @@
 import pyufw as ufw
 import os, subprocess
 from utils.cosmetics import cinput, cprint
-from utils.yaml import Yaml
 
 '''
 Should read rules from config.yml
@@ -52,7 +51,7 @@ class Firewall():
             print("You must be root to use the firewall feature!")
             exit(1)
 
-        firewallSettings = CONFIG.get("firewall")
+        firewallSettings = CONFIG["firewall"]
         # print(firewallSettings)
         self.openAccessPorts = firewallSettings['allow-ports']
         self.ExternalIPFullAccess = firewallSettings['full-access-ip-connections']

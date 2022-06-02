@@ -8,17 +8,25 @@ if not os.path.isfile(PATH_TO_CONFIG_FILE):
     # print(f"Config file not found {PATH_TO_CONFIG_FILE}. Getting default config location")    
     path = os.path.realpath(__file__) # get current directory    
     path = os.path.dirname(path) # get parent directory (src)
-    PATH_TO_CONFIG_FILE = os.path.dirname(os.path.dirname(path)) + "/config.yml" # get parent directory (minecraft_panel/config.yml)
+    PATH_TO_CONFIG_FILE = os.path.dirname(os.path.dirname(path)) + "/config.json" # get parent directory (minecraft_panel/config.yml)
     print(PATH_TO_CONFIG_FILE)
 
-from utils.yaml import Yaml
-CONFIG = Yaml(PATH_TO_CONFIG_FILE).loadConfig()
+from os.path import dirname
+import json
 
+CONFIG = {}
+FILE = f"{dirname(dirname(dirname(__file__)))}/config.json"
+with open(FILE) as f:
+    CONFIG = json.load(f)
+    print(f"Loaded CONFIG with {CONFIG}")
+
+def saveConfig():
+    with open(FILE, 'w') as f:
+        json.dump(CONFIG, f, indent=4)
 
 '''
 from utils.config import CONFIG
 
-# ymlConfig = Yaml(PATH_TO_CONFIG_FILE)
 if CONFIG.get("Mongo-Authentication") == None:
     CONFIG["Mongo-Authentication"] = {}
 

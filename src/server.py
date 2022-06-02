@@ -4,15 +4,16 @@ import subprocess, time, os, sys
 from utils.killable_thread import thread_with_trace
 from utils.screen import is_screen_running
 
-from utils.yaml import Yaml
-# from console import main # would infinite loop
+import sys
+import json
+import yaml
 
 from utils.config import CONFIG
 
 class Server:
     def __init__(self, server_name):
         self.server_name = server_name
-        self.path = f"""{CONFIG.get("SERVER_DIRECTORY")}/{server_name}"""
+        self.path = f"""{CONFIG["SERVER_DIRECTORY"]}/{server_name}"""
         self.values = {} # from properties & spigot.yml
         self.getInformation() # populates values in a dict
 
@@ -184,7 +185,9 @@ class Server:
         proxyYML = self.path + "/waterfall.yml"        
         if os.path.exists(proxyYML):            
             # bungee config yml, is not the panels
-            proxyConfig = Yaml(self.path + "/config.yml").loadConfig().getConfig(); #print(proxyConfig.keys())
+            # proxyConfig = Y-M-L(self.path + "/config.yml").loadConfig().getConfig(); #print(proxyConfig.keys())
+            # Loads yaml file file to read values from
+            proxyConfig = yaml.safe_load(open(proxyYML))
             for key in proxyConfig.keys():
                 self.values[key] = proxyConfig[key]
 

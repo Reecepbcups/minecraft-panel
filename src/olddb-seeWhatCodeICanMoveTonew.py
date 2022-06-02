@@ -75,42 +75,42 @@ class Database:
         return self.client[database_name][collection_name]
 
     # Users
-    def createNewUser(self, database_name, username, password, roles=[]) -> bool:
-        if username in self.listUsers(database_name):
-            cprint(f"&c[!] User {username} already exsist in {database_name}")
-            return False
+    # def createNewUser(self, database_name, username, password, roles=[]) -> bool:
+    #     if username in self.listUsers(database_name):
+    #         cprint(f"&c[!] User {username} already exsist in {database_name}")
+    #         return False
 
-        # ymlConfig = Yaml(PATH_TO_CONFIG_FILE)
-        if CONFIG.get("Mongo-Authentication") == None:
-            CONFIG["Mongo-Authentication"] = {}
+    #     # ymlConfig = Y-M-L(PATH_TO_CONFIG_FILE)
+    #     if "Mongo-Authentication" not in CONFIG:
+    #         CONFIG["Mongo-Authentication"] = {}
 
-        authUsers = CONFIG.get("Mongo-Authentication")
-        if username in authUsers:  # if the user is already in the config for a database            
-            database = authUsers[username] 
-            cprint(f"&cUser already exists in config.yml &e({username} in '{database}' db)")
-            return False
-        else: 
-            # update authUsers dict, set to CONFIG, and save. Then add to database            
-            authUsers[username] = database_name 
-            CONFIG.set("Mongo-Authentication", authUsers)
-            CONFIG.save()
-            # print(authUsers)
+    #     authUsers = CONFIG.get("Mongo-Authentication")
+    #     if username in authUsers:  # if the user is already in the config for a database            
+    #         database = authUsers[username] 
+    #         cprint(f"&cUser already exists in config.yml &e({username} in '{database}' db)")
+    #         return False
+    #     else: 
+    #         # update authUsers dict, set to CONFIG, and save. Then add to database            
+    #         authUsers[username] = database_name 
+    #         CONFIG.set("Mongo-Authentication"] = authUsers)
+    #         CONFIG.save()
+    #         # print(authUsers)
 
-            # maybe do this first and ensure it works before adding to config?
-            v = self.getDatabase(database_name).command({
-                'createUser': username,
-                'pwd': password,
-                'roles': roles
-            })
-            cprint(v)
-            cprint(f"&aUser {username} has been created in {database_name} w/ roles {roles}.")
-            cprint("It will not show until a collection is created\n&fAdded to config")
+    #         # maybe do this first and ensure it works before adding to config?
+    #         v = self.getDatabase(database_name).command({
+    #             'createUser': username,
+    #             'pwd': password,
+    #             'roles': roles
+    #         })
+    #         cprint(v)
+    #         cprint(f"&aUser {username} has been created in {database_name} w/ roles {roles}.")
+    #         cprint("It will not show until a collection is created\n&fAdded to config")
 
-            # check if user was created
-            if username in self.listUsers(database_name):
-                cprint(f"&aUser {username} was found in  self.listUsers of {database_name}")
+    #         # check if user was created
+    #         if username in self.listUsers(database_name):
+    #             cprint(f"&aUser {username} was found in  self.listUsers of {database_name}")
 
-        return True
+    #     return True
 
     def changeUsersPassword(self, database, user):
         if user not in self.listUsers(database):

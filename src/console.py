@@ -7,10 +7,6 @@ sudo pacman -S jre-openjdk
 Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
 
-# from utils.yaml import Yaml
-# PATH_TO_CONFIG_FILE = "/root/minecraft-panel/config.yml"
-# CONFIG = Yaml(PATH_TO_CONFIG_FILE).loadConfig()
-
 from utils.config import CONFIG
 
 from utils.cosmetics import cfiglet, cprint, cinput
@@ -18,9 +14,6 @@ from utils.cosmetics import cfiglet, cprint, cinput
 # from utils_killable_thread import thread_with_trace
 # from utils_screen import is_screen_running
 from utils.file import fetch_servers
-
-# from utils_yaml import Yaml
-# from utils_file import CONFIG
 
 from server import Server
 # from firewall import Firewall
@@ -33,7 +26,7 @@ from akash_servers import AkashConsole
 import time, os
 
 # Load this before anything else
-serverGroups = CONFIG.get('servers') # 'proxy' & 'spigot'
+serverGroups = CONFIG['servers'] # 'proxy' & 'spigot'
 PROXIES = serverGroups['proxy']
 SERVERS = serverGroups['spigot']
 ALL = list(PROXIES) + list(SERVERS)
@@ -65,16 +58,17 @@ def main():
     # print(Server('proxy').getInformation())
     # print(is_screen_running("test"))
 
-    cfiglet("&3", "Control Panel", clearScreen=True)
-    for k, v in controlPanel.items():
-        cprint(f"[{k}]\t {v[0]}")
-        
-    request = cinput("\nCP> ")
-    if request == "exit":
-        cprint("&cExiting Panel"); exit(0)
+    while True:
+        cfiglet("&3", "Control Panel", clearScreen=True)
+        for k, v in controlPanel.items():
+            cprint(f"[{k}]\t {v[0]}")
+            
+        request = cinput("\nCP> ")
+        if request == "exit":
+            cprint("&cExiting Panel"); exit(0)
 
-    controlPanel[request][1]()
-    pass
+        controlPanel[request][1]()
+        pass
 
 def getServers(print_output=False) -> dict:
     choices = {}
@@ -87,7 +81,7 @@ def getServers(print_output=False) -> dict:
 def getAkashServers(print_output=False) -> dict:
     choices = {}
 
-    servers = CONFIG.get('akash-servers')
+    servers = CONFIG['akash-servers']
 
     for idx, server in enumerate(servers):
         choices[str(idx)] = server
@@ -230,7 +224,7 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
         with open(screenfile, 'a') as sf:
             sf.write("termcapinfo xterm* ti@:te@")
 
-    panelDir = CONFIG.get("PANEL_DIRECTORY"); # print(f"{thisDirectory=}")
+    panelDir = CONFIG["PANEL_DIRECTORY"]; # print(f"{thisDirectory=}")
     alias = f"alias console='python {panelDir}/src/console.py'\n"
     # .bashrc | checks if you have an alias for a given command and runs the aliased command instead of the literal one with sudo in that case
     sudoAlias = """sudo() { if alias "$1" &> /dev/null ; then $(type "$1" | sed -E 's/^.*`(.*).$/\1/') "${@:2}" ; else command sudo $@ ; fi }\n"""

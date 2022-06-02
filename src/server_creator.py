@@ -3,7 +3,8 @@ from utils.cosmetics import color, cfiglet, cprint, color_dict, cinput
 import pyfiglet, time, os
 from utils.screen import is_screen_running
 # from utils.file_utils import fetch_servers
-from utils.file import CONFIG, chdir, download
+from utils.file import chdir, download
+from utils.config import CONFIG, saveConfig
 import shutil, requests
 from utils.system import get_time, getPublicIPAddress
 
@@ -55,7 +56,7 @@ def paper_install():
         jarName = project+"-"+version+"-"+build+".jar"
 
         # check if file
-        if os.path.isfile(CONFIG.get("DOWNLOAD_CACHE") + "/" + jarName):
+        if os.path.isfile(CONFIG["DOWNLOAD_CACHE"] + "/" + jarName):
             cprint(f"&aFound {jarName} in cache... Using {jarName} from there")
         else:
             download_url = PAPER_V2_API.format(project=project, version=version, build=build, download=jarName)
@@ -98,7 +99,7 @@ class ServerCreator():
     def __init__(self):
         cfiglet("&a", "Server Creator", clearScreen=True)
 
-        servers_dir = CONFIG.get("SERVER_DIRECTORY")
+        servers_dir = CONFIG["SERVER_DIRECTORY"]
         SERVER_NAME, server_path = self.createServerFolder(servers_dir)
         self.server_path = server_path
 
@@ -190,7 +191,7 @@ class ServerCreator():
         # ask if we should add to global config.yml? default yes
         add_to_config = cinput("&bAdd to global config.yml? &f[(true)/false] &b>> ") or "true"
         if add_to_config == "true":
-            serverGroups = CONFIG.get("servers")
+            serverGroups = CONFIG["servers"]
             
             serverType = 'proxy'
             if 'paper' in JAR_NAME.lower():
@@ -199,8 +200,9 @@ class ServerCreator():
             SERVERS = serverGroups[serverType]
             if SERVER_NAME not in SERVERS: # Adds server to config if not there
                 SERVERS.append(SERVER_NAME)
-                CONFIG.set(f"servers.{serverType}", SERVERS)
-                CONFIG.save()
+                # CONFIG[f"servers.{serverType}", SERVERS)
+                CONFIG['servers'][f'{serverType}'] = SERVERS
+                saveConfig()
 
         # Ask user if they want to preisntall some plugins
         installPlugins = cinput("\n&bInstall common plugins? &f[(yes)/no] &b>> ") or 'yes'
@@ -255,7 +257,7 @@ class ServerCreator():
         jarName = paper_install() # print(jarName); exit()
 
         # Moves file from the cache folder -> the server parent folder
-        downloadCache = str(CONFIG.get("DOWNLOAD_CACHE"))
+        downloadCache = str(CONFIG["DOWNLOAD_CACHE"])
         file_path = f'{downloadCache}/{jarName}'
         shutil.copyfile(file_path, f"{self.server_path}/{jarName}")
         return jarName

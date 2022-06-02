@@ -5,17 +5,13 @@ from utils.cosmetics import cprint
 
 from utils.config import CONFIG
 
-# Move this to main console.py prob
-# CONFIG = Yaml(os.getcwd() + "/src/config.yml")
-# CONFIG.loadConfig()
-
 def download(link, name=None, return_json=False, no_download=False):
     '''
     Downloads a file form the internet using the basic-installer.sh script
     More details about this script in the file itself
     '''
 
-    wd = chdir(CONFIG.get("DOWNLOAD_CACHE"))
+    wd = chdir(CONFIG["DOWNLOAD_CACHE"])
     data = requests.get(link)
 
     if not no_download:
@@ -52,7 +48,7 @@ def chdir(dir):
 from utils.config import PATH_TO_CONFIG_FILE
 
 def fetch_servers() -> list:    
-    serverloc = CONFIG.get("SERVER_DIRECTORY")
+    serverloc = CONFIG["SERVER_DIRECTORY"]
 
     servers = []
 
@@ -61,4 +57,5 @@ def fetch_servers() -> list:
             &cYou don't have any servers yet create servers using 
             the server creator or change the paths in the config,yml
             your config location is: {PATH_TO_CONFIG_FILE}''')
+        return []
     return os.listdir(serverloc)

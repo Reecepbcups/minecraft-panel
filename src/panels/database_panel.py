@@ -330,13 +330,14 @@ class MongoHelper():
         db.command('dropUser', username)
 
 
+# TODO make a parent class for EncyrptedLogin, also so redis can use it
 class MongoServerCache:
     '''
     ServerCache which handles the file, encrypting, decrypting, and URI information
     '''
-    def __init__(self, file_name="MongoDBSCache.json"):
+    def __init__(self, file_name="cache_mongodb.json"):
         # Gets current folder held location
-        self.location = os.path.dirname(os.path.abspath(__file__))
+        self.location = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         self.FILE_NAME = f"{self.location}/{file_name}"
         # print(self.FILE_NAME)
 

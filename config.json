@@ -11,9 +11,7 @@
       "testing",
       "hub3"
     ],
-    "standalone": [
-      ""
-    ]
+    "standalone": []
   },
   "akash-servers": {
     "reece-test-akash-1": {

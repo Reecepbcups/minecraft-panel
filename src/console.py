@@ -42,6 +42,7 @@ ALL = list(PROXIES) + list(SERVERS)
 
 from utils.screen import get_all_active_screens
 from panels.database_panel import DatabasePanel 
+from panels.redis_panel import RedisPanel
 from panels.admin_panel import AdminPanel
 
 def main():
@@ -56,6 +57,7 @@ def main():
 
         "ADMIN": ["&cAdmin Panel&r", AdminPanel],
         "DB": ["&aDatabase Functions&r", DatabasePanel],
+        "RED": ["&4Redis Functions&r", RedisPanel],
     }
 
     # isSpigotServerOnBungee("test")
@@ -239,7 +241,7 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
 
     with open(profile, 'a') as bashprofile:
         bashprofile.write(alias)
-        bashprofile.write(sudoAlias) # `sudo console` then works too
+        bashprofile.write(sudoAlias) # `sudo console` then works too, TODO this does not work yet
         print(f"Added alias 'console' to {profile}.")
         cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
     return False

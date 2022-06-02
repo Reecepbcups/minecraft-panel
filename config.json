@@ -1,7 +1,7 @@
 {
     "SERVER_DIRECTORY": "/root/minecraft-panel/servers",
     "BACKUP_DIRECTORY": "/root/minecraft-panel/backups",
-    "DOWNLOAD_CACHE": "/root/minecraft-panel/downloads",
+    "DOWNLOAD_CACHE": "/tmp",
     "servers": {
         "proxy": [],
         "spigot": [],

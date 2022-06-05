@@ -203,6 +203,7 @@ def serverReboot(server_name):
 # get the users linux home directory
 homeDir = os.path.expanduser('~')
 profile = os.path.join(homeDir, '.bash_profile')
+bashrc = os.path.join(homeDir, '.bashrc')
 screenfile = os.path.join(homeDir, '.screenrc')
 
 
@@ -229,11 +230,14 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
     if alias in open(profile, 'r').read():
         return True # Already added to file
 
+    with open(bashrc, 'a') as bf: # sources .bashrc to run the .profile values
+        bf.write(f"source {profile}")
+
     with open(profile, 'a') as bashprofile:
         bashprofile.write(alias)
         bashprofile.write(sudoAlias) # `sudo console` then works too, TODO this does not work yet
         print(f"Added alias 'console' to {profile}.")
-        cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile}\n\n\n" + "="*20)
+        cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile} && source {bashrc}\n\n\nThen you can run 'console' and 'sconsole'" + "="*20)
     return False
 
 

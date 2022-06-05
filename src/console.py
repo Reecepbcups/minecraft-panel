@@ -202,7 +202,7 @@ def serverReboot(server_name):
 
 # get the users linux home directory
 homeDir = os.path.expanduser('~')
-profile = os.path.join(homeDir, '.bashrc')
+profile = os.path.join(homeDir, '.bash_profile')
 screenfile = os.path.join(homeDir, '.screenrc')
 
 
@@ -223,13 +223,11 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
 
     # gets the root folder of this program
     panelDir = parentDir(parentDir(__file__)); # print(f"{thisDirectory=}")
-    alias = f"alias console='python {panelDir}/src/console.py'\n"
-    # .bashrc | checks if you have an alias for a given command and runs the aliased command instead of the literal one with sudo in that case
-    sudoAlias = """sudo() { if alias "$1" &> /dev/null ; then $(type "$1" | sed -E 's/^.*`(.*).$/\1/') "${@:2}" ; else command sudo $@ ; fi }\n"""
+    alias = f"\nalias console='python {panelDir}/src/console.py'\n"
+    sudoAlias = f"alias sconsole='sudo python {panelDir}/src/console.py'\n"
 
-    if alias in open(profile, 'r').read():        
-        # cprint(f"&cConsole already added. If you need to source: &e`source {profile}`")
-        return True
+    if alias in open(profile, 'r').read():
+        return True # Already added to file
 
     with open(profile, 'a') as bashprofile:
         bashprofile.write(alias)

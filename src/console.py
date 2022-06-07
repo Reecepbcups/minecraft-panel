@@ -39,6 +39,7 @@ def main():
         "1": ["Console", ServerSelector],              
         "2": ["List Running Servers", get_all_active_screens],
         "3": ["StartAllServers\n", startAllServers],
+        # Stop all servers
 
         "a": ["Akash Docker Connect\n", AkashServerSelector],
 
@@ -156,7 +157,7 @@ def changeJavaVersion():
 
 def startAllServers(): 
     for server in ALL:
-        Server(server).start_server()         
+        Server(server).start_server()           
 
 def stopAllServers():
     for server in ALL:
@@ -179,28 +180,8 @@ def isSpigotServerOnBungee(server_name): # do in server object
     return check
 
 
-def firewallBungeeServer(server_name):
-    port = Server(server_name).values['server-port']
-    if port == "25565":
-        v = cinput("&e[!] Caution, are you sure you want to close port 25565 from connections? This is usually the proxy (y/n)")
-        if v.lower() not in ['y', 'yes']:
-            return False
-    # ufw enable firewall for port here
-    return True
-
-
 def fixPort():
     # could do this when server is started / first input? check if log contains the PORT issue
-    pass
-
-# == Firewall ==
-def firewallReset(): # accept all 
-    pass
-def firewallBlockPort(server_name):
-    # check if isServerOnBungee, get port, close to outside connections
-    pass
-def firewallApplyRules():
-    # ensure port 22 is open here always
     pass
 
 def serverReboot(server_name):
@@ -216,7 +197,6 @@ screenfile = os.path.join(homeDir, '.screenrc')
 # Add to system utils in future?
 def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
     # ensure profile file is there. Returns False if `console` being run would not run it
-
     if not os.path.exists(profile):
         cprint(f"&c[!] File {profile} not found.. creating")
         open(profile, 'x') # creates file

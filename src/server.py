@@ -185,16 +185,18 @@ class Server:
                     self.values[pair[0]] = pair[1].strip()            
 
         # This is a proxy, do this then return
-        proxyYML = self.path + "/waterfall.yml"        
+        proxyYML = self.path + "/config.yml"        
         if os.path.exists(proxyYML):            
             # bungee config yml, is not the panels
             # proxyConfig = Y-M-L(self.path + "/config.yml").loadConfig().getConfig(); #print(proxyConfig.keys())
             # Loads yaml file file to read values from
-            proxyConfig = yaml.safe_load(open(proxyYML))
-            for key in proxyConfig.keys():
-                self.values[key] = proxyConfig[key]
+            with open(proxyYML, 'r') as stream:
+                proxyConfig = yaml.safe_load(stream)
+            # print(proxyConfig)
+            for key, v in proxyConfig.items():
+                self.values[key] = v
 
-            # Retrurn early since its not a spigot server
+            # Return early since its not a spigot server
             return self.values
 
 

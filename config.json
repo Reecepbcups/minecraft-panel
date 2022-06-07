@@ -19,13 +19,16 @@
             21,
             22,
             80,
-            443
+            443,
+            25565
         ],
         "full-access-ip-connections": [
             "127.0.0.1",
             "95.217.113.126"
         ],
-        "blocked-ports": []
+        "blocked-ports": [
+            30000
+        ]
     },
     "web-shortner": {
         "location": "/var/www/html/l",

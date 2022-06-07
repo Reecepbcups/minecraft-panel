@@ -1,4 +1,5 @@
 import os
+from pickle import FALSE
 import shutil
 import time
 # from xmlrpc.client import Server
@@ -73,15 +74,16 @@ def paper_install():
 
 # TODO
 nameToID = { # Spigot IDS from url. Uses spiget API to get
+    # ENSURE TO HAVE 'proxy' in plugins which are only for the proxy
     "BungeeServerManager (proxy)": 7388,
     "BungeePluginManager (proxy)": 7288,
 
-    "SecuredNetwork (*Protocollib)": 65075,
+    "SecuredNetwork (proxy & spigot)": 65075,
     "Vault": 34315,
     "ProtocolLib": 1997,
 
-    "ServerTools (*Vault)": 95853, 
-    "Luckperms (SPIGOT, *Vault)": 28140,           
+    "ServerTools": 95853, 
+    "Luckperms": 28140,           
     "Plugman": 88135,    
         
     "placeholderapi": 6245,
@@ -91,6 +93,12 @@ nameToID = { # Spigot IDS from url. Uses spiget API to get
 }
 IDtoName = {v: k for k, v in nameToID.items()}
 
+# PluginIDs which require others to function
+dependencies = {
+    65075: [1997], # SecuredNetwork, protocollib
+    95853: [34315], # STools, Vault
+    28140: [34315], # LPerms, Vault
+}
 
 class ServerCreator():
     # move inputs into console.py
@@ -110,7 +118,9 @@ class ServerCreator():
         RAM = cinput("&bRam amount: &f[500M/(4G)] &b>> ") or "4G"
         self.createStartFile(RAM, JAR_NAME)
 
+        self.isASpigotServer = False
         if 'paper' in JAR_NAME.lower():
+            self.isASpigotServer = True
             allow_end = cinput("&bAllow end? &f[(true)/false] &b>> ") or "true" 
             allow_nether = cinput("&bAllow Nether &f[(true)/false]&b>> ") or "true"            
             max_players = cinput("&bMax Players &f(100) &b>> ") or "100"
@@ -151,7 +161,7 @@ class ServerCreator():
             # TODO make a list in the future?
             serverPriority = cinput("&bServer Priority &7[like a hub] &f(lobby) &b>> ") or "lobby"
 
-            serverPriorityAddr = input("&bServer Priority Address &f(127.0.0.1:30000) &b>> ") or "127.0.0.1:30000"
+            serverPriorityAddr = cinput("&bServer Priority Address &f(127.0.0.1:30000) &b>> ") or "127.0.0.1:30000"
 
             with open(f"{server_path}/config.yml", "a") as conf:                
                 conf.write(f"player_limit: {player_limit}\n")
@@ -161,7 +171,6 @@ class ServerCreator():
                 conf.write(f"connection_throttle_limit: {connection_throttle_limit}\n")
                 conf.write(f"network_compression_threshold: {network_compression_threshold}\n")
                 conf.write(f"ip_forward: {ip_forward}\n")
-                conf.write(f"listeners:\n- host: 0.0.0.0:{port}\n")
                 
                 conf.write(f"""listeners:
 - host: 0.0.0.0:{port}
@@ -208,15 +217,14 @@ class ServerCreator():
         installPlugins = cinput("\n&bInstall common plugins? &f[(yes)/no] &b>> ") or 'yes'
         if installPlugins.lower().startswith('y'):
             print()
-            self.installPluginsToServer()
+            self.installPluginsToServer(self.isASpigotServer)
 
         cprint(f"&aServer created at {server_path=}")
         # Send command to hook into proxy
         if 'paper' in JAR_NAME.lower() and isBehindBungee == "true":
-            if input("Enable Firewall for this server? ([y]/n)").startswith('y'):                                       
-                firewall = Firewall()
-                print("Is firewall enabled", firewall.isFirewallEnabled())
-                firewall.denyPort(port)
+            if input("Enable Firewall for this server? ([y]/n)").startswith('y'):
+                print("Is firewall enabled", Firewall().isFirewallEnabled())
+                Firewall().denyPort(port)
                 cprint(f"\n&cFirewall has been denied port to {port}")
                 
 
@@ -278,14 +286,37 @@ class ServerCreator():
             # print("start.sh file made")
         os.system(f"chmod +x {self.server_path}/start.sh")    
     
-    def installPluginsToServer(self):
+    def installPluginsToServer(self, isSpigot=True):
         title = 'Please choose which plugins you want to download (press SPACE to select, ENTER to continue): '
-        options = list(nameToID.keys())
+
+        options = []
+        for pluginName in list(nameToID.keys()):
+            print(pluginName, 'proxy' in pluginName, isSpigot)
+            if isSpigot == False:
+                if 'proxy' in pluginName:
+                    options.append(pluginName)
+            else:
+                # if its a proxy plugin AND spigot (securedNetwork)
+                if 'proxy' in pluginName and 'spigot' in pluginName:
+                    options.append(pluginName)
+                # else if it is not a proxy plugin
+                elif 'proxy' not in pluginName:
+                    options.append(pluginName)
+                
+
+        # exit()
+        
         selected = pick(options, title, indicator=' =>', multiselect=True, min_selection_count=0)
-        for name, idx in selected:            
+        for name, idx in selected:                       
             pluginID = nameToID[name]            
             cprint(f"&aDownloading {name.split(' ', 1)[0]} ({pluginID})")
             downloadResourceFromSpigot(pluginID, f"{self.server_path}/plugins")
+
+            if pluginID in dependencies:
+                print("This plugin has dependecies, installing")
+                for dep in dependencies[pluginID]:
+                    cprint(f"&aDownloading dependency: {dep}")
+                    downloadResourceFromSpigot(dep, f"{self.server_path}/plugins")
 
         option = cinput("&a[!] &fWould you like to pre-install some configuration settings? &f([y]/n)") or 'y'
         if option.lower().startswith('y'):

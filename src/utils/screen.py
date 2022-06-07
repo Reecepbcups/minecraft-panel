@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 
+from utils.cosmetics import cinput
 
 def get_screen_pid(name: str):
     server = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE)
@@ -35,6 +36,7 @@ def get_all_active_screens(printOutput=True) -> list:
         server = match[1].split("\t")[0]
         server_list.append(server)
     
-    if printOutput: print(server_list)
+    if printOutput: 
+        print(server_list)
+        cinput("\n[screen.py] Enter to continue... ")        
     return server_list
-    

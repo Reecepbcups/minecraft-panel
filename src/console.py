@@ -11,6 +11,7 @@ import os
 from os.path import dirname as parentDir
 
 from akash_servers import AkashConsole
+from panels.firewall_panel import FirewallPanel
 from server import Server
 from utils.config import CONFIG
 from utils.cosmetics import cfiglet, cinput, cprint
@@ -44,6 +45,7 @@ def main():
         "ADMIN": ["&cAdmin Panel&r", AdminPanel],
         "DB": ["&aDatabase Functions&r", DatabasePanel],
         "RED": ["&4Redis Functions&r", RedisPanel],
+        "FIRE": ["&4Firewall Panel&r", FirewallPanel],
     }
 
     # isSpigotServerOnBungee("test")
@@ -59,6 +61,10 @@ def main():
         request = cinput("\nCP> ")
         if request == "exit":
             cprint("&cExiting Panel"); exit(0)
+            
+        if request not in controlPanel:
+            cprint("&cInvalid Selection")
+            continue
 
         controlPanel[request][1]()
         pass

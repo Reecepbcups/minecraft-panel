@@ -1,12 +1,12 @@
 import os
 import shutil
 import time
-from xmlrpc.client import Server
+# from xmlrpc.client import Server
 
 import requests
 from pick import pick
 
-from firewall import Firewall
+from panels.firewall_panel import FirewallPanel, Firewall
 from server import Server
 from utils.config import CONFIG, saveConfig
 from utils.cosmetics import cfiglet, cinput, color_dict, cprint
@@ -213,13 +213,12 @@ class ServerCreator():
         cprint(f"&aServer created at {server_path=}")
         # Send command to hook into proxy
         if 'paper' in JAR_NAME.lower() and isBehindBungee == "true":
-            if input("Enable Firewall for this server? ([y]/n)").startswith('y'):      
-                # TODO: Still needs more testing                          
+            if input("Enable Firewall for this server? ([y]/n)").startswith('y'):                                       
                 firewall = Firewall()
-                print("Is firewall enabled", firewall.isEnabled())
+                print("Is firewall enabled", firewall.isFirewallEnabled())
                 firewall.denyPort(port)
                 cprint(f"\n&cFirewall has been denied port to {port}")
-                firewall.allowFullAccessToWhitelistedConfigAddresses() # ensures other servers can still connect. Not sure this is required
+                
 
             cprint(f"\n&cAdd {SERVER_NAME} to the BungeeCord proxy with the command:")
             cprint(f"&c'svm add {SERVER_NAME} 127.0.0.1:{port}'")

@@ -11,15 +11,13 @@ if not os.path.isfile(PATH_TO_CONFIG_FILE):
     path = os.path.realpath(__file__) # get current directory    
     path = os.path.dirname(path) # get parent directory (src)
     PATH_TO_CONFIG_FILE = os.path.dirname(os.path.dirname(path)) + "/config.json" # get parent directory (minecraft_panel/config.yml)
-    print(PATH_TO_CONFIG_FILE)
+    print("PATH_TO_CONFIG_FILE=", PATH_TO_CONFIG_FILE)
 
 
-
-CONFIG = {}
 FILE = f"{parentDir(parentDir(parentDir(__file__)))}/config.json"
 with open(FILE) as f:
     CONFIG = json.load(f)
-    print(f"Loaded CONFIG with {CONFIG}")
+    # print(f"Loaded CONFIG with {CONFIG}")
 
 def saveConfig():
     with open(FILE, 'w') as f:

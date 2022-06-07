@@ -99,6 +99,7 @@ dependencies = {
     95853: [34315], # STools, Vault
     28140: [34315], # LPerms, Vault
 }
+import random as r
 
 class ServerCreator():
     # move inputs into console.py
@@ -114,18 +115,22 @@ class ServerCreator():
         # Add config check where if serverloc is not found, it will ask the user for the location of servers & make config
         
         JAR_NAME = self.downloadPaper()        
-        port = int(cinput("&bPort: &f(25565) &b>> ") or 25565)
-        RAM = cinput("&bRam amount: &f[500M/(4G)] &b>> ") or "4G"
-        self.createStartFile(RAM, JAR_NAME)
+        
 
         self.isASpigotServer = False
         if 'paper' in JAR_NAME.lower():
             self.isASpigotServer = True
+
+            rNum = r.randint(30_000, 35_000)
+            port = int(cinput(f"&bPort: &f({rNum}) &b>> ") or rNum)
+            RAM = cinput("&bRam amount: &f[500M/(4G)] &b>> ") or "4G"
+            self.createStartFile(RAM, JAR_NAME)
+
             allow_end = cinput("&bAllow end? &f[(true)/false] &b>> ") or "true" 
             allow_nether = cinput("&bAllow Nether &f[(true)/false]&b>> ") or "true"            
             max_players = cinput("&bMax Players &f(100) &b>> ") or "100"
             view_distance = cinput("&bView Distance &f(8)&b>> ") or "8"
-            advancements = cinput("&bEnable Advancements &f[(true)/false]&b>> ") or "true"
+            advancements = cinput("&bEnable Advancements &f[true/(false)]&b>> ") or "false"
             isBehindBungee = cinput("&bBehind Bungee? &f[(true)/false] &b>> ") or "true"
             # add cprint here to show svm command to run on server?
 
@@ -149,6 +154,10 @@ class ServerCreator():
                     file.write("online-mode=false\n")
                     file.write("network-compression-threshold=-1\n")
         else:
+            port = int(cinput(f"&bPort: &f(25565) &b>> ") or 15565)
+            RAM = cinput("&bRam amount: &f[500M/(1G)] &b>> ") or "1G"
+            self.createStartFile(RAM, JAR_NAME)
+
             open(f"{server_path}/waterfall.yml", "a").close()
             player_limit = cinput("&bPlayer Limit &f(1000) &b>> ") or "1000"
             connection_throttle = cinput("&bconnection_throttle (ms) &f(4000) &b>> ") or "4000"

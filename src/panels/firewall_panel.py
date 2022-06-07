@@ -67,7 +67,7 @@ class Firewall():
     def __init__(self):
         pass
 
-    def isFirewallEnabled():
+    def isFirewallEnabled(self):
         return isEnabled()
 
     def denyPort(self, port: int):

@@ -1,6 +1,7 @@
 *.local.yml
 *.local.json
 
+cache_*.json
 
 servers
 

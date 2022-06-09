@@ -10,6 +10,8 @@ Ensure just to edit PATH_TO_CONFIG_FILE from here
 import os
 from os.path import dirname as parentDir
 
+from pick import pick
+
 from akash_servers import AkashConsole
 from panels.firewall_panel import FirewallPanel
 from server import Server
@@ -33,15 +35,16 @@ from utils.screen import get_all_active_screens
 
 
 def main():
-    # databasePanel(); exit(0)
 
     controlPanel = {        
         "1": ["Console", ServerSelector],              
         "2": ["List Running Servers", get_all_active_screens],
-        "3": ["StartAllServers\n", startAllServers],
-        # Stop all servers
+        "3": ["Start Server(s)", startServerPicker],
+        "4": ["Stop Server(s)\n", stopServerPicker],
 
         "a": ["Akash Docker Connect\n", AkashServerSelector],
+
+        "s": ["Screens\n", screenPicker],
 
         "ADMIN": ["&cAdmin Panel&r", AdminPanel],
         "DB": ["&aDatabase Functions&r", DatabasePanel],
@@ -69,6 +72,53 @@ def main():
 
         controlPanel[request][1]()
         pass
+
+
+def screenPicker():
+    activeScreens = get_all_active_screens(printOutput=False)
+
+    if len(activeScreens) == 0:
+        cprint("&cNo screens are running")
+        input("Enter to continue...")
+
+    screen, _ = pick(activeScreens, title="Select Screen to connect too", indicator=' =>')
+    os.system(f"screen -r {screen}")
+
+def stopServerPicker():
+    runningServers = get_all_active_screens(printOutput=False)
+    actualServers = [s for s in runningServers if s in ALL]
+    if len(actualServers) == 0:
+        cprint("&cNo servers are running")
+        input("Enter to continue...")
+
+    # Servers which are running AND are in our config of actual servers    
+    servers, _ = pick(actualServers, title="Select servers to stop (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')
+    for server in servers:
+        Server(server).stop_server()
+
+def startServerPicker():
+    if len(ALL) == 0:
+        cinput("&cThere are no servers in the config to start. (Enter to continue...)")
+
+    # Servers which are running AND are in our config of actual servers
+    servers = pick(ALL, title="Select servers to start (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')
+    started, alreadyRunning = [], []
+    for server in servers:
+        serverName = server[0]
+        
+        status = Server(serverName).start_server(debug=False)
+        if status:
+            started.append(serverName)
+        else:
+            alreadyRunning.append(serverName)  
+
+    output = ""
+    if len(started) > 0: output += f"\n&aStarted: {','.join(started)}\n"    
+    if len(alreadyRunning) > 0: output += f"&eAlready Running: {','.join(alreadyRunning)}."
+    if len(output) > 0: cinput(output + ", Enter to continue...")
+
+# ------
+# below could probably move into their own UTIL Files / panel sections
 
 def getServers(print_output=False) -> dict:
     choices = {}

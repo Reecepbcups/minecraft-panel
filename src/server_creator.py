@@ -36,7 +36,8 @@ def paper_install():
     cprint("&a\nVersions you can use:\n" + versionGroupString)
 
     latest = versionGroupString.split(', ')[-1]
-    version = cinput(f"&bServer Version &f({latest})&b>> ") or latest
+    # version = cinput(f"&bServer Version &f({latest})&b>> ") or latest
+    version = cinput(f"&bServer Version &f(1.18.2)&b>> ") or "1.18.2"
     if version not in versionGroupString:
         if project in ["None", "exit"]:
             return

@@ -27,10 +27,10 @@ class Server:
         except:
             return "ERROR: Property not found"
 
-    def start_server(self):
+    def start_server(self, debug=True) -> bool:
         if is_screen_running(self.server_name):
-            cprint("&cYou can't start a server that is already running")
-            return
+            if debug: cprint("&cYou can't start a server that is already running")
+            return False
 
         # if on bungeecord, ensure that its firewalled
 
@@ -42,11 +42,8 @@ class Server:
         p = os.popen(cmd)
         print(p)
 
-        # v = os.system(cmd)
-        # if v != 0:
-        #     cprint(f"&cSome error when starting server")
-        #     return
         cprint(f"&aServer '{self.server_name}' Started")
+        return True
 
     def stop_server(self):
         if not is_screen_running(self.server_name):

@@ -66,8 +66,8 @@ class DatabasePanel():
             # Split it into args so we can pass through functions? This needed?
             request = cinput("\nDB> ")
             if request == "cp":
-                from console import main
-                main()
+                import panels.main_panel as main_panel
+                main_panel.MainPanel()
             if request not in self.databasePanel.keys():
                 cprint(f"\t&c{request} not in database panel")
                 continue
@@ -169,33 +169,6 @@ class DatabasePanel():
         self.uri = self.m.serverInfoToURI(server, debug=False)
         self.mFuncs = MongoHelper(self.uri)
         self.currentServer = serverName
-
-def main():
-    # m = MongoServerCache()
-    # m.newServer()
-    # m.decryptServer()
-    # uri = m.serverInfoToURI(m.decryptServer())
-    
-    # m.connectToServer(uri)
-    # uri = "mongodb://root:akashmongodb19pass@782sk60c31ell6dbee3ntqc9lo.ingress.provider-2.prod.ewr1.akash.pub:31543/?authSource=admin"
-    # a = MongoHelper(uri)
-    # a.insert('reece', 't2', {"name": "v", 'age': 12})
-
-    # print(a.find_one('test', 'reece2', filter={"name": "reece"}))
-
-    # docs = a.get_all_documents('test', 'reece2')
-    # for d in docs:
-    #     print(d)
-
-    # a.test()
-
-    # a.create_new_user()
-
-    # a._actual_create_user('admin', username='reece', password='1234', roles=[{'role': 'readWrite', 'db': 'test'}])
-
-    # print(f'Databases: {a.get_databases()}')
-    # a.get_users(Database(a.client, 'admin'))
-    pass
 
 class MongoHelper():
     '''
@@ -418,7 +391,7 @@ class MongoServerCache:
 
 
 if __name__ == "__main__":
-    main()
+    pass
 
 
     # # 'Enable Access Control' `mongodb://myDBReader:password@127.0.0.1:27017/?authSource=admin`.

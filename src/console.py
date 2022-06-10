@@ -15,7 +15,7 @@ import CLI_API
 from os.path import dirname as parentDir
 from pick import pick
 
-import panels.main_panel as main_panel # so no circular imports
+import panels.main_panel as main_panel
 
 from server import Server
 from utils.config import CONFIG
@@ -42,9 +42,6 @@ def main():
     # isSpigotServerOnBungee("test")
     # print(Server('proxy').getInformation())
     # print(is_screen_running("test"))
-    
-    # Calls main panel (above).
-    # Done this way so we can get controlpanel at bottom all of main()
     main_panel.MainPanel()
     pass
 
@@ -151,7 +148,6 @@ if __name__ == "__main__":
     
     # check if there are any system arguments, if so, calls the section here or the API
     if len(sys.argv) > 1:   
-        
         m = main_panel.MainPanel(run=False)
         if sys.argv[1] in m.controlPanel:
             # Calls the section directly from our CP

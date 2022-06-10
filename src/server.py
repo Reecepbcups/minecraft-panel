@@ -126,11 +126,10 @@ class Server:
 
         try:
             if user_input == "exit":
-                # main()
-                from console import main
-                main()
-                print("sys exit line 103 of server.py")
-                sys.exit(0)
+                import panels.main_panel as main_panel
+                main_panel.MainPanel()
+                # print("sys exit line 103 of server.py")
+                # sys.exit(0)
         except:
             cprint("&eClosing...")
             pass # user control c'ed out

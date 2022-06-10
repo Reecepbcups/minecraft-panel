@@ -34,8 +34,8 @@ class RedisPanel():
             # Split it into args so we can pass through functions? This needed?
             request = cinput("\nREDIS> ")
             if request == "cp":
-                from console import main
-                main()
+                import panels.main_panel as main_panel
+                main_panel.MainPanel()
             if request not in self.redisPanel.keys():
                 cprint(f"\t&c{request} not in database panel")
                 continue

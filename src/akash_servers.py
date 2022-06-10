@@ -33,7 +33,7 @@ class AkashConsole():
                 if user_input == "\x18": # ctrl + c
                     console.kill()
                     break
-                elif user_input == "exit": # brings you to main() after console killed
+                elif user_input == "exit": # brings you to main CP
                     console.kill()
                     break
                 else:

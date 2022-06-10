@@ -81,6 +81,6 @@ class AdminPanel:
             # Split it into args so we can pass through functions? This needed?
             request = cinput("\nADMIN> ")
             if request == "cp":
-                from console import main
-                main()
+                import panels.main_panel as main_panel
+                main_panel.MainPanel()
             self.adminFunctions[request][1]() 

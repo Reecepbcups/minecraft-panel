@@ -17,9 +17,6 @@ except ModuleNotFoundError as e:
 To delete rules, you need to edit the config.json, then run 'sfw' to [S]et [F]ire[W]all
 '''
 
-def main():
-    f = FirewallPanel()
-
 def isEnabled() -> bool:
     return ufw.status()['status'] == "active"
 
@@ -166,8 +163,8 @@ class FirewallPanel():
             # Split it into args so we can pass through functions? This needed?
             request = cinput("\nFW> ")
             if request == "cp":
-                from console import main
-                main()
+                import panels.main_panel as main_panel
+                main_panel.MainPanel()
             if request not in self.firewallPanel.keys():
                 cprint(f"\t&c{request} not in firewall panel")
                 continue
@@ -235,4 +232,4 @@ class FirewallPanel():
 
 
 if __name__ == "__main__":
-    main()
+    pass

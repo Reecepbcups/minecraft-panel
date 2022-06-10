@@ -7,10 +7,13 @@ sudo pacman -S jre-openjdk
 Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
 
+import sys
 import os
 from os.path import dirname as parentDir
 
 from pick import pick
+
+import CLI_API
 
 from akash_servers import AkashConsole
 from panels.firewall_panel import FirewallPanel
@@ -33,45 +36,55 @@ from panels.database_panel import DatabasePanel
 from panels.redis_panel import RedisPanel
 from utils.screen import get_all_active_screens
 
+class MAIN:
+    def __init__(self, run=True):
+        self.controlPanel = {        
+            "1": ["Console", ServerSelector],              
+            "2": ["List Running Servers", get_all_active_screens],
+            "3": ["Start Server(s)", startServerPicker],
+            "4": ["Stop Server(s)\n", stopServerPicker],
+
+            "a": ["Akash Docker Connect\n", AkashServerSelector],
+
+            "s": ["Screens\n", screenPicker],
+
+            "ADMIN": ["&cAdmin Panel&r", AdminPanel],
+            "DB": ["&aDatabase Functions&r", DatabasePanel],
+            "RED": ["&4Redis Functions&r", RedisPanel],
+            "FIRE": ["&4Firewall Panel&r", FirewallPanel],
+        }
+        if run:
+            self.loop()
+
+    def loop(self):
+        while True:
+            cfiglet("&3", "Control Panel", clearScreen=True)
+            for k, v in self.controlPanel.items():
+                cprint(f"[{k}]\t {v[0]}")
+                
+            request = cinput("\nCP> ")
+            if request == "exit":
+                cprint("&cExiting Panel"); exit(0)
+                
+            if request not in self.controlPanel:
+                cprint("&cInvalid Selection")
+                continue
+
+            self.controlPanel[request][1]()
+            pass
+
 
 def main():
-
-    controlPanel = {        
-        "1": ["Console", ServerSelector],              
-        "2": ["List Running Servers", get_all_active_screens],
-        "3": ["Start Server(s)", startServerPicker],
-        "4": ["Stop Server(s)\n", stopServerPicker],
-
-        "a": ["Akash Docker Connect\n", AkashServerSelector],
-
-        "s": ["Screens\n", screenPicker],
-
-        "ADMIN": ["&cAdmin Panel&r", AdminPanel],
-        "DB": ["&aDatabase Functions&r", DatabasePanel],
-        "RED": ["&4Redis Functions&r", RedisPanel],
-        "FIRE": ["&4Firewall Panel&r", FirewallPanel],
-    }
-
     # isSpigotServerOnBungee("test")
-    
     # print(Server('proxy').getInformation())
     # print(is_screen_running("test"))
+    
+    # Calls main panel (above).
+    # Done this way so we can get controlpanel at bottom all of main()
+    MAIN()
 
-    while True:
-        cfiglet("&3", "Control Panel", clearScreen=True)
-        for k, v in controlPanel.items():
-            cprint(f"[{k}]\t {v[0]}")
-            
-        request = cinput("\nCP> ")
-        if request == "exit":
-            cprint("&cExiting Panel"); exit(0)
-            
-        if request not in controlPanel:
-            cprint("&cInvalid Selection")
-            continue
-
-        controlPanel[request][1]()
-        pass
+    
+    
 
 
 def screenPicker():
@@ -282,9 +295,7 @@ __version__ = "1.0.0"
 def getVersion() -> str:
     return __version__
 
-import sys
 
-from CLI_API import call
 
 if __name__ == "__main__":
 
@@ -296,10 +307,15 @@ if __name__ == "__main__":
     if(addConsoleAliasToBashProfileIfNotThereAlready() == False):
         exit(1)
     
-    # check if there are any system arguments
-    if len(sys.argv) > 1:        
-        call(list(sys.argv)[1::])
-        exit(0) # true or false we also return so no main call is done
+    # check if there are any system arguments, if so, calls the section here or the API
+    if len(sys.argv) > 1:   
+        m = MAIN(run=False)
+        if sys.argv[1] in m.controlPanel:
+            # Calls the section directly from our CP
+            m.controlPanel[sys.argv[1]][1]()
+        else:
+            CLI_API.call(list(sys.argv)[1::])
+        exit(0)
         
     # Call the main console fo the user if the above are good
     main()

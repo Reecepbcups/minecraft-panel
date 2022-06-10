@@ -7,20 +7,21 @@ sudo pacman -S jre-openjdk
 Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
 
-import sys
 import os
-from os.path import dirname as parentDir
-
-from pick import pick
+import sys
 
 import CLI_API
 
-from akash_servers import AkashConsole
-from panels.firewall_panel import FirewallPanel
+from os.path import dirname as parentDir
+from pick import pick
+
+import panels.main_panel as main_panel # so no circular imports
+
 from server import Server
 from utils.config import CONFIG
 from utils.cosmetics import cfiglet, cinput, cprint
 from utils.file import fetch_servers
+from utils.screen import get_all_active_screens
 from utils.system import checkIfRequirementsAreInstalled
 
 # Load this before anything else
@@ -28,50 +29,13 @@ serverGroups = CONFIG['servers'] # 'proxy' & 'spigot'
 PROXIES = serverGroups['proxy']
 SERVERS = serverGroups['spigot']
 ALL = list(PROXIES) + list(SERVERS)
-# /////
-
-
-from panels.admin_panel import AdminPanel
-from panels.database_panel import DatabasePanel
-from panels.redis_panel import RedisPanel
-from utils.screen import get_all_active_screens
-
-class MAIN:
-    def __init__(self, run=True):
-        self.controlPanel = {        
-            "1": ["Console", ServerSelector],              
-            "2": ["List Running Servers", get_all_active_screens],
-            "3": ["Start Server(s)", startServerPicker],
-            "4": ["Stop Server(s)\n", stopServerPicker],
-
-            "a": ["Akash Docker Connect\n", AkashServerSelector],
-
-            "s": ["Screens\n", screenPicker],
-
-            "ADMIN": ["&cAdmin Panel&r", AdminPanel],
-            "DB": ["&aDatabase Functions&r", DatabasePanel],
-            "RED": ["&4Redis Functions&r", RedisPanel],
-            "FIRE": ["&4Firewall Panel&r", FirewallPanel],
-        }
-        if run:
-            self.loop()
-
-    def loop(self):
-        while True:
-            cfiglet("&3", "Control Panel", clearScreen=True)
-            for k, v in self.controlPanel.items():
-                cprint(f"[{k}]\t {v[0]}")
-                
-            request = cinput("\nCP> ")
-            if request == "exit":
-                cprint("&cExiting Panel"); exit(0)
-                
-            if request not in self.controlPanel:
-                cprint("&cInvalid Selection")
-                continue
-
-            self.controlPanel[request][1]()
-            pass
+#
+# Get the users linux home directory
+#
+homeDir = os.path.expanduser('~')
+profile = os.path.join(homeDir, '.bash_profile')
+bashrc = os.path.join(homeDir, '.bashrc')
+screenfile = os.path.join(homeDir, '.screenrc')
 
 
 def main():
@@ -81,135 +45,19 @@ def main():
     
     # Calls main panel (above).
     # Done this way so we can get controlpanel at bottom all of main()
-    MAIN()
+    main_panel.MainPanel()
+    pass
 
     
     
 
 
-def screenPicker():
-    activeScreens = get_all_active_screens(printOutput=False)
 
-    if len(activeScreens) == 0:
-        cprint("&cNo screens are running")
-        input("Enter to continue...")
 
-    screen, _ = pick(activeScreens, title="Select Screen to connect too", indicator=' =>')
-    os.system(f"screen -r {screen}")
 
-def stopServerPicker():
-    runningServers = get_all_active_screens(printOutput=False)
-    actualServers = [s for s in runningServers if s in ALL]
-    if len(actualServers) == 0:
-        cprint("&cNo servers are running")
-        input("Enter to continue...")
-
-    # Servers which are running AND are in our config of actual servers    
-    servers, _ = pick(actualServers, title="Select servers to stop (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')
-    for server in servers:
-        Server(server).stop_server()
-
-def startServerPicker():
-    if len(ALL) == 0:
-        cinput("&cThere are no servers in the config to start. (Enter to continue...)")
-
-    # Servers which are running AND are in our config of actual servers
-    servers = pick(ALL, title="Select servers to start (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')
-    started, alreadyRunning = [], []
-    for server in servers:
-        serverName = server[0]
-        
-        status = Server(serverName).start_server(debug=False)
-        if status:
-            started.append(serverName)
-        else:
-            alreadyRunning.append(serverName)  
-
-    output = ""
-    if len(started) > 0: output += f"\n&aStarted: {','.join(started)}\n"    
-    if len(alreadyRunning) > 0: output += f"&eAlready Running: {','.join(alreadyRunning)}."
-    if len(output) > 0: cinput(output + ", Enter to continue...")
 
 # ------
 # below could probably move into their own UTIL Files / panel sections
-
-def getServers(print_output=False) -> dict:
-    choices = {}
-    for idx, server in enumerate(fetch_servers()):
-        choices[str(idx)] = server
-        if print_output:
-            print(f"[{idx}] {server}")
-    return choices
-
-def getAkashServers(print_output=False) -> dict:
-    choices = {}
-
-    servers = CONFIG['akash-servers']
-
-    for idx, server in enumerate(servers):
-        choices[str(idx)] = server
-        if print_output:
-            print(f"[{idx}] {server}")
-    return choices
-
-def ServerSelector():
-    cfiglet("&a", "Console", clearScreen=True)
-
-    choices = getServers(print_output=True)
-
-    server = cinput("\nServer Selector > ")
-    if server not in choices:
-        cprint("&cInvalid Selection")
-
-    if len(server) > 0:
-        panel = Server(choices[server])
-        panel.enter_console()
-    else:
-        cprint("&cNo server selected")
-
-def AkashServerSelector():
-    cfiglet("&b", "Akash Selector", clearScreen=True)
-
-    choices = getAkashServers(print_output=True)
-
-    server = cinput("\nAkash Server Selector > ")
-    if server not in choices:
-        cprint("&cInvalid Selection")
-
-    panel = AkashConsole(choices[server])
-    panel.enter_console()
-
-
-def DockerSelector():
-    import pick
-
-    from akash_servers import DockerConsole
-    '''
-    cd paper-docker-build
-    docker build . -t test-server
-    docker rm mc2
-    docker run -d -it -p 25565:25565 --name mc2 -e OPS=reecepbcups -e MOTD="My Docker Server" -e EULA=TRUE -e VERSION=1.18.2 test-server:latest
-    # Ensure the port for rcon is enabled too
-    '''
-    cfiglet("&a", "C-Docker", clearScreen=True)
-
-    # I guess we add host here & run docker ps to see running stuff?
-    # This possible with akash or?
-    dockers = {"mc2": ["65.21.197.51", 2375]}
-
-    for d in dockers:
-        print(f"[{d}] {dockers[d][0]}:{dockers[d][1]}")
-    print()
-
-    server = cinput("\nDocker Selector > ")
-    if server not in dockers:
-        cprint("&cInvalid Selection")
-
-    host = dockers[server][0]
-    port = dockers[server][1]
-    panel = DockerConsole(host, port, server)
-    panel.enter_console()
-
 
 def changeJavaVersion():
     # sudo archlinux-java
@@ -237,10 +85,10 @@ def console(server_name):
     else:
         cprint("&cServer not found")
 
-def isSpigotServerOnBungee(server_name): # do in server object
+def isSpigotServerOnBungee(server_name) -> bool: # do in server object
     check = Server(server_name).values['bungeecord']
 	# if so, return 1 - UFW will block port from outside world, but ensure localhost can access it. Or do I do this in firewallBungeeServer?
-    return check
+    return True if check == 1 else False
 
 
 def fixPort():
@@ -249,12 +97,6 @@ def fixPort():
 
 def serverReboot(server_name):
     pass
-
-# get the users linux home directory
-homeDir = os.path.expanduser('~')
-profile = os.path.join(homeDir, '.bash_profile')
-bashrc = os.path.join(homeDir, '.bashrc')
-screenfile = os.path.join(homeDir, '.screenrc')
 
 
 # Add to system utils in future?
@@ -309,7 +151,8 @@ if __name__ == "__main__":
     
     # check if there are any system arguments, if so, calls the section here or the API
     if len(sys.argv) > 1:   
-        m = MAIN(run=False)
+        
+        m = main_panel.MainPanel(run=False)
         if sys.argv[1] in m.controlPanel:
             # Calls the section directly from our CP
             m.controlPanel[sys.argv[1]][1]()

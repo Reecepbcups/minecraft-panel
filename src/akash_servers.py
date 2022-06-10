@@ -1,5 +1,5 @@
 from utils.config import CONFIG
-from utils.cosmetics import cprint
+from utils.cosmetics import cprint, cfiglet, cinput
 from utils.killable_thread import thread_with_trace
 from utils.system import os_command, run_os_command
 

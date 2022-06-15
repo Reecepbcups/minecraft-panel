@@ -31,18 +31,12 @@ def paper_install():
         paper_install()
 
     jsonReply = requests.get(PAPER_LINK.format(project=project)).json()
-    versionGroupString = ', '.join(jsonReply['versions'])
 
-    cprint("&a\nVersions you can use:\n" + versionGroupString)
+    versionGroups= list(jsonReply['versions'])
+    versionGroups.reverse() # so 1.18.2 is on top
 
-    latest = versionGroupString.split(', ')[-1]
-    # version = cinput(f"&bServer Version &f({latest})&b>> ") or latest
-    version = cinput(f"&bServer Version &f(1.18.2)&b>> ") or "1.18.2"
-    if version not in versionGroupString:
-        if project in ["None", "exit"]:
-            return
-        cprint(f"&4Invalid version: {version}. Try again...")
-        paper_install()
+    selected = pick(versionGroups, "Pick the version you want to use (Enter to select)", indicator=' =>', multiselect=False)
+    version = selected[0]
     
     
     try: # Download the jar file
@@ -155,7 +149,7 @@ class ServerCreator():
                     file.write("online-mode=false\n")
                     file.write("network-compression-threshold=-1\n")
         else:
-            port = int(cinput(f"&bPort: &f(25565) &b>> ") or 15565)
+            port = cinput(f"&bPort: &f(25565) &b>> ") or "25565"
             RAM = cinput("&bRam amount: &f[500M/(1G)] &b>> ") or "1G"
             self.createStartFile(RAM, JAR_NAME)
 
@@ -311,10 +305,7 @@ class ServerCreator():
                     options.append(pluginName)
                 # else if it is not a proxy plugin
                 elif 'proxy' not in pluginName:
-                    options.append(pluginName)
-                
-
-        # exit()
+                    options.append(pluginName)            
         
         selected = pick(options, title, indicator=' =>', multiselect=True, min_selection_count=0)
         for name, idx in selected:                       

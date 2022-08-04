@@ -3,9 +3,12 @@ Original Bash Version - https://github.com/Reecepbcups/bash-minecraft-panel
 
 <br/>
 
-# Setup
-## Arch
-```
+# Setup Machine
+### Initial Setup
+- [Hetzner Recommended Arch](https://www.hetzner.com/dedicated-rootserver/matrix-ax)
+- **[Arch From Scratch Install Guide (OVH)](Docs/ARCH/OVH_ARCH_INSTALL.md)
+### Post Installation & Connections
+```bash
 pacman -S ufw python-pip sudo curl git screen zip \
 unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
 iotop atop dstat glances maven cpio pahole htop btop go-pie redis
@@ -19,13 +22,11 @@ python -m pip install -r requirements/requirements.txt
 # Update src/utils/config.py PATH_TO_CONFIG_FILE for custom config location
 
 # First run it will prompt you to source the bashrc file for the console alias
-python minecraft-panel/src/console.py
+python src/console.py
 
-hostnamectl hostname myMachineName
-
-git config --global user.name "Reece"
-git config --global user.email "Reece@gmail.com"
-git config credential.helper store
+# git config --global user.name "Reece"
+# git config --global user.email "Reece@gmail.com"
+# git config credential.helper store
 
 # You can view all params to change with `sysctl -a`
 echo "65535" > /proc/sys/fs/file-max
@@ -40,10 +41,14 @@ timedatectl set-timezone America/Chicago
 
 # Other Documentation
 
-> ## [Akash Client Install](Docs/AKASH_CLIENT_INSTALL.md)
+Arch:
+> ### [Performance Kernel](Docs/ARCH/PERFORMANCE_KERNEL.md)
+> ### [MongoDB Install](Docs/ARCH/MONGODB.md)
 
-> ## [Stress Testing Minecraft](Docs/STRESS_TEST_MC.md)
+Akash:
+> ### [Akash Client Install](Docs/AKASH/AKASH_CLIENT_INSTALL.md)
+> ### [Akash Misc Commands](Docs/AKASH/AKASH_COMMANDS.md)
 
-> ## [Arch Custom Kernel](Docs/ARCH_CUSTOM_KERNEL.md)
 
-> ## [Ubuntu Overclock](Docs/OVERCLOCKING.md)
+Other:
+> ### [Stress Testing Minecraft](Docs/STRESS_TEST_MC.md)

@@ -1,5 +1,5 @@
 ### Akash Client
-```
+```bash
 # Install the Client 
 # https://docs.akash.network/guides/cli/streamlined-steps/install-the-akash-client
 

@@ -1,4 +1,4 @@
-### Arch Custom Kernel
+### Arch Performance Kernel
 ```
 sudo pacman -S linux-zen linux-zen-headers
 

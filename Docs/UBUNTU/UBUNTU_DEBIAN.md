@@ -22,3 +22,10 @@ java -version
 
 sudo update-alternatives --config java
 ```
+
+
+## OVERCLOCKING
+```
+sudo apt install cpufrequtils
+cpufreq-set -r -g performance	
+```

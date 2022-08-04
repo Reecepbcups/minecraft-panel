@@ -11,3 +11,4 @@ pick  # https://github.com/wong2/pick
 pymongo
 dnspython
 cryptocode
+tqdm

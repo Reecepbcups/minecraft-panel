@@ -1,4 +1,43 @@
 # Install MongoDB Tools & Shell on Arch
+
+> ### UPDATED GUIDE - WIP
+```bash
+This is 4.4.6, we need >5.0.0
+
+
+# https://awan.com.np/how-to-install-mongodb-on-arch-linux-working/
+useradd -m software -p myAccountsPassword --shell /bin/false
+
+passwd software
+
+su software -s /bin/bash
+git clone https://aur.archlinux.org/yay-git.git
+cd yay-git
+
+makepkg -si
+
+yay -S mongodb-bin
+
+exit # su root
+
+systemctl enable --now mongodb
+systemctl start --now mongodb
+
+mongo
+
+
+sudo nano /etc/mongodb.conf
+# update:
+ - bindIp: 127.0.0.1,0.0.0.0
+
+# update
+security:
+  authorization: "enabled"
+```
+
+
+
+
 ```bash
 
 useradd -m software -p myAccountsPassword --shell /bin/false
@@ -14,15 +53,20 @@ chmod +x -R /home/software/mongodb-shell-bin
 
 su software -s /bin/bash
 
+cd ~
 cd mongodb-tools
-makepkg
+makepkg -s -f
 cd ../mongodb-tools
-makepkg
+makepkg -s -f
 
 exit # need to be root again
 cp /home/software/mongodb-shell-bin/pkg/mongodb-shell-bin/usr/bin/mongo /usr/bin/
 cp /home/software/mongodb-tools/pkg/mongodb-tools/usr/bin/* /usr/bin/
 ```
+
+
+
+
 
 ## Install via AUR
 ```bash
@@ -39,7 +83,7 @@ su software -s /bin/bash
 cd ~
 git clone https://aur.archlinux.org/mongodb-bin.git
 cd mongodb-bin
-makepkg
+makepkg -s
 
 exit # gets you back to root user
 cd /home/software/mongodb-bin/ && sudo pacman -U --noconfirm mongodb-bin-*.tar.zst\\

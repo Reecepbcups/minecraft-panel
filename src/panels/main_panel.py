@@ -47,6 +47,7 @@ class MainPanel():
     def loop(self):
         while True:
             cfiglet("&3", "Control Panel", clearScreen=True)
+            cprint(f"&3version: {console.getVersion()}")
             for k, v in self.controlPanel.items():
                 cprint(f"[{k}]\t {v[0]}")
                 

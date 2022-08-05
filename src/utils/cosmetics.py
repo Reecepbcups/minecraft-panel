@@ -42,7 +42,8 @@ def color(text):
 def cfiglet(clr, figlet, clearScreen=False):
     if clearScreen:
         os.system('clear')
-    print(color(clr+pyfiglet.figlet_format(figlet)))
+    # standard, small, computer, bulbhead, cybersmall, cybermedium, digital,  doom, madrid, maxfour, mini, rounded
+    print(color(clr+pyfiglet.figlet_format(figlet, font="small")))
 
 
 def cprint(text):  

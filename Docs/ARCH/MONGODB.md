@@ -22,13 +22,19 @@ systemctl start --now mongodb
 
 mongosh
 
+## move backup from old server. Get these from the mongodbtools bin
+## mongodump --username admin --password PASSWORD --authenticationDatabase admin --out /home/craft/MongoDB_Dump/
+
 
 # create new users
 use crafteconomy
 db.createUser({ user: "craftdbuser", pwd: passwordPrompt(), roles: [ "readWrite" ] })
 
+use luckperms
+db.createUser({ user: "luck", pwd: passwordPrompt(), roles: [ "readWrite" ] })
+
 use admin
-db.createUser( { user: "admin", pwd: passwordPrompt(), roles: [ "readWrite", "dbAdmin" ] })
+db.createUser( { user: "admin", pwd: passwordPrompt(), roles: [ "root", "userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase" ] })
 
 
 sudo nano /etc/mongodb.conf
@@ -41,6 +47,9 @@ security:
 # ctrl + x, y, enter
 
 systemctl restart mongodb
+
+## restore db
+## mongorestore --uri=mongodb://admin:PASSWORD@ip_addr:27017/?authSource=admin MongoDB_Dump/
 
 
 sudo cp /usr/bin/mongosh /usr/bin/mongo

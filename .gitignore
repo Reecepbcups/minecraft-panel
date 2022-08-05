@@ -8,3 +8,5 @@ servers
 __pycache__
 
 downloads/*
+
+config.json

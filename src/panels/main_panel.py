@@ -119,7 +119,7 @@ def screenPicker():
 
 def stopServerPicker():
     runningServers = get_all_active_screens(printOutput=False)
-    actualServers = [s for s in runningServers if s in ALL]
+    actualServers = [s for s in runningServers if s in console.ALL]
     if len(actualServers) == 0:
         cprint("&cNo servers are running")
         input("Enter to continue...")

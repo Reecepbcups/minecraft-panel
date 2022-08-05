@@ -2,42 +2,53 @@
 
 > ### UPDATED GUIDE - WIP
 ```bash
-This is 4.4.6, we need >5.0.0
-
-
 # https://awan.com.np/how-to-install-mongodb-on-arch-linux-working/
 useradd -m software -p myAccountsPassword --shell /bin/false
 
 passwd software
 
 su software -s /bin/bash
+cd /home/software
 git clone https://aur.archlinux.org/yay-git.git
 cd yay-git
 
 makepkg -si
 
-yay -S mongodb-bin
+yay -S mongodb-bin mongodb-tools-bin mongosh-bin
 
 exit # su root
-
 systemctl enable --now mongodb
 systemctl start --now mongodb
 
-mongo
+mongosh
+
+
+# create new users
+use crafteconomy
+db.createUser({ user: "craftdbuser", pwd: passwordPrompt(), roles: [ "readWrite" ] })
+
+use admin
+db.createUser( { user: "admin", pwd: passwordPrompt(), roles: [ "readWrite", "dbAdmin" ] })
 
 
 sudo nano /etc/mongodb.conf
 # update:
- - bindIp: 127.0.0.1,0.0.0.0
 
+ - bindIp: 127.0.0.1,MACHINE_IP_HERE
 # update
 security:
   authorization: "enabled"
+# ctrl + x, y, enter
+
+systemctl restart mongodb
+
+
+sudo cp /usr/bin/mongosh /usr/bin/mongo
 ```
 
 
 
-
+## DEPRECATED - manual way, use yay instead
 ```bash
 
 useradd -m software -p myAccountsPassword --shell /bin/false
@@ -68,7 +79,7 @@ cp /home/software/mongodb-tools/pkg/mongodb-tools/usr/bin/* /usr/bin/
 
 
 
-## Install via AUR
+## DEPRECATED - Install via AUR
 ```bash
 # https://www.maketecheasier.com/use-aur-in-arch-linux/
 useradd -m software -p myPassword19191 --shell /bin/false
@@ -91,10 +102,13 @@ cd /home/software/mongodb-bin/ && sudo pacman -U --noconfirm mongodb-bin-*.tar.z
 sudo mkdir -p /data/db
 sudo nano /etc/mongodb.conf #(update path to /data/db)
 grep mongo /etc/passwd # (get the mongodb user id & group)
-sudo chown -R 966:966 /data/db # (where 966 is the group)
+sudo chown -R 970:970 /data/db # (where 966 is the group)
 
-systemctl start mongodb.service
-systemctl status mongodb # should return active
+sudo chown -R mongodb:mongodb /var/lib/mongodb # or /data/db
+sudo chown mongodb:mongodb /tmp/mongodb-27017.sock
+
+
+systemctl start mongodb.service && systemctl status mongodb # should return active
 
 # if so:
 systemctl enable mongodb.service

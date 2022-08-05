@@ -59,13 +59,12 @@ class AdminPanel:
 
             'new': ["Create New Instance\n", ServerCreator],
 
-            'firewall': ["Firewall\n", print], # firewall panel with options to use the class
-
-            'web-short': ["Link Shortener\n", print],
+            # 'firewall': ["Firewall\n", print], # firewall panel with options to use the class
+            # 'web-short': ["Link Shortener\n", print],
 
             'env': ["OS ENV Variables\n", setENVVariable],
 
-            "cp": ["Main Menu", print],
+            # "cp": ["Main Menu", print],
             "exit": ["Exit", exit]
 
             # "UAC": ["Enable user access control", userAccessControl],

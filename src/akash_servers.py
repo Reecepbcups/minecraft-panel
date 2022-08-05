@@ -50,9 +50,12 @@ class AkashConsole():
                     line = line[1]
                     print("[" + str(line[1::]))
         except OSError as e:
-            cprint("&cConsole Closing... " + e)
+            cprint(f"&cConsole Closing... {e}")
         except KeyboardInterrupt as e:
-            cprint("&cConsole Closing... " + e)
+            cprint(f"&cConsole Closing... {e}")
 
     def console_cmd(self, command):
-        run_os_command(self.c.replace("{COMMAND}", command), print_output=True)
+        try:
+            run_os_command(self.c.replace("{COMMAND}", command), print_output=True)
+        except Exception as e:
+            cprint(f"&cError running os command... {e}")

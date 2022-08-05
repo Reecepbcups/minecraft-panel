@@ -245,15 +245,15 @@ class MongoHelper():
             "dbo": "dbOwner",
             "backup": "backup",
             "restore": "restore",
-            "-": "", # seperator
+            "-": "", # separator
             "rad": "readAnyDatabase",
             "rwad": "readWriteAnyDatabase",
             "uad": "userAdminAnyDatabase",
             "dbaad": "dbAdminAnyDatabase",
-            "--": "", # seperator
+            "--": "", # separator
             "dba": "dbAdmin",            
             "ua": "userAdmin",
-            "---": "", # seperator
+            "---": "", # separator
             "ca": "clusterAdmin",
             "cm": "clusterManager",
             "root": "root",

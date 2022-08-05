@@ -52,14 +52,14 @@ class MainPanel():
                 
             request = cinput("\nCP> ")
             if request == "exit":
-                cprint("&cExiting Panel"); exit(0)
+                cprint("&cExiting Panel")
+                exit(0)
                 
-            if request not in self.controlPanel:
+            if request not in self.controlPanel or len(request) == 0:
                 cprint("&cInvalid Selection")
                 continue
-
+            
             self.controlPanel[request][1]()
-            pass
 
 def getServers(print_output=False) -> dict:
     choices = {}
@@ -88,6 +88,7 @@ def ServerSelector():
 def startServerPicker():
     if len(console.ALL) == 0:
         cinput("&cThere are no servers in the config to start. (Enter to continue...)")
+        return
 
     # Servers which are running AND are in our config of actual servers
     servers = pick(console.ALL, title="Select servers to start (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')
@@ -123,6 +124,7 @@ def stopServerPicker():
     if len(actualServers) == 0:
         cprint("&cNo servers are running")
         input("Enter to continue...")
+        return
 
     # Servers which are running AND are in our config of actual servers    
     servers, _ = pick(actualServers, title="Select servers to stop (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')

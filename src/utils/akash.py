@@ -19,11 +19,13 @@ def getAkashServers(print_output=False) -> dict:
 def AkashServerSelector():
     cfiglet("&b", "Akash Selector", clearScreen=True)
 
-    choices = getAkashServers(print_output=True)
+    while True:
+        choices = getAkashServers(print_output=True)
 
-    server = cinput("\nAkash Server Selector > ")
-    if server not in choices:
-        cprint("&cInvalid Selection")
+        server = cinput("\nAkash Server Selector > ")
+        if server not in choices or len(server) == 0:
+            cprint("\n\n\n&cInvalid Selection")
+            continue
 
-    panel = AkashConsole(choices[server])
-    panel.enter_console()
+        panel = AkashConsole(choices[server])
+        panel.enter_console()

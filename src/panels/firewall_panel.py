@@ -5,13 +5,20 @@ from pick import pick
 from utils.cosmetics import cprint, cinput, cfiglet
 
 from utils.config import CONFIG, saveConfig
+from ufw.common import UFWError
 
+CAN_RUN_UFW=True
 try:
     import pyufw as ufw
 except ModuleNotFoundError as e: 
     cprint("&cUFW is not installed on this system.")
     cprint(f"&epacman -S ufw  |   sudo apt install ufw")
     exit(1)
+except UFWError as e: # prob not running as root
+    cprint(f"&cUFW Error: {e}")
+    if e.value == "You need to be root to run this script":
+        CAN_RUN_UFW=False
+    # exit(1)
 
 '''
 To delete rules, you need to edit the config.json, then run 'sfw' to [S]et [F]ire[W]all

@@ -15,9 +15,14 @@ if not os.path.isfile(PATH_TO_CONFIG_FILE):
 
 
 FILE = f"{parentDir(parentDir(parentDir(__file__)))}/config.json"
-with open(FILE) as f:
-    CONFIG = json.load(f)
-    # print(f"Loaded CONFIG with {CONFIG}")
+try:
+    with open(FILE) as f:
+        CONFIG = json.load(f)     
+        # print(f"Loaded CONFIG with {CONFIG}")
+except Exception as e:
+    print(f"\nError loading config.json: {e}\nMAKE SURE YOU 'cp config.json.example config.json'")
+    CONFIG = {}
+    exit(0)  
 
 def saveConfig():
     with open(FILE, 'w') as f:

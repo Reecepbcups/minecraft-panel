@@ -9,7 +9,7 @@
     },
     "akash-servers": {
         "reece-test-akash-1": {
-            "dseq": 5753968,
+            "dseq": 57539680,
             "owner": "akash1rpv97xasy7px29ccdhy93ar6aj0t8a6895d4n3",
             "provider": "akash1r7y2msa9drwjss5umza854he5vwr2czunye9de"
         }

@@ -13,6 +13,13 @@ pacman -S ufw python-pip sudo curl git screen zip \
 unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
 iotop atop dstat glances maven cpio pahole htop btop go-pie redis
 
+# Install Redis
+systemctl start redis
+nano /etc/redis/redis.conf
+>> # find requirepass  & set as you want
+>> # comment out "bind 127.0.0.1 -::1" line
+systemctl restart redis
+
 # optional: nginx glances nodejs figlet sysstat slurm speedometer
 
 git clone https://github.com/Reecepbcups/minecraft-panel.git

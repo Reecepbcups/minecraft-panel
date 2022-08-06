@@ -35,11 +35,12 @@
         "max-local-backups": 3,
         "save-relative": false,
         "parent-paths": {
-            "/home/reece/Desktop/Programming/POCS/RegexBackup": [
-                "Spigot.jar", ".*.zip", "ignore/", "plugins/Dynmap/files/", "plugins/LuckPerms/translations/", ".*.jpg", ".*.txt"
+            "/root/servers/": [
+                ".*.zip", "logs/", "cache/", ".*_OLD", ".*_TEMP-REMOVED", ".*.jar-",
+                "plugins/dynmap", "LuckPerms/translations/", "LuckPerms/libs/", "plugins/bStats", "libraries/"
             ],
-            "/home/reece/Desktop/Programming/POCS/TestRegex/": [
-                ".*.jpg"
+            "/root/core/": [
+                ".*node_modules/", ".git/"
             ],
             "/root/minecraft-panel/": [
                 ".*akash/", ".*Docs/", ".*requirements/", ".*src/", ".git/"

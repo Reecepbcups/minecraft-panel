@@ -9,7 +9,7 @@ Original Bash Version - https://github.com/Reecepbcups/bash-minecraft-panel
 - **[Arch From Scratch Install Guide (OVH)](Docs/ARCH/OVH_ARCH_INSTALL.md)
 ### Post Installation & Connections
 ```bash
-pacman -S ufw python-pip sudo curl git screen zip \
+pacman -S ufw python-pip sudo curl git screen zip cron \
 unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
 iotop atop dstat glances maven cpio pahole htop btop go-pie redis
 

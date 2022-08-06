@@ -207,4 +207,4 @@ class BackupGUI:
         # get current file path
         # current_path = os.path.dirname(os.path.realpath(__file__))
         from console import console_file
-        cinput(f"""\n&f# Backup every day at midnight\n&a0 0 * * * python3 {console_file} backup""")
+        cinput(f"""\nEDITOR=nano crontab -e\n&f# Backup every day at midnight\n&a0 0 * * * python3 {console_file} backup false""")

@@ -3,7 +3,7 @@ from utils.file import CONFIG
 from utils.cosmetics import cfiglet, cinput, cprint
 from pick import pick
 
-from utils.system import getStorageAmount, getRamUsage
+from utils.system import getStorageAmount, getRamUsage, getCurrentHostname
 
 from datetime import datetime
 import zipfile
@@ -45,9 +45,8 @@ class Backup:
         self.discord_webook = CONFIG['backups']['discord-webhook']
         self.debug = debug
         self.save_relative = CONFIG['backups']['save-relative']
-        
-        self.server_name = CONFIG['backups']['server-name']
-        self.zipfilename = f"{self.server_name}_{self.current_time}.zip"
+                
+        self.zipfilename = f"{getCurrentHostname()}_{self.current_time}.zip"
         self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)
         
 
@@ -56,11 +55,11 @@ class Backup:
 
         for root_path in self.root_paths:            
             if not os.path.isdir(root_path):
-                cprint(f"&c{root_path} is not a directory, ignoring...")
+                cprint(f"\n&c{root_path} is not a directory, ignoring...")
                 continue
 
             ignore_regex = CONFIG['backups']['parent-paths'][root_path]
-            print(root_path, ignore_regex)            
+            # print(root_path, ignore_regex)            
 
             for root, dirs, files in os.walk(root_path):        
                 for file in files:
@@ -86,7 +85,7 @@ class Backup:
         if len(list_of_backups) > self.max_local_backups:
             oldest_file = min(full_paths, key=os.path.getctime)
             os.remove(oldest_file)
-            cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
+            # cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
 
         # if there is a discord webhook, then send a notification.
         if len(self.discord_webook) > 0:
@@ -95,18 +94,18 @@ class Backup:
             totalRam, usedRam, percentUsed = getRamUsage()
             values = {
                 "Backup Size (MB)": [str(fileSizeMB), True],
-                "Backup Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],
-                "Filename": [self.zipfilename, False],
+                "Backup Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],                
                 "Backup To Hetzner": [str(CONFIG['backups']['hetzner-sftp']['enabled']), True],
                 "Storage": [f"Total: {size} - Free: {free} - Used: {used} ({storagePercent})", False],
                 "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],
             }
 
-            time_passed = datetime.now() - datetime.strptime(self.current_time, TIME_FORMAT)
+            time_passed = (datetime.now() - datetime.strptime(self.current_time, TIME_FORMAT)).seconds
+
             self.discord_notification(
                 url=self.discord_webook, 
-                title=f"Minecraft Panel - Backup - {self.server_name}",
-                description=f"Backup of {self.server_name} completed successfully in {time_passed} seconds",
+                title=f"Panel - Backup - {getCurrentHostname()}",
+                description=f"Backup of {self.zipfilename} | ({time_passed}s)",
                 color="11ff44",
                 values=values
             )
@@ -176,9 +175,15 @@ class Backup:
 
 
 class BackupRun:
-    def __init__(self):
-        b = Backup(debug=True)
+    def __init__(self, debugBool="False"):
+        debugging = False  
+        if debugBool[0].lower().startswith("t"):
+            debugging = True
+        
+        print(f"BackupRun {debugging=}")
+        b = Backup(debug=debugging)
         b.zip_files()
+
 
 # TODO: Make it like this in the MongoDB class?
 class BackupGUI:
@@ -188,22 +193,15 @@ class BackupGUI:
             f"Setup Crontab": self.crontab,
         }
 
-        selected, _ = pick(list(options.keys()), "Select which you would like to do:", indicator=' =>', multiselect=False)
-        print(selected)
+        selected, _ = pick(list(options.keys()), "Select which you would like to do:", indicator=' =>', multiselect=False)        
         options[selected]()
 
     def backup(self):
-        b = Backup(debug=True)
-        b.zip_files()
-        cinput("&aBackup complete!\n&fEnter to continue...")
+        BackupRun()
+        cinput("&aBackup complete!\n&cEnter to continue...")
 
     def crontab(self):
         # get current file path
         # current_path = os.path.dirname(os.path.realpath(__file__))
         from console import console_file
-        cinput(
-        f"""
-        &f# Backup every day at midnight
-        &a0 0 * * * python3 {console_file} backup
-        """
-        )
+        cinput(f"""\n&f# Backup every day at midnight\n&a0 0 * * * python3 {console_file} backup""")

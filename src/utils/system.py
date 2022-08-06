@@ -51,6 +51,9 @@ def getRamUsage():
     print(f"System is using {percentUsed}% of TOTAL RAM ({usedRam}/{totalRam})")
     return totalRam, usedRam, percentUsed
 
+def getCurrentHostname():
+    return os.popen("hostname").read().strip()
+
 def getNetworkUsage():
     usage = os.popen("""ip -h -s link""").read()
     print(usage)

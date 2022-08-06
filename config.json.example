@@ -30,30 +30,30 @@
             30000
         ]
     },
-    "backups": {
-        "server-name": "my-server",
-        "save-location": "/root/backups",
+    "backups": {        
+        "save-location": "/home/reece/Desktop/test_backups",
+        "max-local-backups": 3,
         "save-relative": false,
         "parent-paths": {
-            "/root/servers/survival": [
+            "/home/reece/Desktop/Programming/POCS/RegexBackup": [
                 "Spigot.jar", ".*.zip", "ignore/", "plugins/Dynmap/files/", "plugins/LuckPerms/translations/", ".*.jpg", ".*.txt"
             ],
-            "/root/servers/images": [
+            "/home/reece/Desktop/Programming/POCS/TestRegex/": [
                 ".*.jpg"
             ],
-            "/root/core/discord_bot": [
-                ".*node_modules/"
-            ],
+            "/root/minecraft-panel/": [
+                ".*akash/", ".*Docs/", ".*requirements/", ".*src/"
+            ]
         },
         "hetzner-sftp": {
             "enabled": false,
-            "server-url": "user.your-storagebox.de",
-            "username": "user",
-            "password": "PASSWORD",
-            "ssh-key-path": "not-done-yet",
+            "server-url": "u.your-storagebox.de",
+            "username": "u",
+            "password": "password",
+            "ssh-key-path": "",
             "remote-dir": "/backups"
         },
-        "discord-webhook": "https://discord.com/api/webhooks/000000/ddddd"
+        "discord-webhook": "https://discord.com/api/webhooks/000000"
     },
     "web-shortner": {
         "location": "/var/www/html/l",

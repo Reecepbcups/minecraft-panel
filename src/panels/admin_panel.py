@@ -66,7 +66,7 @@ class AdminPanel:
             'env': ["OS ENV Variables", setENVVariable],
 
             # TODO: add backup function
-            'backup': ["Backup Crontab", BackupGUI],
+            'b': ["Backup Crontab", BackupGUI],
 
             "cp": ["Main Menu", print], # handled in loop logic
             "exit": ["Exit", exit]

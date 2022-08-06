@@ -58,6 +58,7 @@ class Backup:
         self.zip_file = zipfile.ZipFile(self.backup_file_name, "w", compression=zipfile.ZIP_DEFLATED)
 
         # use pymongo to save the backup to the database
+        # https://stackoverflow.com/questions/24610484/pymongo-mongoengine-equivalent-of-mongodump ??
         mongoDBData = CONFIG['backups']['database']['mongodb']
         isMongoBackupEnabled = mongoDBData['enabled']
         if(isMongoBackupEnabled):
@@ -74,7 +75,9 @@ class Backup:
                 exit(0)
 
             # add mongodb to the zip file
-            self.zip_file.write(mongoLocation, arcname=os.path.basename(mongoLocation))
+            # print(mongoLocation, os.path.basename(mongoLocation))
+            # self.zip_file.write(mongoLocation, arcname=os.path.basename(mongoLocation))
+            self.root_paths[mongoLocation] = []
 
         # exit(0)
 

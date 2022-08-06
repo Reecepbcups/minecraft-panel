@@ -19,6 +19,7 @@ class RedisPanel():
 
             "add": ["Add a New Redis Instance\n", self.addInstance],        
 
+            "cp": ["Main Menu", print], # handled in loop logic
             "exit": ["exit", exit],
         }
         self.run()

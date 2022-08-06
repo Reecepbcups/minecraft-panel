@@ -135,8 +135,9 @@ class Firewall():
 class FirewallPanel():
     def __init__(self):
         if isUserRoot() == False:
-            print("You must be root to use the firewall feature!")
-            exit(1)
+            cinput("You must be root to use the firewall feature!\nEnter to continue...")
+            # exit(1)
+            return
 
         self.fSettings = CONFIG["firewall"]
         print(self.fSettings)

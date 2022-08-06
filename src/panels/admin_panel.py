@@ -64,7 +64,7 @@ class AdminPanel:
 
             'env': ["OS ENV Variables\n", setENVVariable],
 
-            # "cp": ["Main Menu", print],
+            "cp": ["Main Menu", print], # handled in loop logic
             "exit": ["Exit", exit]
 
             # "UAC": ["Enable user access control", userAccessControl],

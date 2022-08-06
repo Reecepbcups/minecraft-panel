@@ -1,6 +1,5 @@
 {
-    "SERVER_DIRECTORY": "/root/minecraft-panel/servers",
-    "BACKUP_DIRECTORY": "/root/minecraft-panel/backups",
+    "SERVER_DIRECTORY": "/root/minecraft-panel/servers",    
     "DOWNLOAD_CACHE": "/tmp",
     "servers": {
         "proxy": [],

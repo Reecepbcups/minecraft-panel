@@ -140,7 +140,11 @@ class Server:
 
     def follow(self):
         path = f'{self.path}/logs/latest.log'
-        # check if exist
+
+        # wait 1 second, useful if you are starting up server from the console directly.
+        time.sleep(1)
+
+        # check if exist        
         if not os.path.exists(path):
             cprint("&cLog file not found. Creating...")
             # write to path, including any nested folders

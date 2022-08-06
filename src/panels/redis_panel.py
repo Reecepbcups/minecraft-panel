@@ -45,7 +45,7 @@ class RedisPanel():
     def showURI(self):
         if len(self.uri) == 0:
             self._change_uri()        
-        print(self.uri)
+        cinput(f"&f\n{self.uri}\n&cEnter to continue...")
 
     def connectToServer(self):        
         self._set_server_uri()
@@ -84,7 +84,11 @@ class RedisServerCache:
     def _askPassword(self, text="&eEnter your password to encrypt >> "):
         return cinput(text)
 
-    def decryptServer(self, server='') -> Tuple[dict, str]:      
+    def decryptServer(self, server='') -> Tuple[dict, str]:
+        if len(self.servers) == 0:
+            cinput("&cNo redis servers found / saved to cache, be sure to add 1 first.\nEnter to continue...")
+            return {}, ""
+
         if len(server) == 0:  
             server, _ = pick(list(self.servers.keys()), 'Redis Server to Connect too: ', multiselect=False, indicator=' =>')
 
@@ -108,13 +112,29 @@ class RedisServerCache:
         print(', '.join(self.servers.keys()))
 
     def newServer(self):
-        server_name = input("New Redis Instance Name: ") or 'myServer'
+        server_name = cinput("New Redis Instance Name: ") or 'myServer'
+
+        address = cinput("Enter IP Address [port optional OR 'redis://:URI'] (127.0.0.1:6379): ") or '127.0.0.1'
+
+        if address.startswith("redis://"):
+            # redis://:PASSWORD@15.204.162.18:6379
+            sections = address.split("@") #["redis://:PASSWORD", "15.204.162.18:6379"]
+            address, port = sections[1].split(":")
+            password = sections[0].split("://:")[1]            
+        else:        
+            port = 6379
+            if ':' in address:
+                address, port = address.split(':')
+            else:
+                port = cinput("Enter Port (6379): ") or 6379
+            password = cinput("Enter Password: ") or 'password'
+
         tempObj = {
-            "addr": input("Enter IP Address/URL (127.0.0.1): ") or '127.0.0.1',
-            "port": input("Enter Port (6379): ") or 6379,
-            # "user": input("Enter Username (''): ") or '',            
-            "password": input("Enter Password: ") or 'password',
+            "addr": address,
+            "port": port,                     
+            "password": password,
         }
+        print(f"Object: {tempObj}")
 
         # removes http(s):// & the / at the end
         if tempObj['addr'].startswith("http"):

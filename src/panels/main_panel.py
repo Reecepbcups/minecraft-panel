@@ -115,6 +115,7 @@ def screenPicker():
     if len(activeScreens) == 0:
         cprint("&cNo screens are running")
         input("Enter to continue...")
+        return
 
     screen, _ = pick(activeScreens, title="Select Screen to connect too", indicator=' =>')
     os.system(f"screen -r {screen}")

@@ -7,7 +7,7 @@ sudo pacman -S jre-openjdk
 Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 def getVersion() -> str:
     return __version__
 

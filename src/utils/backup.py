@@ -5,6 +5,8 @@ from pick import pick
 
 from utils.system import getStorageAmount, getRamUsage, getCurrentHostname
 
+from utils.notifications import discord_notification
+
 from datetime import datetime
 import zipfile
 import pysftp
@@ -42,7 +44,7 @@ class Backup:
         if not os.path.exists(self.backup_path):
             os.makedirs(self.backup_path)
 
-        self.discord_webook = CONFIG['backups']['discord-webhook']
+        self.discord_webhook = CONFIG['backups']['discord-webhook']
         self.debug = debug
         self.save_relative = CONFIG['backups']['save-relative']
                 
@@ -88,7 +90,7 @@ class Backup:
             # cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
 
         # if there is a discord webhook, then send a notification.
-        if len(self.discord_webook) > 0:
+        if len(self.discord_webhook) > 0:
             fileSizeMB = round(os.path.getsize(self.backup_file_name) / 1024 / 1024, 4)
             size, used, free, storagePercent = getStorageAmount()
             totalRam, usedRam, percentUsed = getRamUsage()
@@ -102,12 +104,14 @@ class Backup:
 
             time_passed = (datetime.now() - datetime.strptime(self.current_time, TIME_FORMAT)).seconds
 
-            self.discord_notification(
-                url=self.discord_webook, 
+            discord_notification(
+                url=self.discord_webhook, 
                 title=f"Panel - Backup - {getCurrentHostname()}",
                 description=f"Backup of {self.zipfilename} | ({time_passed}s)",
                 color="11ff44",
-                values=values
+                values=values,
+                imageLink="https://media.istockphoto.com/vectors/digital-signage-pixel-icon-tech-element-vector-logo-icon-illustrator-vector-id1164466990?k=20&m=1164466990&s=612x612&w=0&h=K5Zp0dtbjKWQS9CdOO53O09EKphYnxZTqDHppSMZ8Rk=",
+                footerText=""
             )
 
 
@@ -143,38 +147,7 @@ class Backup:
         print("Upload to Hetzner finished!")
 
 
-    def discord_notification(self, url="", title="", description="", color="ffffff", values={}):
-        from discord_webhook import DiscordWebhook, DiscordEmbed
-        webhook = DiscordWebhook(url=url)
-        # create embed object for webhook
-
-        # get time passed since self.current_time
-        
-
-        embed = DiscordEmbed(
-            title=title, 
-            description=description, 
-            color=color
-        )   
-        # # set thumbnail
-        embed.set_thumbnail(
-            url='https://media.istockphoto.com/vectors/digital-signage-pixel-icon-tech-element-vector-logo-icon-illustrator-vector-id1164466990?k=20&m=1164466990&s=612x612&w=0&h=K5Zp0dtbjKWQS9CdOO53O09EKphYnxZTqDHppSMZ8Rk='
-        )
-        
-        embed.set_footer(text='Embed Footer Text')
-        embed.set_timestamp()
-        
-
-        # # add fields to embed
-        # embed.add_embed_field(name='File Size', value='Lorem ipsum')
-
-        for k, v in values.items():
-            # print(k, v)
-            embed.add_embed_field(name=k, value=v[0], inline=v[1])
-
-        webhook.add_embed(embed)
-
-        response = webhook.execute()
+       
 
 
 class BackupRun:

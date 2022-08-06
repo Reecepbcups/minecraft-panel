@@ -96,7 +96,8 @@ class Backup:
             values = {
                 "Backup Size (MB)": [str(fileSizeMB), True],
                 "Backup Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],
-                "Filename": [self.zipfilename, False],              
+                "Filename": [self.zipfilename, False],
+                "Backup To Hetzner": [str(CONFIG['backups']['hetzner-sftp']['enabled']), True],
                 "Storage": [f"Total: {size} - Free: {free} - Used: {used} ({storagePercent})", False],
                 "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],
             }

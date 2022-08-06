@@ -33,6 +33,7 @@ class DatabasePanel():
     def __init__(self):
         self.m = MongoServerCache()
         self.uri = ""
+        self.mFuncs = MongoHelper("mongodb://127.0.0.1:27017")
         self.currentServer = "" # changes with each URI change
         self.databasePanel = {
             'ld': ["List Databases", self.showDatabases],            
@@ -77,7 +78,7 @@ class DatabasePanel():
     def showURI(self):
         if len(self.uri) == 0:
             self._change_uri()        
-        print(self.uri)
+        cinput(f"\n&f{self.uri}\n&cEnter to continue...")
 
     def backupDatabase(self):
         # TODO: allow a user to select databases to backup?
@@ -96,15 +97,22 @@ class DatabasePanel():
         self.m.connectToServer(self.uri)
 
     def showDatabases(self):    
-        self._set_server_uri()        
-        cprint(f"\n&fDatabases: &b{self.mFuncs.get_databases()}")
-        cinput("\n&7Enter to continue...")
+        self._set_server_uri()
+        if len(self.uri) == 0:
+            cinput("No URI set, make sure you connect to a db\n&7Enter to continue...")
+            return   
+                       
+        cinput(f"\n&fDatabases: &b{self.mFuncs.get_databases()}\n&7Enter to continue...")        
 
     def addInstance(self):
         self.m.newServer()
 
     def createNewUser(self):
-        self._set_server_uri()    
+        self._set_server_uri()
+        if len(self.uri) == 0:
+            cinput("No URI set, make sure you connect to a db\n&7Enter to continue...")
+            return
+
         username = input("New User Username: ")
         password = input("New User Password: ")
         database = input("Database (admin): ") or 'admin'    
@@ -112,7 +120,12 @@ class DatabasePanel():
         input("Enter to continue...")
 
     def deleteDatabase(self):
-        dbToDelete = input("DB to delete:")
+        self._set_server_uri()
+        if len(self.uri) == 0:
+            cinput("No URI set, make sure you connect to a db\n&7Enter to continue...")
+            return  
+
+        dbToDelete = cinput("DB to delete:")
         if dbToDelete not in self.mFuncs.get_databases():
             cprint(f"\t&c{dbToDelete} not in this server's mongodb")
             return
@@ -126,8 +139,13 @@ class DatabasePanel():
         
 
     def deleteUser(self):
-        userToDel = input("User to delete:")
-        usersDatabase = input("Database they are in:")
+        self._set_server_uri()
+        if len(self.uri) == 0:
+            cinput("No URI set, make sure you connect to a db\n&7Enter to continue...")
+            return
+
+        userToDel = cinput("User to delete:")
+        usersDatabase = cinput("Database they are in:")
         usersInTheDB = self.mFuncs.get_users(usersDatabase)
         if userToDel not in usersInTheDB:
             cprint(f"\t&c{userToDel} not in this server's mongodb")
@@ -135,7 +153,11 @@ class DatabasePanel():
         self.mFuncs.drop_user(usersDatabase, userToDel)
 
     def showUsers(self):
-        self._set_server_uri()        
+        self._set_server_uri()
+        if len(self.uri) == 0:
+            cinput("No URI set, make sure you connect to a db\n&7Enter to continue...")
+            return      
+
         print("Databases:", self.mFuncs.get_databases())
 
         db = cinput("&eDatabase you want to show users for &e>> ")
@@ -158,7 +180,7 @@ class DatabasePanel():
 
 
     def _set_server_uri(self):
-        if len(self.uri) > 0:
+        if len(self.uri) > 0:            
             return self.uri
         self._change_uri()
         return self.uri
@@ -322,7 +344,11 @@ class MongoServerCache:
     def _askPassword(self, text="&eEnter your password to encrypt >> "):
         return cinput(text)
 
-    def decryptServer(self, server='') -> Tuple[dict, str]:      
+    def decryptServer(self, server='') -> Tuple[dict, str]:
+        if len(self.servers) == 0:
+            cprint("&cNo servers found in cache, be sure to add one.")
+            return {}, ""
+
         if len(server) == 0:  
             server, _ = pick(list(self.servers.keys()), 'Mongo Server to Connect too: ', multiselect=False, indicator=' =>')
 
@@ -346,14 +372,36 @@ class MongoServerCache:
         print(', '.join(self.servers.keys()))
 
     def newServer(self):
-        server_name = input("New MongoDB Instance Name: ") or 'myServer'
+        server_name = cinput("New MongoDB Instance Name: ") or 'myServer'
+
+        address = cinput("Enter IP Address OR URI (127.0.0.1): ") or '127.0.0.1'
+        if address.startswith("mongodb://"):
+            sections = address.replace("mongodb://","").split("@") #["admin:PASSWORD", "IP_ADDR:27017/?authSource=admin"]
+            user, password = sections[0].split(":")
+
+            if "/?authSource" in sections[1]:
+                authsource = sections[1].split("/?authSource=") # ["IP_ADDR:27017", "admin"]
+                authdb = authsource[1] # admin
+            else:
+                authdb = "admin"
+            
+            address = sections[1].split(":")[0]
+            port = sections[1].split(":")[1].split("/?")[0]            
+        else:        
+            port = cinput("Enter Port (27017): ") or 27017        
+            user = cinput("Enter Username: ") or 'admin'
+            password = cinput("Enter Password: ") or 'password'
+            authdb = cinput("Enter Authentication Database (admin): ") or 'admin'
+
+
         tempObj = {
-            "addr": input("Enter IP Address/URL (127.0.0.1): ") or '127.0.0.1',
-            "port": input("Enter Port (27017): ") or 27017,
-            "user": input("Enter Username: ") or 'admin',            
-            "password": input("Enter Password: ") or 'password',
-            "authdb": input("Enter Authentication Database (admin): ") or 'admin',
+            "addr": address,
+            "port": port,
+            "user": user,
+            "password": password,
+            "authdb": authdb,
         }
+        print(f"Mongo Object: {tempObj}")
 
         # removes http(s):// & the / at the end
         if tempObj['addr'].startswith("http"):

@@ -41,7 +41,7 @@ def getStorageAmount():
     free = storage[3]
     percentUsed = storage[4]
     print(f"{size=} {used=} {free=} {percentUsed=}")
-    return size, used, free
+    return size, used, free, percentUsed
 
 def getRamUsage():
     totalRam = os.popen("""free -h | grep Mem | awk '{print $2}'""").read().strip()

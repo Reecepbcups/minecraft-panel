@@ -54,7 +54,11 @@ class Backup:
     def zip_files(self):
         self.zip_file = zipfile.ZipFile(self.backup_file_name, "w", compression=zipfile.ZIP_DEFLATED)
 
-        for root_path in self.root_paths:
+        for root_path in self.root_paths:            
+            if not os.path.isdir(root_path):
+                cprint(f"&c{root_path} is not a directory, ignoring...")
+                continue
+
             ignore_regex = CONFIG['backups']['parent-paths'][root_path]
             print(root_path, ignore_regex)            
 
@@ -87,13 +91,13 @@ class Backup:
         # if there is a discord webhook, then send a notification.
         if len(self.discord_webook) > 0:
             fileSizeMB = round(os.path.getsize(self.backup_file_name) / 1024 / 1024, 4)
-            size, used, free = getStorageAmount()
+            size, used, free, storagePercent = getStorageAmount()
             totalRam, usedRam, percentUsed = getRamUsage()
             values = {
                 "Backup Size (MB)": [str(fileSizeMB), True],
                 "Backup Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],
                 "Filename": [self.zipfilename, False],              
-                "Storage": [f"Total: {size} - Free: {free} - Used: {used}", False],
+                "Storage": [f"Total: {size} - Free: {free} - Used: {used} ({storagePercent})", False],
                 "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],
             }
 

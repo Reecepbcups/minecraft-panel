@@ -7,6 +7,8 @@ from utils.system import getStorageAmount, getRamUsage, getCurrentHostname
 
 from utils.notifications import discord_notification
 
+from pymongo import MongoClient
+
 from datetime import datetime
 import zipfile
 import pysftp
@@ -31,7 +33,7 @@ class Backup:
         self.showIgnored = showIgnored
         self.showSuccess = showSuccess
 
-    # check if backups is in config
+        # check if backups is in config
         if not 'backups' in CONFIG:
             cprint("&cNo backup section in config, grab example from 'config.json.example'")
             exit(0)
@@ -54,6 +56,27 @@ class Backup:
 
     def zip_files(self):
         self.zip_file = zipfile.ZipFile(self.backup_file_name, "w", compression=zipfile.ZIP_DEFLATED)
+
+        # use pymongo to save the backup to the database
+        mongoDBData = CONFIG['backups']['database']['mongodb']
+        isMongoBackupEnabled = mongoDBData['enabled']
+        if(isMongoBackupEnabled):
+            client = MongoClient(mongoDBData['backup-uri'])        
+            # confirm client is connected
+            if client is None:
+                cprint("&cMongoDB client is not connected")
+                exit(0)
+
+            mongoLocation = os.path.join(self.backup_path, f'mongodb_dump_{self.current_time}')
+            res = os.system(f"mongodump --uri={mongoDBData['backup-uri']} --out {mongoLocation}")
+            if res != 0:
+                cprint("&cMongoDB backup failed!")
+                exit(0)
+
+            # add mongodb to the zip file
+            self.zip_file.write(mongoLocation, arcname=os.path.basename(mongoLocation))
+
+        # exit(0)
 
         for root_path in self.root_paths:            
             if not os.path.isdir(root_path):
@@ -79,6 +102,8 @@ class Backup:
                     else:
                         if self.debug and self.showIgnored: 
                             cprint(f"&c{relative_filename} is being ignored")
+
+        # TODO: mongodb here
         self.zip_file.close()
 
         # Remove oldest backup so we don't store too many

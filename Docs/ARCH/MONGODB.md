@@ -24,6 +24,7 @@ mongosh
 
 ## move backup from old server. Get these from the mongodbtools bin
 ## mongodump --username admin --password PASSWORD --authenticationDatabase admin --out /home/craft/MongoDB_Dump/
+## mongodump --uri=mongodb://admin:PASSWORD@ip_addr:27017/?authSource=admin --out /home/craft/MongoDB_Dump/
 
 
 # create new users

@@ -123,11 +123,14 @@ class Backup:
         hetzner = CONFIG['backups']['hetzner-sftp']
         REMOTE_BACKUP_DIR = hetzner['remote-dir']
 
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys = None
         print("Uploading backup to Hetzner SFTP server...")
         with pysftp.Connection(
             hetzner['server-url'], 
             username=hetzner['username'], 
-            password=hetzner['password']
+            password=hetzner['password'],
+            cnopts=cnopts
         ) as sftp:
             # .cd, .listdir("path"), .get, .put, .makedirs, .rmdir
 

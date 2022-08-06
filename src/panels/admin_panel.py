@@ -1,8 +1,9 @@
 from utils.cosmetics import cfiglet, cprint, cinput
 
 
-from server_creator import ServerCreator    
+from server_creator import ServerCreator
 
+# from utils.backup import Backup
 '''
 adminPanel = {
         "1": newServerInstance,
@@ -63,6 +64,9 @@ class AdminPanel:
             # 'web-short': ["Link Shortener\n", print],
 
             'env': ["OS ENV Variables\n", setENVVariable],
+
+            # TODO: add backup function
+            # 'backup': ["Backup All\n", Backup],
 
             "cp": ["Main Menu", print], # handled in loop logic
             "exit": ["Exit", exit]

@@ -14,11 +14,13 @@ except ModuleNotFoundError as e:
     cprint("&cUFW is not installed on this system.")
     cprint(f"&epacman -S ufw  |   sudo apt install ufw")
     exit(1)
-except UFWError as e: # prob not running as root
-    cprint(f"&cUFW Error: {e}")
+except UFWError as e: # prob not running as root    
     if e.value == "You need to be root to run this script":
+        cprint(f"&cUFW Error: To use UFW functions, you must run as root")
         CAN_RUN_UFW=False
-    # exit(1)
+    else:
+        cprint(f"&cUFW Error: {e.value}")
+        CAN_RUN_UFW=False    
 
 '''
 To delete rules, you need to edit the config.json, then run 'sfw' to [S]et [F]ire[W]all

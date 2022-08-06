@@ -12,3 +12,5 @@ pymongo
 dnspython
 cryptocode
 tqdm
+discord-webhook # https://github.com/lovvskillz/python-discord-webhook
+pysftp

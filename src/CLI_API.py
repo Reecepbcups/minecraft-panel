@@ -5,6 +5,7 @@ from os.path import dirname as parentDir
 
 from server import Server
 from utils.cosmetics import cprint
+from utils.backup import Backup
 
 
 def startAllServers(listOfArgs):
@@ -28,6 +29,7 @@ possibleArgs = {
     "start-all": startAllServers,
     "path": path,
     "show-logs": showLogs,
+    "backup": Backup,
 }
 
 def _printValidUsage():

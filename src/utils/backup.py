@@ -3,6 +3,8 @@ from utils.file import CONFIG
 from utils.cosmetics import cfiglet, cinput, cprint
 from pick import pick
 
+from utils.system import getStorageAmount, getRamUsage
+
 from datetime import datetime
 import zipfile
 import pysftp
@@ -22,8 +24,10 @@ class Backup:
     It should take in the ROOT_PATH to start to compile. THen loop through all sub directories and files
     '''
 
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, showIgnored=True, showSuccess=True):
         self.current_time = datetime.now().strftime(TIME_FORMAT)
+        self.showIgnored = showIgnored
+        self.showSuccess = showSuccess
 
     # check if backups is in config
         if not 'backups' in CONFIG:
@@ -32,6 +36,12 @@ class Backup:
 
         self.root_paths = CONFIG['backups']['parent-paths']
         self.backup_path = CONFIG['backups']['save-location']
+        self.max_local_backups = CONFIG['backups']['max-local-backups']
+
+        # make directory if it doesn't exist
+        if not os.path.exists(self.backup_path):
+            os.makedirs(self.backup_path)
+
         self.discord_webook = CONFIG['backups']['discord-webhook']
         self.debug = debug
         self.save_relative = CONFIG['backups']['save-relative']
@@ -40,9 +50,6 @@ class Backup:
         self.zipfilename = f"{self.server_name}_{self.current_time}.zip"
         self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)
         
-        
-
-
 
     def zip_files(self):
         self.zip_file = zipfile.ZipFile(self.backup_file_name, "w", compression=zipfile.ZIP_DEFLATED)
@@ -54,24 +61,40 @@ class Backup:
             for root, dirs, files in os.walk(root_path):        
                 for file in files:
                     abs_path = os.path.join(root, file)
+                    relative_filename = str(abs_path).replace(root_path, "")
                     # print('"' + abs_path + '",'); continue
 
                     if not any(re.search(regex, abs_path) for regex in ignore_regex):
                         if self.save_relative:
-                            self.zip_file.write(abs_path, arcname=str(abs_path).replace(root_path, "")) # saves just from the rooth path onwards
+                            self.zip_file.write(abs_path, arcname=relative_filename) # saves just from the rooth path onwards
                         else:
-                            self.zip_file.write(os.path.join(root, file)) # saves them as teh full abs path                        
+                            self.zip_file.write(os.path.join(root, file)) # saves them as teh full abs path      
+                        if self.debug and self.showSuccess:
+                            cprint(f"&a{relative_filename}")                  
                     else:
-                        if self.debug: print(f"{str(abs_path).replace(root_path, '')} is being ignored")
+                        if self.debug and self.showIgnored: 
+                            cprint(f"&c{relative_filename} is being ignored")
         self.zip_file.close()
 
+        # Remove oldest backup so we don't store too many
+        list_of_backups = os.listdir(self.backup_path)  
+        full_paths = [f"{os.path.join(self.backup_path, x)}" for x in list_of_backups]
+        if len(list_of_backups) > self.max_local_backups:
+            oldest_file = min(full_paths, key=os.path.getctime)
+            os.remove(oldest_file)
+            cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
 
+        # if there is a discord webhook, then send a notification.
         if len(self.discord_webook) > 0:
             fileSizeMB = round(os.path.getsize(self.backup_file_name) / 1024 / 1024, 4)
+            size, used, free = getStorageAmount()
+            totalRam, usedRam, percentUsed = getRamUsage()
             values = {
-                "File Size (MB)": [str(fileSizeMB), True],
-                "File Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],
-                "Filename": [self.zipfilename, False]
+                "Backup Size (MB)": [str(fileSizeMB), True],
+                "Backup Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],
+                "Filename": [self.zipfilename, False],              
+                "Storage": [f"Total: {size} - Free: {free} - Used: {used}", False],
+                "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],
             }
 
             time_passed = datetime.now() - datetime.strptime(self.current_time, TIME_FORMAT)

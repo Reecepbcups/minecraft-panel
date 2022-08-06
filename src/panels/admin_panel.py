@@ -87,4 +87,8 @@ class AdminPanel:
                 import panels.main_panel as main_panel
                 main_panel.MainPanel()
             
+            if request not in self.adminFunctions:
+                cprint("&c[!] &rInvalid request")
+                continue
+            
             self.adminFunctions[request][1]()

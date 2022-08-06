@@ -7,6 +7,10 @@ sudo pacman -S jre-openjdk
 Ensure just to edit PATH_TO_CONFIG_FILE from here
 '''
 
+__version__ = "1.0.3"
+def getVersion() -> str:
+    return __version__
+
 import os
 import sys
 
@@ -129,14 +133,6 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
         print(f"Added alias 'console' to {profile}.")
         cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile} && source {bashrc}\n\n\nThen you can run 'console' and 'sconsole'" + "="*20)
     return False
-
-
-
-__version__ = "1.0.2"
-def getVersion() -> str:
-    return __version__
-
-
 
 if __name__ == "__main__":
 

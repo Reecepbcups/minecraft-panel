@@ -42,7 +42,7 @@
                 ".*.jpg"
             ],
             "/root/minecraft-panel/": [
-                ".*akash/", ".*Docs/", ".*requirements/", ".*src/"
+                ".*akash/", ".*Docs/", ".*requirements/", ".*src/", ".git/"
             ]
         },
         "hetzner-sftp": {

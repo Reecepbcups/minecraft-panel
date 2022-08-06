@@ -2,8 +2,8 @@ from utils.cosmetics import cfiglet, cprint, cinput
 
 
 from server_creator import ServerCreator
+from utils.backup import Backup, BackupGUI
 
-# from utils.backup import Backup
 '''
 adminPanel = {
         "1": newServerInstance,
@@ -53,20 +53,20 @@ class AdminPanel:
     This class is the user panel which wraps Database class.
     This is for user input & should wrap those functions
     '''
-    def __init__(self):
+    def __init__(self):        
         self.adminFunctions = {
             # "l": ["ClearAllLogs", clear_all_logs],
             # "port": ["Fix Broken Port\n", print],
 
-            'new': ["Create New Instance\n", ServerCreator],
+            'new': ["Create New Instance", ServerCreator],
 
             # 'firewall': ["Firewall\n", print], # firewall panel with options to use the class
             # 'web-short': ["Link Shortener\n", print],
 
-            'env': ["OS ENV Variables\n", setENVVariable],
+            'env': ["OS ENV Variables", setENVVariable],
 
             # TODO: add backup function
-            # 'backup': ["Backup All\n", Backup],
+            'backup': ["Backup Crontab", BackupGUI],
 
             "cp": ["Main Menu", print], # handled in loop logic
             "exit": ["Exit", exit]
@@ -86,4 +86,5 @@ class AdminPanel:
             if request == "cp":
                 import panels.main_panel as main_panel
                 main_panel.MainPanel()
-            self.adminFunctions[request][1]() 
+            
+            self.adminFunctions[request][1]()

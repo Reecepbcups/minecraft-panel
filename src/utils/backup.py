@@ -1,6 +1,7 @@
 from dataclasses import fields
 from utils.file import CONFIG
 from utils.cosmetics import cfiglet, cinput, cprint
+from pick import pick
 
 from datetime import datetime
 import zipfile
@@ -24,6 +25,11 @@ class Backup:
     def __init__(self, debug=False):
         self.current_time = datetime.now().strftime(TIME_FORMAT)
 
+    # check if backups is in config
+        if not 'backups' in CONFIG:
+            cprint("&cNo backup section in config, grab example from 'config.json.example'")
+            exit(0)
+
         self.root_paths = CONFIG['backups']['parent-paths']
         self.backup_path = CONFIG['backups']['save-location']
         self.discord_webook = CONFIG['backups']['discord-webhook']
@@ -32,7 +38,11 @@ class Backup:
         
         self.server_name = CONFIG['backups']['server-name']
         self.zipfilename = f"{self.server_name}_{self.current_time}.zip"
-        self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)         
+        self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)
+        
+        
+
+
 
     def zip_files(self):
         self.zip_file = zipfile.ZipFile(self.backup_file_name, "w", compression=zipfile.ZIP_DEFLATED)
@@ -137,7 +147,35 @@ class Backup:
         response = webhook.execute()
 
 
+class BackupRun:
+    def __init__(self):
+        b = Backup(debug=True)
+        b.zip_files()
 
-# test backup
-b = Backup(debug=True)
-b.zip_files()
+# TODO: Make it like this in the MongoDB class?
+class BackupGUI:
+    def __init__(self):
+        options = {
+            f"Backup Server": self.backup,
+            f"Setup Crontab": self.crontab,
+        }
+
+        selected, _ = pick(list(options.keys()), "Select which you would like to do:", indicator=' =>', multiselect=False)
+        print(selected)
+        options[selected]()
+
+    def backup(self):
+        b = Backup(debug=True)
+        b.zip_files()
+        cinput("&aBackup complete!\n&fEnter to continue...")
+
+    def crontab(self):
+        # get current file path
+        # current_path = os.path.dirname(os.path.realpath(__file__))
+        from console import console_file
+        cinput(
+        f"""
+        &f# Backup every day at midnight
+        &a0 0 * * * python3 {console_file} backup
+        """
+        )

@@ -37,6 +37,8 @@ profile = os.path.join(homeDir, '.bash_profile')
 bashrc = os.path.join(homeDir, '.bashrc')
 screenfile = os.path.join(homeDir, '.screenrc')
 
+console_file = os.path.join(parentDir(__file__), 'console.py')
+
 
 def main():
     # isSpigotServerOnBungee("test")

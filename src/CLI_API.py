@@ -5,7 +5,7 @@ from os.path import dirname as parentDir
 
 from server import Server
 from utils.cosmetics import cprint
-from utils.backup import Backup
+from utils.backup import BackupRun
 
 
 def startAllServers(listOfArgs):
@@ -16,7 +16,7 @@ def startAllServers(listOfArgs):
 from utils.config import CONFIG
 
 
-def path(empyList):
+def path():
     # print(f"{CONFIG['PANEL_DIRECTORY']}")
     print(parentDir(parentDir(__file__)))
 
@@ -25,11 +25,12 @@ def showLogs(args):
     s = Server(serverName)
     s.showLogOnce(numOfLines)
 
+# also does args which are in the main control panel panels/main_panel.py
 possibleArgs = {
     "start-all": startAllServers,
     "path": path,
     "show-logs": showLogs,
-    "backup": Backup,
+    "backup": BackupRun,
 }
 
 def _printValidUsage():
@@ -53,5 +54,9 @@ def call(args) -> bool:
         return False
 
     # Call the function
-    possibleArgs[mainArg](args)
+
+    if  len(args) == 0:
+        possibleArgs[mainArg]()
+    else:
+        possibleArgs[mainArg](args)
     return True

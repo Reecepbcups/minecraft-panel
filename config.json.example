@@ -30,6 +30,31 @@
             30000
         ]
     },
+    "backups": {
+        "server-name": "my-server",
+        "save-location": "/root/backups",
+        "save-relative": false,
+        "parent-paths": {
+            "/root/servers/survival": [
+                "Spigot.jar", ".*.zip", "ignore/", "plugins/Dynmap/files/", "plugins/LuckPerms/translations/", ".*.jpg", ".*.txt"
+            ],
+            "/root/servers/images": [
+                ".*.jpg"
+            ],
+            "/root/core/discord_bot": [
+                ".*node_modules/"
+            ],
+        },
+        "hetzner-sftp": {
+            "enabled": false,
+            "server-url": "user.your-storagebox.de",
+            "username": "user",
+            "password": "PASSWORD",
+            "ssh-key-path": "not-done-yet",
+            "remote-dir": "/backups"
+        },
+        "discord-webhook": "https://discord.com/api/webhooks/000000/ddddd"
+    },
     "web-shortner": {
         "location": "/var/www/html/l",
         "domain": "reece.sh/l"

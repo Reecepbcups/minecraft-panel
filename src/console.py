@@ -132,7 +132,7 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
 
 
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 def getVersion() -> str:
     return __version__
 

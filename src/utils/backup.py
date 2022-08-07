@@ -12,6 +12,7 @@ from pymongo import MongoClient
 from datetime import datetime
 import zipfile
 import pysftp
+import shutil
 import re
 import os
 
@@ -54,32 +55,45 @@ class Backup:
         self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)
         
 
+    def backup_mongodb(self, mongoDBConfig):
+        client = MongoClient(mongoDBConfig['backup-uri'])        
+        # confirm client is connected
+        if client is None:
+            cprint("&cMongoDB client is not connected")
+            exit(0)
+
+        self.mongodb_abs_location = os.path.join(self.backup_path, f'mongodb_dump_{self.current_time}')
+        res = os.system(f"mongodump --uri={mongoDBConfig['backup-uri']} --out {self.mongodb_abs_location}")
+        if res != 0:
+            cprint("&cMongoDB backup failed!")
+            exit(0)
+
+        # print(self.mongodb_abs_location)
+        # exit(0)
+
+        # Adds mongodb absolute location to the zip file to be looped through
+        self.root_paths[self.mongodb_abs_location] = []
+        # exit(0)
+
+
+    def _delete_oldest_file_in_dir(self):
+        # Remove oldest backup so we don't store too many
+        list_of_backups = os.listdir(self.backup_path) 
+        print(list_of_backups) 
+        full_paths = [f"{os.path.join(self.backup_path, x)}" for x in list_of_backups]
+        if len(list_of_backups) > self.max_local_backups:
+            oldest_file = min(full_paths, key=os.path.getctime)
+            os.remove(oldest_file)
+            # cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
+
     def zip_files(self):
         self.zip_file = zipfile.ZipFile(self.backup_file_name, "w", compression=zipfile.ZIP_DEFLATED)
 
         # use pymongo to save the backup to the database
         # https://stackoverflow.com/questions/24610484/pymongo-mongoengine-equivalent-of-mongodump ??
-        mongoDBData = CONFIG['backups']['database']['mongodb']
-        isMongoBackupEnabled = mongoDBData['enabled']
-        if(isMongoBackupEnabled):
-            client = MongoClient(mongoDBData['backup-uri'])        
-            # confirm client is connected
-            if client is None:
-                cprint("&cMongoDB client is not connected")
-                exit(0)
-
-            mongoLocation = os.path.join(self.backup_path, f'mongodb_dump_{self.current_time}')
-            res = os.system(f"mongodump --uri={mongoDBData['backup-uri']} --out {mongoLocation}")
-            if res != 0:
-                cprint("&cMongoDB backup failed!")
-                exit(0)
-
-            # add mongodb to the zip file
-            # print(mongoLocation, os.path.basename(mongoLocation))
-            # self.zip_file.write(mongoLocation, arcname=os.path.basename(mongoLocation))
-            self.root_paths[mongoLocation] = []
-
-        # exit(0)
+        mongoConfig = CONFIG['backups']['database']['mongodb']        
+        if(mongoConfig['enabled']):
+            self.backup_mongodb(mongoConfig)
 
         for root_path in self.root_paths:            
             if not os.path.isdir(root_path):
@@ -105,17 +119,16 @@ class Backup:
                     else:
                         if self.debug and self.showIgnored: 
                             cprint(f"&c{relative_filename} is being ignored")
-
-        # TODO: mongodb here
         self.zip_file.close()
+        
+        # delete folder self.mongodb_abs_location
+        if(mongoConfig['enabled']):
+            if len(self.mongodb_abs_location) > 3:
+                shutil.rmtree(self.mongodb_abs_location)
+            else:
+                print(f"Safety check hit, can't delete {self.mongodb_abs_location}")
 
-        # Remove oldest backup so we don't store too many
-        list_of_backups = os.listdir(self.backup_path)  
-        full_paths = [f"{os.path.join(self.backup_path, x)}" for x in list_of_backups]
-        if len(list_of_backups) > self.max_local_backups:
-            oldest_file = min(full_paths, key=os.path.getctime)
-            os.remove(oldest_file)
-            # cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
+        self._delete_oldest_file_in_dir()
 
         # if there is a discord webhook, then send a notification.
         if len(self.discord_webhook) > 0:

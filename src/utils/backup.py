@@ -13,6 +13,7 @@ from datetime import datetime
 import zipfile
 import pysftp
 import shutil
+import time
 import re
 import os
 
@@ -87,6 +88,7 @@ class Backup:
             # cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
 
     def zip_files(self):
+        # ! IMPORTANT: Switch to https://pypi.org/project/aiozipstream/
         self.zip_file = zipfile.ZipFile(self.backup_file_name, "w", compression=zipfile.ZIP_DEFLATED)
 
         # use pymongo to save the backup to the database
@@ -157,12 +159,29 @@ class Backup:
             )
 
 
-        if CONFIG['backups']['hetzner-sftp']['enabled']:
+        if CONFIG['backups']['hetzner-sftp']['enabled']:            
+            timer_start_seconds = time.time()
             try:
                 self.send_file_to_sftp_server()
+                discord_notification(
+                    url=self.discord_webhook, 
+                    title=f"Panel - Upload - {getCurrentHostname()}",
+                    description=f"Completed upload -> Hetzner in {round(time.time() - timer_start_seconds, 2)} seconds",
+                    color="00ff00",                
+                    imageLink="https://cdn.icon-icons.com/icons2/2407/PNG/512/hetzner_icon_146165.png",
+                    footerText=""
+                )
             except Exception as e:
                 print("Error sending backup to Hetzner SFTP server", e)
-                return
+                discord_notification(
+                    url=self.discord_webhook, 
+                    title=f"Panel - Upload failed - {getCurrentHostname()}",
+                    description=f"Upload failed -> Hetzner. Reason: {e}",
+                    color="ff0000",                
+                    imageLink="https://cdn.icon-icons.com/icons2/2407/PNG/512/hetzner_icon_146165.png",
+                    footerText=""
+                )
+                return            
 
     # Requires a Hetzner Storage Box (sftp, $3/Month for 1TB)    
     def send_file_to_sftp_server(self):  

@@ -53,6 +53,13 @@
             "ssh-key-path": "",
             "remote-dir": "/backups"
         },
+        "database": {
+            "mongodb": {
+                "enabled": false,                
+                "backup-uri": "mongodb://admin:PASSWORD@IP_ADDR:27017/?authSource=admin",                
+                "NOTE-how_to_restore": "mongorestore --uri=mongodb://admin:PASSWORD@ip_addr:27017/?authSource=admin output_dir/"
+            }
+        },
         "discord-webhook": "https://discord.com/api/webhooks/000000"
     },
     "web-shortner": {

@@ -13,6 +13,10 @@ pacman -S ufw python-pip sudo curl git screen zip cron \
 unzip lsof jq dos2unix jre-openjdk base-devel git nano vi \
 iotop atop dstat glances maven cpio pahole htop btop go-pie redis
 
+# Start cronjob
+systemctl enable cronie
+systemctl start cronie
+
 # Install Redis
 systemctl start redis
 nano /etc/redis/redis.conf

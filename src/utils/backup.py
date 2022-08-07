@@ -79,7 +79,7 @@ class Backup:
     def _delete_oldest_file_in_dir(self):
         # Remove oldest backup so we don't store too many
         list_of_backups = os.listdir(self.backup_path) 
-        print(list_of_backups) 
+        # print(list_of_backups) 
         full_paths = [f"{os.path.join(self.backup_path, x)}" for x in list_of_backups]
         if len(list_of_backups) > self.max_local_backups:
             oldest_file = min(full_paths, key=os.path.getctime)
@@ -139,6 +139,7 @@ class Backup:
                 "Backup Size (MB)": [str(fileSizeMB), True],
                 "Backup Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],                
                 "Backup To Hetzner": [str(CONFIG['backups']['hetzner-sftp']['enabled']), True],
+                "Backup MongoDB": [str(mongoConfig['enabled']), True],
                 "Storage": [f"Total: {size} - Free: {free} - Used: {used} ({storagePercent})", False],
                 "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],
             }

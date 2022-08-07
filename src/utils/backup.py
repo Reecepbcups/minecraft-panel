@@ -48,7 +48,7 @@ class Backup:
         if not os.path.exists(self.backup_path):
             os.makedirs(self.backup_path)
 
-        self.discord_webhook = CONFIG['backups']['discord-webhook']
+        self.discord_webhook = CONFIG['discord-webhook']
         self.debug = debug
         self.save_relative = CONFIG['backups']['save-relative']
                 
@@ -138,12 +138,13 @@ class Backup:
             size, used, free, storagePercent = getStorageAmount()
             totalRam, usedRam, percentUsed = getRamUsage()
             values = {
-                "Backup Size (MB)": [str(fileSizeMB), True],
-                "Backup Size (GB)": [str(round(fileSizeMB / 1024, 4)), True],                
-                "Backup To Hetzner": [str(CONFIG['backups']['hetzner-sftp']['enabled']), True],
-                "Backup MongoDB": [str(mongoConfig['enabled']), True],
+                "Backup (MB)": [str(fileSizeMB), True],
+                "Backup (GB)": [str(round(fileSizeMB / 1024, 4)), True],                
+                "To Hetzner": [str(CONFIG['backups']['hetzner-sftp']['enabled']), True],
+                "MongoDB": [str(mongoConfig['enabled']), True],
+                "Directories": ['\n'.join(self.root_paths.keys()), False],
                 "Storage": [f"Total: {size} - Free: {free} - Used: {used} ({storagePercent})", False],
-                "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],
+                "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],                
             }
 
             time_passed = (datetime.now() - datetime.strptime(self.current_time, TIME_FORMAT)).seconds

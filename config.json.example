@@ -1,6 +1,8 @@
 {
     "SERVER_DIRECTORY": "/root/minecraft-panel/servers",    
     "DOWNLOAD_CACHE": "/tmp",
+    "discord-webhook-enable": true,
+    "discord-webhook": "https://discord.com/api/webhooks/000000",
     "servers": {
         "proxy": [],
         "spigot": [],
@@ -59,8 +61,7 @@
                 "backup-uri": "mongodb://admin:PASSWORD@IP_ADDR:27017/?authSource=admin",                
                 "NOTE-how_to_restore": "mongorestore --uri=mongodb://admin:PASSWORD@ip_addr:27017/?authSource=admin output_dir/"
             }
-        },
-        "discord-webhook": "https://discord.com/api/webhooks/000000"
+        },        
     },
     "web-shortner": {
         "location": "/var/www/html/l",

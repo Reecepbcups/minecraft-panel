@@ -61,7 +61,7 @@
                 "backup-uri": "mongodb://admin:PASSWORD@IP_ADDR:27017/?authSource=admin",                
                 "NOTE-how_to_restore": "mongorestore --uri=mongodb://admin:PASSWORD@ip_addr:27017/?authSource=admin output_dir/"
             }
-        },        
+        }      
     },
     "web-shortner": {
         "location": "/var/www/html/l",

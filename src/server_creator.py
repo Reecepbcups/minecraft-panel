@@ -227,7 +227,7 @@ class ServerCreator():
         # Send command to hook into proxy
         if 'paper' in JAR_NAME.lower() and isBehindBungee == "true":
             if os.geteuid() == 0:           
-                if input("Enable Firewall for this server? ([y]/n)").startswith('y'):
+                if cinput("Enable Firewall for this server? ([y]/n)").startswith('y'):
                     print("Is firewall enabled", Firewall().isFirewallEnabled())
                     Firewall().denyPort(port)
                     cprint(f"\n&cFirewall has been denied port to {port}")

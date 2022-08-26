@@ -13,6 +13,7 @@ try:
 except ModuleNotFoundError as e: 
     cprint("&cUFW is not installed on this system.")
     cprint(f"&epacman -S ufw  |   sudo apt install ufw")
+    cprint(f"&epip3 install pyufw  |  pip install pyufw")
     exit(1)
 except UFWError as e: # prob not running as root    
     if e.value == "You need to be root to run this script":

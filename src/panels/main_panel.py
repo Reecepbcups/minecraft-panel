@@ -1,4 +1,4 @@
-from panels.firewall_panel import FirewallPanel
+from importlib import import_module
 from panels.admin_panel import AdminPanel
 from panels.database_panel import DatabasePanel
 from panels.redis_panel import RedisPanel
@@ -24,8 +24,14 @@ import console # dont from import, only reference here so no import loop
 
 from utils.akash import AkashServerSelector
 
+IS_ROOT: bool = False
+
 class MainPanel():
+
     def __init__(self, run=True):
+
+        IS_ROOT = os.geteuid() == 0
+
         self.controlPanel = {        
             "1": ["Console", ServerSelector],              
             "2": ["List Running Servers", get_all_active_screens],
@@ -39,8 +45,12 @@ class MainPanel():
             "ADMIN": ["&cAdmin Panel&r", AdminPanel],
             "DB": ["&aDatabase Functions&r", DatabasePanel],
             "RED": ["&4Redis Functions&r", RedisPanel],
-            "FIRE": ["&4Firewall Panel&r", FirewallPanel],
         }
+        # pick / pyfiglet / discord_webhook / pymongo / pysftp / pyufw / tqdm / cryptocode
+        if IS_ROOT:
+            firewall_import = import_module("panels.firewall_panel")
+            self.controlPanel["FIRE"] = ["&cFirewall Panel&r", firewall_import.FirewallPanel]
+
         if run:
             self.loop()
 

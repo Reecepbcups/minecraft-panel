@@ -51,6 +51,12 @@ def getRamUsage():
     print(f"System is using {percentUsed}% of TOTAL RAM ({usedRam}/{totalRam})")
     return totalRam, usedRam, percentUsed
 
+def getLargestDirs(path: str, num: int = 5):
+    # du -h /root/juno/ | sort -rh | head -10
+    output = os.popen(f"du -h {path} | sort -rh | head -{num}").read().strip()
+    return output
+
+
 def getCurrentHostname():
     return os.popen("hostname").read().strip()
 

@@ -54,6 +54,7 @@ class Backup:
                 
         self.zipfilename = f"{getCurrentHostname()}_{self.current_time}.zip"
         self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)
+        self.log_filename = os.path.join(self.backup_path, f"{getCurrentHostname()}_{self.current_time}.log")
         
 
     def backup_mongodb(self, mongoDBConfig):
@@ -103,13 +104,14 @@ class Backup:
                 continue
 
             ignore_regex = CONFIG['backups']['parent-paths'][root_path]
-            # print(root_path, ignore_regex)            
+            # print(root_path, ignore_regex)
 
+            text_output = ""
+            log = ""
             for root, dirs, files in os.walk(root_path):        
                 for file in files:
                     abs_path = os.path.join(root, file)
-                    relative_filename = str(abs_path).replace(root_path, "")
-                    # print('"' + abs_path + '",'); continue
+                    relative_filename = str(abs_path).replace(root_path, "")                    
 
                     if not any(re.search(regex, abs_path) for regex in ignore_regex):
                         if self.save_relative:
@@ -117,11 +119,24 @@ class Backup:
                         else:
                             self.zip_file.write(os.path.join(root, file)) # saves them as teh full abs path      
                         if self.debug and self.showSuccess:
-                            cprint(f"&a{relative_filename}")                  
+                            # cprint(f"&a{relative_filename}")
+                            text_output += f"&a{relative_filename}\n"
+                        log += f"+ {abs_path}\n"             
                     else:
                         if self.debug and self.showIgnored: 
-                            cprint(f"&c{relative_filename} is being ignored")
+                            # cprint(f"&c{relative_filename} is being ignored")
+                            text_output += f"&c{relative_filename} ignored\n"
+                        log += f"- {abs_path}\n"
+                        
+                    if self.debug and text_output.count('\n') % 25 == 0:
+                        cprint(text_output)
+                        text_output = ""
+
         self.zip_file.close()
+
+        # save log to backups folder self.log_filename
+        with open(self.log_filename, 'w') as f:
+            f.write(log)            
         
         # delete folder self.mongodb_abs_location
         if(mongoConfig['enabled']):

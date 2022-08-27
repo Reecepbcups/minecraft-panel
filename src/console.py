@@ -106,8 +106,13 @@ def serverReboot(server_name):
 def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
     # ensure profile file is there. Returns False if `console` being run would not run it
     if not os.path.exists(profile):
-        cprint(f"&c[!] File {profile} not found.. creating")
-        open(profile, 'x') # creates file
+        cprint(f"&c[!] File {profile} not found.. creating"); open(profile, 'x')
+
+    if not os.path.exists(bashrc):
+        cprint(f"&c[!] File {bashrc} not found.. creating"); open(bashrc, 'x')
+
+    if "alias console" in open(profile, 'r').read():
+        return True # Already added to file
 
     # allows scrolling in screen
     if not os.path.exists(screenfile):
@@ -117,19 +122,17 @@ def addConsoleAliasToBashProfileIfNotThereAlready() -> bool:
             sf.write("termcapinfo xterm* ti@:te@")
 
     # gets the root folder of this program
-    panelDir = parentDir(parentDir(__file__)); # print(f"{thisDirectory=}")
+    panelDir = parentDir(parentDir(__file__)); # print(f"{panelDir=}")
     alias = f"\nalias console='python {panelDir}/src/console.py'\n"
     sudoAlias = f"alias sconsole='sudo python {panelDir}/src/console.py'\n"
 
-    if alias in open(profile, 'r').read():
-        return True # Already added to file
-
-    with open(bashrc, 'a') as bf: # sources .bashrc to run the .profile values
-        bf.write(f"source {profile}")
+    if f"source {profile}" not in open(bashrc, 'r').read():
+        with open(bashrc, 'a') as bf: # sources .bashrc to run the .profile values (console & sconsole)
+            bf.write(f"source {profile}")
 
     with open(profile, 'a') as bashprofile:
         bashprofile.write(alias)
-        bashprofile.write(sudoAlias) # `sudo console` then works too, TODO this does not work yet
+        bashprofile.write(sudoAlias)
         print(f"Added alias 'console' to {profile}.")
         cprint(f"&c{'='*20}\n\t\tRun the following command in your terminal:\n\n\n\t\tsource {profile} && source {bashrc}\n\n\nThen you can run 'console' and 'sconsole'" + "="*20)
     return False

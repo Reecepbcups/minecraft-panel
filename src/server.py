@@ -40,8 +40,6 @@ class Server:
 
         # run command & get stdfout
         p = os.popen(cmd)
-        print(p)
-
         cprint(f"&aServer '{self.server_name}' Started")
         return True
 

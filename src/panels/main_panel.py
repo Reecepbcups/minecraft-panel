@@ -139,6 +139,7 @@ def stopServerPicker():
         return
 
     # Servers which are running AND are in our config of actual servers    
-    servers, _ = pick(actualServers, title="Select servers to stop (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')
+    servers = pick(actualServers, title="Select servers to stop (Select: Space, Confirm: Enter)!", multiselect=True, indicator=' =>')    
     for server in servers:
-        Server(server).stop_server()
+        serverName = server[0] 
+        Server(serverName).stop_server()

@@ -235,9 +235,10 @@ class ServerCreator():
 
             cprint(f"\n&cAdd {SERVER_NAME} to the BungeeCord proxy with the command:")
             cprint(f"&c'svm add {SERVER_NAME} 127.0.0.1:{port}'")
-        else:
-            cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}:{port}")
+        elif 'waterfall' in JAR_NAME.lower():
             cprint(f"&cSince this is a proxy, you may need to tweak config.yml so the lobby server does not point to 25565.")
+        
+        cprint(f"&aYour server is now live at: 127.0.0.1:{port} OR {getPublicIPAddress()}:{port}")        
         
 
         doStart = cinput("\n&bStart server now? &f[yes/(no)] &b>> ") or "yes"

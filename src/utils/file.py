@@ -60,4 +60,4 @@ def fetch_servers() -> list:
             the server creator or change the paths in the config,yml
             your config location is: {PATH_TO_CONFIG_FILE}''')
         return []
-    return os.listdir(serverloc)
+    return [server for server in os.listdir(serverloc) if not server.startswith("_")]

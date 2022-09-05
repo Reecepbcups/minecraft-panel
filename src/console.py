@@ -23,9 +23,10 @@ import panels.main_panel as main_panel
 
 from server import Server
 from utils.config import CONFIG
-from utils.cosmetics import cfiglet, cinput, cprint
-from utils.file import fetch_servers
-from utils.screen import get_all_active_screens
+# from utils.cosmetics import cfiglet, cinput, cprint
+from utils.cosmetics import cprint
+# from utils.file import fetch_servers
+# from utils.screen import get_all_active_screens
 from utils.system import checkIfRequirementsAreInstalled
 
 # Load this before anything else
@@ -50,14 +51,6 @@ def main():
     # print(is_screen_running("test"))
     main_panel.MainPanel()
     pass
-
-    
-    
-
-
-
-
-
 
 # ------
 # below could probably move into their own UTIL Files / panel sections

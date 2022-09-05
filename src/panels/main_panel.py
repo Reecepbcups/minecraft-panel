@@ -3,21 +3,20 @@ from panels.admin_panel import AdminPanel
 from panels.database_panel import DatabasePanel
 from panels.redis_panel import RedisPanel
 
-import sys
+# import sys
 import os
-from os.path import dirname as parentDir
-
+# from os.path import dirname as parentDir
 from pick import pick
 
-import CLI_API
+# import CLI_API
 
-from akash_servers import AkashConsole
+# from akash_servers import AkashConsole
 
 from server import Server
 from utils.config import CONFIG
 from utils.cosmetics import cfiglet, cinput, cprint
 from utils.file import fetch_servers
-from utils.system import checkIfRequirementsAreInstalled
+# from utils.system import checkIfRequirementsAreInstalled
 from utils.screen import get_all_active_screens
 
 import console # dont from import, only reference here so no import loop
@@ -89,7 +88,7 @@ def ServerSelector():
     if server not in choices:
         cprint("&cInvalid Selection")
 
-    if len(server) > 0:
+    if len(server) > 0 and server in choices:
         panel = Server(choices[server])
         panel.enter_console()
     else:

@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import time
+# from sh import tail
 
 import yaml
 
@@ -40,28 +41,31 @@ class Server:
 
         # run command & get stdfout
         p = os.popen(cmd)
-        cprint(f"&aServer '{self.server_name}' Started")
+        cprint(f"&aServer '{self.server_name}' Started")        
         return True
 
     def stop_server(self):
         if not is_screen_running(self.server_name):
             cprint(f"&cServer {self.server_name} is not running")
             return
-        
-        # sigterm minecraft
-        # kill $(ps h --ppid $(screen -ls | grep session_name | cut -d. -f1) -o pid)
-        self.send_console_command("stop")
+                        
+
+        self.send_console_command("stop")         
+        v1 = os.system(f'screen -X -S "{self.server_name}" stuff "^C"')                
         cprint(f"&eServer '{self.server_name}' stopping...")
-        time.sleep(5)
+        time.sleep(8)
 
         # stop the screen using os.system
-        v = os.system(f'screen -S {self.server_name} -X quit')
+        os.system(f'screen -X -S "{self.server_name}" stuff "^C"')   
+        os.system(f'screen -X -S "{self.server_name}" stuff "^C"')   
+        os.system(f'screen -X -S "{self.server_name}" stuff "^C"')   
+        v = os.system(f'screen -X -S "{self.server_name}" quit')
         if v != 0:
             cprint(f"&cSome error when stopping server")
             return
         cprint(f"&aServer '{self.server_name}' Stopped")
 
-    def enter_console(self):
+    def enter_console(self):               
         statusColor = '&a' if is_screen_running(self.server_name) else '&c'
 
         cfiglet(statusColor, self.server_name)
@@ -88,21 +92,29 @@ class Server:
                 pass        
         print()
 
+        try: # error handling incase they 'log' to reset this
+            console.kill()
+        except UnboundLocalError:
+            pass
+
         console = thread_with_trace(target=self.follow)
         console.start()
 
         options = {
-            "start-server": [self.start_server, "continue"],
+            "start-server": [self.start_server, "start-server"],
             "stop-server": [self.stop_server, "break"],
+            "log": [self.enter_console, "log"],
             # "restart": self.re, # start.sh will auto do this
-            "stop": [self.stop_server, "break"],
+            # "stop": [self.stop_server, "break"],
         }
 
         try:
             while True:
                 user_input = cinput()
 
-                if user_input in options:
+                if user_input in options:    
+                    if options[user_input][1] == "start-server" or options[user_input][1] == "log":
+                        console.kill() # kill console read if we start new instance (no duplicates)
                     options[user_input][0]()
                     if options[user_input][1] == "break":
                         break
@@ -134,24 +146,19 @@ class Server:
 
     def send_console_command(self, user_input):
         #\015 = new line character unicode
-        subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015']) 
+        subprocess.call(['screen', '-S', f'{self.server_name}', '-X', 'stuff', f'{user_input}\015'])
 
     def follow(self):
-        path = f'{self.path}/logs/latest.log'
-
-        # wait 1 second, useful if you are starting up server from the console directly.
-        time.sleep(1)
+        path = f'{self.path}/logs/latest.log'        
 
         # check if exist        
         if not os.path.exists(path):
             cprint("&cLog file not found. Creating...")
             # write to path, including any nested folders
-            open(path, 'w')
+            open(path, 'x').close()                  
             
-        # Could add `show-logs` command, show last X logs from file + print file name at bottom
-
-        # read the last X lines of the log file
-        self.showLogOnce(20)
+        # read the last X lines of the log file on open
+        self.showLogOnce(15)
 
         with open(path, 'r') as log:
             log.seek(0, os.SEEK_END)            
@@ -159,9 +166,11 @@ class Server:
                 line = log.readline()
                 if not line:
                     time.sleep(0.1)
-                    continue
-                
+                    continue                
                 cprint(line.replace("\n", ""))
+
+        # for line in tail("-f", path, _iter=True):
+        #     cprint(line.replace("\n", ""))            
 
     def showLogOnce(self, numOfLines):
         '''Shows the last X number of lines in the log file 1 time'''

@@ -57,7 +57,10 @@ def cinput(text=""):
             exit(0)
         return user_input
     except KeyboardInterrupt:
-        cprint("\n&cKeyboard Interup, Exiting...\n")
+        cprint("\n&cKeyboard Interrupt, Exiting...\n")
+        exit(0)
+    except ValueError:
+        cprint("\n&cExit on input, Exiting...\n")
         exit(0)
 
 def splitColors(myStr) -> list:

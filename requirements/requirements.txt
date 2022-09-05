@@ -14,3 +14,4 @@ cryptocode
 tqdm
 discord-webhook # https://github.com/lovvskillz/python-discord-webhook
 pysftp
+# sh # was used for tail, not used

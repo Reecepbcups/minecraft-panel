@@ -24,6 +24,10 @@ nano /etc/redis/redis.conf
 >> # comment out "bind 127.0.0.1 -::1" line
 systemctl restart redis
 
+# If you need to listen to key events:
+# nano /etc/redis/redis.conf
+# notify-keyspace-events "KEA"
+
 # optional: nginx glances nodejs figlet sysstat slurm speedometer
 
 git clone https://github.com/Reecepbcups/minecraft-panel.git
